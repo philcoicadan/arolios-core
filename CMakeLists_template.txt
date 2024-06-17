@@ -1,0 +1,161 @@
+cmake_minimum_required(VERSION 3.5)
+project(core CXX)
+# set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# set the 3 following parameters
+set (XERCES_LIB_DIR /usr/lib/x86_64-linux-gnu)
+set (AROLIOS_LIB_INSTALL /usr/local/arolios/lib)
+set (AROLIOS_INC_INSTALL /usr/local/arolios/include)
+
+include(CheckIncludeFileCXX)
+
+check_include_file_cxx(any HAS_ANY)
+check_include_file_cxx(string_view HAS_STRING_VIEW)
+check_include_file_cxx(coroutine HAS_COROUTINE)
+if (NOT "${CMAKE_CXX_STANDARD}" STREQUAL "")
+    # Do nothing
+elseif (HAS_ANY AND HAS_STRING_VIEW AND HAS_COROUTINE)
+    set(CMAKE_CXX_STANDARD 20)
+elseif (HAS_ANY AND HAS_STRING_VIEW)
+    set(CMAKE_CXX_STANDARD 17)
+else ()
+    set(CMAKE_CXX_STANDARD 14)
+endif ()
+
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+
+add_executable(initdb src/initdb/main.cpp)
+
+# ##############################################################################
+# If you include the drogon source code locally in your project, use this method
+# to add drogon 
+# add_subdirectory(drogon) 
+# target_link_libraries(${PROJECT_NAME} PRIVATE drogon)
+#
+# and comment out the following lines
+set(PostgreSQL_ADDITIONAL_VERSIONS "16.1" "16")
+find_package(PostgreSQL)
+find_package(Drogon CONFIG REQUIRED)
+
+
+target_link_libraries(initdb PRIVATE Drogon::Drogon
+model
+base
+${XERCES_LIB_DIR}/libxerces-c-3.2.so
+)
+
+if (CMAKE_CXX_STANDARD LESS 17)
+    # With C++14, use boost to support any, string_view and filesystem
+    message(STATUS "use c++14")
+    find_package(Boost 1.61.0 REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PUBLIC Boost::boost)
+elseif (CMAKE_CXX_STANDARD LESS 20)
+    message(STATUS "use c++17")
+else ()
+    message(STATUS "use c++20")
+endif ()
+
+
+aux_source_directory(src/initdb INITDB_SRC)
+
+
+file ( GLOB_RECURSE base_src src/queries/*  src/utils/*  src/appconfigs/* src/commonobjects/* src/metamodel/* src/exceptions/*)
+file ( GLOB_RECURSE objmodels_src src/objmodels/* )
+file ( GLOB_RECURSE mutators_src  src/mutators/*)
+file ( GLOB_RECURSE treequeries_src  src/treequeries/* src/qryfilter/*)
+
+
+add_library(base SHARED ${base_src})
+add_library(model SHARED ${objmodels_src})
+add_library(mttr SHARED ${mutators_src})
+add_library(tqry SHARED ${treequeries_src})
+
+
+
+target_include_directories(base
+                            PRIVATE
+                                   src/queries
+                                   src/utils
+                                   src/appconfigs
+                                   src/metamodel
+                                   src/commonobjects
+                                   src/exceptions
+                                   ${JSONCPP_INCLUDE_DIRS}
+)
+
+target_include_directories(model
+                            PRIVATE
+                                    src/objmodels                                   
+                                   src/queries
+                                   src/utils
+                                   src/appconfigs
+                                   src/metamodel
+                                   src/commonobjects
+                                   src/exceptions                                  
+                                   ${JSONCPP_INCLUDE_DIRS}
+)
+
+target_include_directories(mttr
+                            PRIVATE
+                                    src/mutators                                   
+                                   src/queries
+                                   src/utils
+                                   src/appconfigs
+                                   src/metamodel
+                                   src/commonobjects
+                                   src/exceptions                                  
+                                   ${JSONCPP_INCLUDE_DIRS}
+)
+
+target_include_directories(tqry
+                            PRIVATE
+                            src/treequeries                                   
+                            src/qryfilter                                  
+                            src/queries
+                                   src/utils
+                                   src/appconfigs
+                                   src/metamodel
+                                   src/commonobjects
+                                   src/exceptions
+                                   /home/philippe/SW1/antlr4-cpp-runtime-4.13.0/runtime/src                                  
+                                   ${JSONCPP_INCLUDE_DIRS}
+)
+
+
+target_include_directories(initdb
+                            PRIVATE
+                                            src/initdb
+                                           src/queries
+                                           src/objmodels
+                                           src/utils
+                                          src/appconfigs
+                                         src/metamodel
+                                         src/commonobjects
+                                         src/exceptions
+                                           ${JSONCPP_INCLUDE_DIRS}
+                                         )
+                                           
+
+target_sources(initdb
+               PRIVATE
+               ${INITDB_SRC}
+
+               )
+
+install(TARGETS base model mttr tqry DESTINATION ${AROLIOS_LIB_INSTALL})
+
+install(DIRECTORY 
+    src/appconfigs/appcfg 
+    src/commonobjects/common
+    src/exceptions/exception
+    src/metamodel/omm
+    src/mutators/mttr
+    src/objmodels/model
+    src/queries/qry
+    src/treequeries/tqry
+    src/utils/util
+    DESTINATION ${AROLIOS_INC_INSTALL})

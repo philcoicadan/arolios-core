@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<a:model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://arolios.org/arolios/model ./xam.xsd"
+	xmlns:a="http://arolios.org/arolios/model">
+	<domain name="std">
+
+        <type name="integer"></type>
+		<type name="bigint"></type>
+        <type name="smallint"></type>
+		<type name="boolean"></type>
+		<type name="decimal"></type>
+		<type name="real"></type>
+		<type name="doubleprecision"></type>
+		<type name="charstring"></type>
+		<type name="text"></type>
+		<type name="date"></type>
+		<type name="time"></type>
+		<type name="timestamp"></type>
+		<type name="timetz"></type>
+		<type name="timestamptz"></type>
+		<type name="mlangcharstring">
+        </type>
+        <type name="mlangtext">
+        </type>
+	</domain>
+</a:model>
+
+
+	

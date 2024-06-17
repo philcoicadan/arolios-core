@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<!--                                                           
+ 
+  Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+  License: LGPL-3.0-or-later
+ 
+ -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://arolios.org/arolios/model"
+	xmlns:t="http://arolios.org/arolios/model"
+	elementFormDefault="unqualified">
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">
+		Schema to define the model translations
+		Version 0.1
+		Copyright 2022 Philippe Coicadan. All rights reserved.
+		</xsd:documentation>
+	</xsd:annotation>
+
+	<!--  global definitions -->
+	<xsd:element name="model_translation" type="t:Model_tlt"/>
+
+	<xsd:complexType name="Model_tlt">
+		<xsd:sequence>
+			<xsd:element name="domain" type="t:Domain_tlt" minOccurs="1" maxOccurs="unbounded"/>
+		</xsd:sequence>
+        <xsd:attribute name="language" type="xsd:NCName" use="required"/> 
+
+	</xsd:complexType>	
+
+		  
+		
+	<xsd:complexType name="Element_tlt">
+        <xsd:attribute name="name" type="xsd:NCName" use="required"/> 
+		<xsd:attribute name="translation" type="xsd:string" use="required"/>
+	</xsd:complexType>
+	
+
+	<xsd:complexType name="Domain_tlt">
+		<xsd:complexContent>
+			<xsd:extension base="t:Element_tlt">
+				<xsd:sequence>
+					<xsd:choice maxOccurs="unbounded">
+						<xsd:element name="enumeration" type="t:Enumeration_tlt" minOccurs="0" maxOccurs="unbounded"/>
+						<xsd:element name="type" type="t:Type_tlt" minOccurs="0" maxOccurs="unbounded"/>
+						<xsd:element name="class" type="t:Type_tlt" minOccurs="0" maxOccurs="unbounded"/>
+						<xsd:element name="association" type="t:Association_tlt" minOccurs="0" maxOccurs="unbounded"/>	
+					</xsd:choice>
+				</xsd:sequence>
+			</xsd:extension>	
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+
+<xsd:complexType name="Type_tlt">
+		<xsd:complexContent>
+			<xsd:extension base="t:Element_tlt">
+				<xsd:sequence>
+					<xsd:element name="property" type="t:Element_tlt" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>	
+		</xsd:complexContent>	
+	</xsd:complexType>
+
+
+	<xsd:complexType name="Association_tlt">
+		<xsd:complexContent>
+			<xsd:extension base="t:Type_tlt">
+				<xsd:sequence>
+					<xsd:element name="memberEnd" type="t:Element_tlt" minOccurs="0" maxOccurs="2"/>
+				</xsd:sequence>			
+			</xsd:extension>	
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	
+	<xsd:complexType name="Enumeration_tlt">
+		<xsd:complexContent>
+			<xsd:extension base="t:Element_tlt">
+				<xsd:sequence>
+					<xsd:element name="value" type="t:Element_tlt" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>			
+			</xsd:extension>	
+		</xsd:complexContent>
+	</xsd:complexType>
+
+
+
+</xsd:schema>

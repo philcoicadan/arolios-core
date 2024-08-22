@@ -38,42 +38,40 @@ class Failure : public Base_exception, public std::runtime_error
     explicit Failure(const std::string& p_what);
 };
 
+class Input_error : public Base_exception, public std::invalid_argument
+{
+    virtual const std::exception &base() const noexcept override
+    {
+        return *this;
+    }
+
+  public:
+    explicit Input_error(const std::string& p_what);
+};
+
 class Not_yet_implemented : public Failure
 {
-
 
   public:
     explicit Not_yet_implemented(const std::string& p_what);
 };
 
-class Model_error : public Base_exception, public std::invalid_argument
+class Model_error : public Input_error
 {
-    virtual const std::exception &base() const noexcept override
-    {
-        return *this;
-    }
 
   public:
     explicit Model_error(const std::string& p_what);
 };
 
-class Data_error : public Base_exception, public std::invalid_argument
+class Data_error : public Input_error
 {
-    virtual const std::exception &base() const noexcept override
-    {
-        return *this;
-    }
 
   public:
     explicit Data_error(const std::string& p_what);
 };
 
-class Not_found : public Base_exception, public std::invalid_argument
+class Not_found : public Input_error
 {
-    virtual const std::exception &base() const noexcept override
-    {
-        return *this;
-    }
 
   public:
     explicit Not_found(const std::string& p_what);

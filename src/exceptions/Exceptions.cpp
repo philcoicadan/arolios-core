@@ -17,19 +17,24 @@ Failure::Failure(const std::string & p_what) : std::runtime_error(p_what)
     std::cerr << "ERROR: " << p_what  << std::endl;
 }
 
-Model_error::Model_error(const std::string & p_what) : std::invalid_argument(p_what)
+Input_error::Input_error(const std::string & p_what) : std::invalid_argument(p_what)
 {
     std::cerr << "ERROR: " << p_what << std::endl;
 }
 
-Data_error::Data_error(const std::string & p_what) : std::invalid_argument(p_what)
+Model_error::Model_error(const std::string & p_what) : Input_error(p_what)
 {
-    std::cerr << "ERROR: " << p_what << std::endl;
+
 }
 
-Not_found::Not_found (const std::string & p_what) : std::invalid_argument(p_what)
+Data_error::Data_error(const std::string & p_what) : Input_error(p_what)
 {
-    std::cerr << "ERROR: " << p_what << std::endl;
+
+}
+
+Not_found::Not_found (const std::string & p_what) : Input_error(p_what)
+{
+
 }
 
 Not_yet_implemented::Not_yet_implemented(const std::string & p_what) : Failure(p_what) {

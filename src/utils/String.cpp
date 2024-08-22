@@ -121,16 +121,17 @@ unsigned int String::stoui (const std::string& p_str)  {
     try {
         unsigned long ul = std::stoul ( p_str );
         if ( ul > std::numeric_limits<unsigned int>::max() ) {
-            throw std::out_of_range ( p_str );
+            throw exception::Data_error ( p_str + " is not a number");
         }
         return static_cast<unsigned int> ( ul );
         
     } catch ( const std::invalid_argument& e ) {
          
-        throw e;
+        throw exception::Data_error ( p_str + " is not a number");
+
     } catch ( const std::out_of_range& e ) {
          
-        throw e;
+        throw exception::Data_error ( p_str + " is not a number");
     }
 }
 

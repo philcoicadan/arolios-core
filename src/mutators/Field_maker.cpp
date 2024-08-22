@@ -130,11 +130,11 @@ void Field_maker::check_instance_value (const std::string& p_inst_id, const omm:
         inst_id = std::stoul ( p_inst_id ) ;
     } catch ( const std::invalid_argument& e ) {
 
-        throw e;
+        throw exception::Data_error ("the instance value is invalid");
 
     } catch ( const std::out_of_range& e ) {
 
-        throw e;
+         throw exception::Data_error ("the instance value is invalid");
 
     }
     

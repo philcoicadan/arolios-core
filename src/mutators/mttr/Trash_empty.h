@@ -43,7 +43,7 @@ public:
     
 private:
     
-void eliminate_instances ( const Json::Value& p_json, const std::shared_ptr<const omm::Classifier>& p_csf, const std::shared_ptr<const omm::Association>& p_assoc, const std::shared_ptr<omm::Table>& p_elem_lo ) const ;
+void eliminate_instances ( const Json::Value& p_json, const std::shared_ptr<const omm::Classifier>& p_csf ) const ;
     
     const std::shared_ptr<common::App_info> app_info_ptr_;
     const  std::shared_ptr<common::Object_model_info> om_ptr_;

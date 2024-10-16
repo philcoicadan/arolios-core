@@ -7,7 +7,7 @@
 #include <mttr/Trash_empty.h>
 #include <common/Singleton.h>
 #include <common/App_info.h>
-#include <mttr/Class_instance_association_eliminate.h>
+#include <mttr/Classifier_instance_factory.h>
 #include <mttr/Classifier_instance_eliminate.h>
 #include <appcfg/App.h>
 #include <qry/Classifier_instances_list.h>
@@ -83,7 +83,7 @@ void Trash_empty::execute () {
             }
 
             if ( csf ) {
-                const std::shared_ptr<omm::Table> elem_lo = csf->table ();
+                //const std::shared_ptr<omm::Table> elem_lo = csf->table ();
                 std::unique_ptr<qry::Base_list_query> q ;
                 const std::string offset;
                 const std::string limit;
@@ -101,7 +101,7 @@ void Trash_empty::execute () {
                     const Json::Value & json = q->return_json();
 
                     // eliminate instances 
-                    eliminate_instances ( json, csf, assoc, elem_lo);
+                    eliminate_instances ( json, csf);
 
                 } else {
                     std::cout << "WARNING: Trash retrieval for classifier " << csf_id << " failed" << std::endl;
@@ -123,33 +123,33 @@ void Trash_empty::execute () {
                 
 }
 
-void Trash_empty::eliminate_instances ( const Json::Value& p_json, const std::shared_ptr<const omm::Classifier>& p_csf, const std::shared_ptr<const omm::Association>& p_assoc, const std::shared_ptr<omm::Table>& p_elem_lo ) const {
+void Trash_empty::eliminate_instances(
+    const Json::Value &p_json,
+    const std::shared_ptr<const omm::Classifier> &p_csf) const {
 
-    if ( !p_json.empty() ) {
-        const Json::Value& json_rows = p_json["elements"];
-        for ( Json::Value::const_iterator it = json_rows.begin() ; it != json_rows.end(); ++it ) {
-            const Json::Value& elem = *it;
-            const std::string iid_str = elem["id"].asString();
-            if ( p_elem_lo ) {
-                // additional table for association (binary association N-M)
+  if (!p_json.empty()) {
+    const Json::Value &json_rows = p_json["elements"];
+    for (Json::Value::const_iterator it = json_rows.begin();
+         it != json_rows.end(); ++it) {
+      const Json::Value &elem = *it;
+      const std::string iid_str = elem["id"].asString();
 
-                mttr::Classifier_instance_eliminate ip ( p_csf, iid_str, 0 );
-                ip.execute ();
+      auto ip = mttr::Classifier_instance_factory::instance().make_eliminate(
+          p_csf, iid_str, 0);
+      if (ip) {
+        ip->execute();
 
-                if ( ip.return_code () != qry::Return_code::OK ) {
-                    std::cout << "WARNING: Instance deletion failed for classifier " << p_csf->id() << " instance " << iid_str<< std::endl;
-                }
-
-            } else if ( p_assoc ) { // no table (binary association 1-N or 1-1), one class instance must be updated
-                mttr::Class_instance_association_eliminate iap ( p_assoc, iid_str, 0 );
-                iap.execute ();
-
-                if ( iap.return_code () != qry::Return_code::OK ) {
-                    std::cout << "WARNING: Instance deletion failed for classifier " << p_assoc->id() << " instance " << iid_str<< std::endl;
-
-                }
-
-            }
+        if (ip->return_code() != qry::Return_code::OK) {
+          std::cout << "WARNING: Instance deletion failed for classifier "
+                    << p_csf->id() << " instance " << iid_str << std::endl;
         }
+
+      } else {
+        const std::string error(
+            "Classifier not mapped to a relational object:  ");
+
+        std::cout << "WARNING: " << error << p_csf->id() << " instance " << iid_str << std::endl;
+      }
     }
+  }
 }

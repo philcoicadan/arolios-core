@@ -4,7 +4,7 @@
  * License: LGPL-3.0-or-later
  *
  */
-#include <mttr/Class_instance_association_create.h>
+#include <mttr/Association_instance_wolo_create.h>
 #include <omm/Property.h>
 #include <omm/Class.h>
 #include <omm/Table.h>
@@ -22,17 +22,17 @@
 using namespace arolios;
 using namespace arolios::mttr;
 
-Class_instance_association_create::Class_instance_association_create(const std::shared_ptr<const omm::Association>& p_assoc, const Json::Value& p_data_root, const std::unordered_map<std::string, std::shared_ptr<const Json::Value>>& p_import_cache)
-:  Base_element_create (p_data_root), assoc_ (p_assoc),  import_cache_ (p_import_cache) {
+Association_instance_wolo_create::Association_instance_wolo_create(const std::shared_ptr<const omm::Association>& p_assoc, const Json::Value& p_data_root, const std::unordered_map<std::string, std::shared_ptr<const Json::Value>>& p_import_cache)
+:  Classifier_instance_create (p_data_root, p_import_cache), assoc_ (p_assoc) {
 upd_row_id_ = 0;
 
 }
 
-Class_instance_association_create::~Class_instance_association_create() {
+Association_instance_wolo_create::~Association_instance_wolo_create() {
 
 }
 
-void Class_instance_association_create::execute()
+void Association_instance_wolo_create::execute()
 {
 
     auto upd_csf = assoc_->managing_table_class(); 

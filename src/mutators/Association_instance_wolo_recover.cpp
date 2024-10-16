@@ -4,11 +4,12 @@
  * License: LGPL-3.0-or-later
  *
  */
-#include <mttr/Class_instance_association_recover.h>
+#include <mttr/Association_instance_wolo_recover.h>
 #include <omm/Property.h>
 #include <omm/Column.h>
 #include <omm/Table.h>
 #include <omm/Class.h>
+#include <omm/Association.h>
 #include <mttr/Classifier_instance_row.h>
 #include <common/Db_client.h>
 #include <appcfg/App.h>
@@ -22,16 +23,16 @@
 using namespace arolios;
 using namespace arolios::mttr;
 
-Class_instance_association_recover::Class_instance_association_recover( const std::shared_ptr<const omm::Association>& p_csf, const std::string& p_inst_id,  const int p_rfu_count)
+Association_instance_wolo_recover::Association_instance_wolo_recover( const std::shared_ptr<const omm::Association>& p_csf, const std::string& p_inst_id,  const int p_rfu_count)
 : Classifier_instance_recover ( p_csf, p_inst_id, p_rfu_count) {
 
 }
 
-Class_instance_association_recover::~Class_instance_association_recover() {
+Association_instance_wolo_recover::~Association_instance_wolo_recover() {
 
 }
 
-void Class_instance_association_recover::execute() {
+void Association_instance_wolo_recover::execute() {
   auto assoc = std::dynamic_pointer_cast<const omm::Association>(csf_);
   int k = 0;
   auto members = assoc->member_ends();

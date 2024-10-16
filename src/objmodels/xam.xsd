@@ -12,8 +12,6 @@
 	<xsd:annotation>
 		<xsd:documentation xml:lang="en">
 		Schema to define the application model
-		Version 0.1
-		Copyright 2024 Philippe Coicadan. All rights reserved.
 		</xsd:documentation>
 	</xsd:annotation>
 

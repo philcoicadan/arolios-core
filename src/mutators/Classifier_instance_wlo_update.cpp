@@ -4,49 +4,43 @@
  * License: LGPL-3.0-or-later
  *
  */
-#include <mttr/Class_instance_association_update.h>
-#include <mttr/Base_element_update.h>
-#include <omm/Property.h>
-#include <omm/Logical_field.h>
+#include <mttr/Classifier_instance_wlo_update.h>
+#include <omm/Classifier.h>
+#include <util/String.h>
 #include <mttr/Classifier_instance_row.h>
 #include <appcfg/App.h>
 #include <appcfg/Base_classifier_config.h>
 #include <exception/Exceptions.h>
-#include <util/String.h>
+
+
+
 
 
 
 using namespace arolios;
-using namespace arolios::mttr;
+using namespace arolios::mttr ;
 
-Class_instance_association_update::Class_instance_association_update( const std::shared_ptr<const omm::Association>& p_assoc, const Json::Value& p_data_root, const std::string& p_inst_id, const std::unordered_map<std::string, std::shared_ptr<const Json::Value>>& p_import_cache, const int p_rfu_count)
-: Base_element_update(p_inst_id, p_data_root, p_rfu_count), assoc_ (p_assoc), import_cache_(p_import_cache){
+Classifier_instance_wlo_update::Classifier_instance_wlo_update( const std::shared_ptr<const omm::Classifier>& p_csf, const Json::Value& p_data_root, const std::string& p_inst_id, const int p_rfu_count, const std::unordered_map<std::string, std::shared_ptr<const Json::Value>>& p_import_cache) 
+: Classifier_instance_update (p_data_root, p_inst_id, p_rfu_count, p_import_cache), csf_ (p_csf) {
 
+    std::tie(csf_id_,row_id_)= qry::Util::split_instance_id(p_inst_id);
+    
+}
 
+Classifier_instance_wlo_update::~Classifier_instance_wlo_update() {
 
 }
 
-Class_instance_association_update::~Class_instance_association_update() {
-
-}
-
-void Class_instance_association_update::execute()
-{
- 
+void Classifier_instance_wlo_update::execute () {
     
-    auto mtc = assoc_->managing_table_class();
-    
-    const std::string csf_id_list = assoc_->classifier_id_with_specializations();
-    const auto [ csf_id, row_id] = qry::Util::split_instance_id(elem_id_);
-        
-    std::shared_ptr<omm::Logical_struct> lo = (mtc) ? mtc->logical_struct() : nullptr;
+    auto lo = csf_->logical_struct();
     if (!lo) {
-       std::string error_msg = "classifier " + assoc_->name() + " cannot accept values";
+       std::string error_msg = "classifier " + csf_->name() + " cannot accept values";
         throw exception::Not_found ( error_msg );
     }
     
     if ( !lo->is_table() ) {
-        std::string error_msg = "classifier " + assoc_->name() + " is not mapped correctly to a relational object";
+        std::string error_msg = "classifier " + csf_->name() + " is not mapped correctly to a relational object";
         throw exception::Not_found ( error_msg );
     }
 
@@ -55,15 +49,14 @@ void Class_instance_association_update::execute()
       std::shared_ptr<appcfg::App> config = app_info_ptr_->app();
 
       std::shared_ptr<appcfg::Base_classifier_config> csf_config =
-          config->find_config_by_name(assoc_->package()->name(),
-                                      assoc_->name());
+          config->find_config_by_name(csf_->package()->name(), csf_->name());
 
       std::vector<std::shared_ptr<const omm::Property_view>> prop_views;
 
       csf_config->properties_for_update(prop_views);
 
       std::shared_ptr<mttr::Classifier_instance_row> row =
-          std::make_shared<mttr::Classifier_instance_row>(lo, assoc_,
+          std::make_shared<mttr::Classifier_instance_row>(lo, csf_,
                                                           import_cache_);
 
       row->build_fields(data_root_["properties"], prop_views);
@@ -78,10 +71,16 @@ void Class_instance_association_update::execute()
       fields_stmt.replace(fields_stmt.length() - 2, 2, ") ");
       values_stmt.replace(values_stmt.length() - 2, 2, ") ");
 
+      // auto mtc = csf_->managing_table_class();
+
+      const std::string csf_id_list =
+          csf_->classifier_id_with_specializations();
+
       std::string stmt =
           fields_stmt + values_stmt +
-          " WHERE trashed_date = 'epoch' AND id=" + std::to_string(row_id) +
+          " WHERE trashed_date = 'epoch' AND id=" + std::to_string(row_id_) +
           " AND  ( " + csf_id_list + " )";
+
       if (rfu_count_ > 0) {
         stmt += " AND upd_count=" + std::to_string(rfu_count_);
       }
@@ -103,7 +102,7 @@ void Class_instance_association_update::execute()
 
     } else {
       std::string error_msg = "Update without properties for classifier " +
-                              assoc_->name() + ", instance not updated";
+                              csf_->name() + ", instance not updated";
        
       throw exception::Data_error(error_msg);
     }

@@ -13,8 +13,6 @@
 	<xsd:annotation>
 		<xsd:documentation xml:lang="en">
 		Schema to define the application configuration
-		Version 0.1
-		Copyright 2022 Philippe Coicadan. All rights reserved.
 		</xsd:documentation>
 	</xsd:annotation>
 

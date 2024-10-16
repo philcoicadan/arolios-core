@@ -8,11 +8,10 @@
 #include <common/Singleton.h>
 #include <common/App_info.h>
 #include <fstream>
+#include <mttr/Classifier_instance_factory.h>
 #include <mttr/Classifier_instance_create.h>
 #include <json/value.h>
 #include <mttr/Classifier_instance_update.h>
-#include <mttr/Class_instance_association_create.h>
-#include <mttr/Class_instance_association_update.h>
 #include <util/String.h>
 #include <qry/Util.h>
 #include <exception/Exceptions.h>
@@ -92,218 +91,150 @@ void Data_import::execute () {
     
 }
 
-void Data_import::execute_statement ( const Json::Value& p_stmt ) {
+void Data_import::execute_statement(const Json::Value &p_stmt) {
 
-    
-    auto jcsf = p_stmt["classifier"];
-    std::string csf_full_name;
-    Json::Value jcls;
-    Json::Value jassoc;
-    if (jcsf.isNull()) {
-        jcls = p_stmt["class"];
-        if (jcls.isNull()) {
-            jassoc = p_stmt["association"];
-            csf_full_name = jassoc.asString();
-        }
-        else {
-            csf_full_name = jcls.asString();
-        }
-    }
-    else {
-        csf_full_name = jcsf.asString();
-    }
-        
-
-    if ( jcsf.isNull() && jcls.isNull() && jassoc.isNull()) {
-        const std::string error ( "classifier key not found in the import statement: " );
-         
-         
-        throw exception::Data_error ( error );
-    }
-
-
-
-    auto action = p_stmt.get("action", "create").asString();
-
-    std::transform ( action.begin(), action.end(), action.begin(),
-                     [] ( unsigned char c ) -> unsigned char {return std::tolower ( c ); } );
-    if ( action != "create" && action != "update" ) {
-        const std::string error ( "action value unknown in the import statement: " );
-         
-         
-        throw exception::Data_error ( error );
-    }
-    
-    std::string inst_str;
-    const auto jinstance = p_stmt["instance"];
-    if (jinstance.isNull() && action  == "update") {
-            const std::string error ( "instance key not found in the import statement: " );
-             
-             
-            throw exception::Data_error ( error ); 
-    } else if (!jinstance.isNull()){
-        if (action == "update") { // instance can be a string composed of 2 integers or a name prefixed by a $ and contained in the import cache
-
-            inst_str = jinstance.asString();
-            if (inst_str[0] != '$') {
-
-                // check the format of inst_str
-                const auto [csf_id , row_id] = qry::Util::split_instance_id(inst_str);
-
-                
-            } else  {
-                // instance is not an unsigned long . Check if string starts with $ and present in the import cache
-               
-                    inst_str.erase(0,1);
-                    inst_str = util::String::standardize(inst_str);
-                    std::transform ( inst_str.begin(), inst_str.end(), inst_str.begin(),
-                            [] ( unsigned char c ) -> unsigned char {return std::tolower ( c ); } );
-                    
-                    auto search = cache_.find(inst_str);
-                    if ( search != cache_.end() ) {
-                        const Json::Value& jinst = * ( search->second );
-                        inst_str = jinst.asString();
-                    } else {
-                        const std::string error ( "instance value not found in the import statement: " );
-                         
-                         
-                        throw exception::Data_error ( error ); 
-                    }
-                
-            }
-        } else { // action = create, instance must be a name
-            inst_str = jinstance.asString();
-            if (inst_str[0] == '$') {
-                inst_str.erase ( 0,1 );
-                inst_str = util::String::standardize ( inst_str );
-                std::transform ( inst_str.begin(), inst_str.end(), inst_str.begin(),
-                                 [] ( unsigned char c ) -> unsigned char {return std::tolower ( c ); } );
-            } else {
-                const std::string error ( "instance value is not valid in the import statement: " );
-                 
-                 
-                throw exception::Data_error ( error );
-            }        
-        }    
-                
-    }
-
-    
-    std::shared_ptr<omm::Class>  cls = app_info_ptr_->find_domain_element_by_full_name<omm::Class>(csf_full_name);
-    if ( cls ) {
-        if ( ! cls->is_abstract() ) {
-
-            std::shared_ptr<omm::Table> elem_lo =  cls->table() ;
-            if ( elem_lo ) {
-                if (action == "create") {
-                    mttr::Classifier_instance_create ic (  cls, p_stmt, cache_ );
-                    ic.execute ();
-
-                    if ( ic.return_code () == qry::Return_code::OK ) {
-
-                        register_instance( ic.return_json(), inst_str );
-
-                    } else {
-                        const std::string error ( "Class instance creation failed: " );
-                         
-                         
-                        throw exception::Data_error ( error );
-                    }
-                    
-                } else { //update 
-                    mttr::Classifier_instance_update iu ( cls, p_stmt, inst_str , cache_, 0);
-                    iu.execute ();
-                    
-                    if (iu.return_code () != qry::Return_code::OK) {
-
-                        const std::string error ( "Class instance updating failed: " );
-                         
-                         
-                        throw exception::Data_error ( error );
-                    }
-                }  
-            } else {
-                const std::string error ( "Class not mapped to a relational object: " );
-                 
-                 
-                throw exception::Data_error ( error );
-            }
-        } else {
-            const std::string error ( "Class is abstract, creation not applicable:" );
-             
-             
-            throw exception::Data_error ( error );
-        }
+  auto jcsf = p_stmt["classifier"];
+  std::string csf_full_name;
+  Json::Value jcls;
+  Json::Value jassoc;
+  if (jcsf.isNull()) {
+    jcls = p_stmt["class"];
+    if (jcls.isNull()) {
+      jassoc = p_stmt["association"];
+      csf_full_name = jassoc.asString();
     } else {
-       std::shared_ptr<omm::Association>  assoc = app_info_ptr_->find_domain_element_by_full_name<omm::Association>(csf_full_name);
+      csf_full_name = jcls.asString();
+    }
+  } else {
+    csf_full_name = jcsf.asString();
+  }
 
-        if ( assoc ) {
-            std::shared_ptr<omm::Table> elem_lo =  assoc->table() ;
-                if ( elem_lo ) {
-                    // additional table for association (binary association N-M)
-                    if (action == "create" ) {
-                        mttr::Classifier_instance_create ic (  assoc, p_stmt, cache_ );
-                        ic.execute ();
+  if (jcsf.isNull() && jcls.isNull() && jassoc.isNull()) {
+    const std::string error(
+        "classifier key not found in the import statement: ");
 
-                        if ( ic.return_code () == qry::Return_code::OK ) {
-                            register_instance( ic.return_json(), inst_str );
-                        
-                        } else {
-                            const std::string error ( "Association instance creation failed: " );
-                             
-                             
-                            throw exception::Data_error ( error );
-                        }
-                    } else { //update
- 
-                        mttr::Classifier_instance_update iu (assoc, p_stmt, inst_str, cache_, 0);
-                        iu.execute ();
-                    
-                        if ( iu.return_code () != qry::Return_code::OK ) {
+    throw exception::Data_error(error);
+  }
 
-                            const std::string error ( "Association instance updating failed: " );
-                             
-                             
-                            throw exception::Data_error ( error );
-                        }
-                    }
-                    
-            } else { // no table (binary association 1-N or 1-1), one class instance must be updated
-                if (action == "create" ) {
-                    mttr::Class_instance_association_create iac ( assoc, p_stmt , cache_);
-                    iac.execute ();
+  auto action = p_stmt.get("action", "create").asString();
 
-                    if ( iac.return_code () == qry::Return_code::OK ) {
-                       register_instance( iac.return_json(), inst_str );
-                    } else {
-                        const std::string error ( "Association instance creation failed: " );
-                         
-                         
-                        throw exception::Data_error ( error );
-                    }
-                } else { // update
-                    mttr::Class_instance_association_update iau ( assoc, p_stmt, inst_str, cache_, 0);
-                    iau.execute ();
-                    
-                    if (iau.return_code () != qry::Return_code::OK) {
+  std::transform(
+      action.begin(), action.end(), action.begin(),
+      [](unsigned char c) -> unsigned char { return std::tolower(c); });
+  if (action != "create" && action != "update") {
+    const std::string error("action value unknown in the import statement: ");
 
-                        const std::string error ( "Association instance updating failed: " );
-                         
-                         
-                        throw exception::Data_error ( error );
-                    }
-                }
-            }
+    throw exception::Data_error(error);
+  }
+
+  std::string inst_str;
+  const auto jinstance = p_stmt["instance"];
+  if (jinstance.isNull() && action == "update") {
+    const std::string error("instance key not found in the import statement: ");
+
+    throw exception::Data_error(error);
+  } else if (!jinstance.isNull()) {
+    if (action ==
+        "update") { // instance can be a string composed of 2 integers or a name
+                    // prefixed by a $ and contained in the import cache
+
+      inst_str = jinstance.asString();
+      if (inst_str[0] != '$') {
+
+        // check the format of inst_str
+        const auto [csf_id, row_id] = qry::Util::split_instance_id(inst_str);
+
+      } else {
+        // instance is not an unsigned long . Check if string starts with $ and
+        // present in the import cache
+
+        inst_str.erase(0, 1);
+        inst_str = util::String::standardize(inst_str);
+        std::transform(
+            inst_str.begin(), inst_str.end(), inst_str.begin(),
+            [](unsigned char c) -> unsigned char { return std::tolower(c); });
+
+        auto search = cache_.find(inst_str);
+        if (search != cache_.end()) {
+          const Json::Value &jinst = *(search->second);
+          inst_str = jinst.asString();
+        } else {
+          const std::string error(
+              "instance value not found in the import statement: ");
+
+          throw exception::Data_error(error);
+        }
+      }
+    } else { // action = create, instance must be a name
+      inst_str = jinstance.asString();
+      if (inst_str[0] == '$') {
+        inst_str.erase(0, 1);
+        inst_str = util::String::standardize(inst_str);
+        std::transform(
+            inst_str.begin(), inst_str.end(), inst_str.begin(),
+            [](unsigned char c) -> unsigned char { return std::tolower(c); });
+      } else {
+        const std::string error(
+            "instance value is not valid in the import statement: ");
+
+        throw exception::Data_error(error);
+      }
+    }
+  }
+
+  std::shared_ptr<omm::Classifier> csf =
+      app_info_ptr_->find_domain_element_by_full_name<omm::Classifier>(
+          csf_full_name);
+
+  if (!csf->is_abstract()) {
+    if (action == "create") {
+      auto ic = mttr::Classifier_instance_factory::instance().make_create(
+          csf, p_stmt, cache_);
+      if (ic) {
+        ic->execute();
+
+        if (ic->return_code() == qry::Return_code::OK) {
+
+          register_instance(ic->return_json(), inst_str);
 
         } else {
-            const std::string error ( "Classifier not found: " );
-             
-             
-            throw exception::Not_found ( error );
+          const std::string error("Classifier instance creation failed ");
+
+          throw exception::Data_error(error);
         }
+      } else {
+        const std::string error(
+            "Classifier not mapped to a relational object ");
+
+        throw exception::Failure(error);
+      }
+    } else { // update
+      auto iu = mttr::Classifier_instance_factory::instance().make_update(
+          csf, p_stmt, inst_str, 0, cache_);
+      if (iu) {
+        iu->execute();
+
+        if (iu->return_code() != qry::Return_code::OK) {
+
+          const std::string error("Classifier instance updating failed ");
+
+          throw exception::Data_error(error);
+        }
+      } else {
+        const std::string error(
+            "Classifier not mapped to a relational object ");
+
+        throw exception::Failure(error);
+      }
     }
 
+  } else {
+    const std::string error("Classifier is abstract, action not applicable ");
+
+    throw exception::Data_error(error);
+  }
 }
+
 
 void Data_import::register_instance (const Json::Value& p_j_value, const std::string& p_inst_name) {
     

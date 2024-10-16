@@ -16,17 +16,17 @@
 namespace arolios {
 
 namespace mttr {
-class Class_instance_association_eliminate : public Classifier_instance_eliminate {
+class Association_instance_wolo_eliminate : public Classifier_instance_eliminate {
 public:
     /**
      * Constructor
      */
-    Class_instance_association_eliminate( const std::shared_ptr<const omm::Association>& p_csf, const std::string& p_inst_id, const int p_fru_count = 0);
+    Association_instance_wolo_eliminate( const std::shared_ptr<const omm::Association>& p_csf, const std::string& p_inst_id, const int p_fru_count = 0);
 
     /**
      * Destructor
      */
-    virtual ~Class_instance_association_eliminate();
+    virtual ~Association_instance_wolo_eliminate();
     
      virtual void execute () override ;
 

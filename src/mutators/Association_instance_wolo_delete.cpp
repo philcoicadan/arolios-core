@@ -4,7 +4,7 @@
  * License: LGPL-3.0-or-later
  *
  */
-#include <mttr/Class_instance_association_delete.h>
+#include <mttr/Association_instance_wolo_delete.h>
 #include <omm/Property.h>
 #include <omm/Column.h>
 #include <mttr/Classifier_instance_row.h>
@@ -16,16 +16,16 @@
 using namespace arolios;
 using namespace arolios::mttr;
 
-Class_instance_association_delete::Class_instance_association_delete( const std::shared_ptr<const omm::Association>& p_csf, const std::string& p_inst_id,  const int p_rfu_count)
+Association_instance_wolo_delete::Association_instance_wolo_delete( const std::shared_ptr<const omm::Association>& p_csf, const std::string& p_inst_id,  const int p_rfu_count)
 : Classifier_instance_delete (p_csf, p_inst_id, p_rfu_count) {
 
 }
 
-Class_instance_association_delete::~Class_instance_association_delete() {
+Association_instance_wolo_delete::~Association_instance_wolo_delete() {
 
 }
 
-void Class_instance_association_delete::execute()
+void Association_instance_wolo_delete::execute()
 {
     auto assoc = std::dynamic_pointer_cast<const omm::Association>(csf_);
     int k= 0;

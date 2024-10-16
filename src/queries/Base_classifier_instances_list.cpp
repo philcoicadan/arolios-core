@@ -35,7 +35,8 @@ using namespace arolios::qry;
 
 Base_classifier_instances_list::Base_classifier_instances_list ( const std::string& p_offset, const std::string& p_limit, const std::string& p_sort, const std::string& p_direction, const std::vector<std::shared_ptr<const qry::Instance_filter>>& p_filters, const std::string& p_prop_list , const std::shared_ptr<const omm::Language>& p_lang) 
 : Base_list_query {  p_offset, p_limit, p_sort, p_direction, p_lang},
-  filters_ (p_filters), prop_list_ (p_prop_list) , enum_val_sort_ (false) { 
+  filters_ (p_filters), prop_list_ ((p_prop_list != "LIST")? "ALL": "LIST") , enum_val_sort_ (false) { 
+
 
 }
 
@@ -48,7 +49,7 @@ void Base_classifier_instances_list::execute ()  {
 
     std::string&& order_by = compute_order_by();
 
-    std::string query = (prop_list_ == "ALL" ) ? config()->select_all_template() :  config()->list_select_template () ;
+    std::string query = (prop_list_ == "ALL" ) ? config()->select_all_template () :  config()->list_select_template () ;
     
     const qry::Util::Context ctx= (prop_list_ == "ALL") ? qry::Util::Context::all : qry::Util::Context::list;
     for (auto filter : filters_) {

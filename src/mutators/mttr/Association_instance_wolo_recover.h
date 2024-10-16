@@ -16,17 +16,17 @@
 namespace arolios {
 
 namespace mttr {
-class Class_instance_association_recover : public Classifier_instance_recover {
+class Association_instance_wolo_recover : public Classifier_instance_recover {
 public:
     /**
      * Constructor
      */
-    Class_instance_association_recover( const std::shared_ptr<const omm::Association>& p_csf, const std::string& p_inst_id, const int p_fru_count = 0);
+    Association_instance_wolo_recover( const std::shared_ptr<const omm::Association>& p_csf, const std::string& p_inst_id, const int p_fru_count = 0);
 
     /**
      * Destructor
      */
-    virtual ~Class_instance_association_recover();
+    virtual ~Association_instance_wolo_recover();
     
      virtual void execute () override ;
 

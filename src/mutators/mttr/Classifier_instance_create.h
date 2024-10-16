@@ -7,7 +7,6 @@
 #pragma once
 #include <json/json.h>
 #include <mttr/Base_element_create.h>
-#include <omm/Classifier.h>
 
 namespace arolios {
 
@@ -19,23 +18,16 @@ public:
     /**
      * Constructor
      */
-    Classifier_instance_create( const std::shared_ptr<const omm::Classifier>& p_csf, const Json::Value& p_data_root, const std::unordered_map<std::string, std::shared_ptr<const Json::Value>>& p_import_cache);
+    Classifier_instance_create( const Json::Value& p_data_root, const std::unordered_map<std::string, std::shared_ptr<const Json::Value>>& p_import_cache= {});
 
     /**
      * Destructor
      */
     virtual ~Classifier_instance_create();
     
-     virtual void execute () override ;
-    
-
-    
-private:
-
-    std::shared_ptr<const omm::Classifier> csf_ ;
+protected:
 
     const std::unordered_map<std::string, std::shared_ptr<const Json::Value>>& import_cache_;
-
 
 };
 }

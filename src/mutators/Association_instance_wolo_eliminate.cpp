@@ -4,7 +4,7 @@
  * License: LGPL-3.0-or-later
  *
  */
-#include <mttr/Class_instance_association_eliminate.h>
+#include <mttr/Association_instance_wolo_eliminate.h>
 #include <omm/Property.h>
 #include <omm/Column.h>
 #include <omm/Class.h>
@@ -20,16 +20,16 @@
 using namespace arolios;
 using namespace arolios::mttr;
 
-Class_instance_association_eliminate::Class_instance_association_eliminate( const std::shared_ptr<const omm::Association>& p_csf, const std::string& p_inst_id,  const int p_rfu_count)
+Association_instance_wolo_eliminate::Association_instance_wolo_eliminate( const std::shared_ptr<const omm::Association>& p_csf, const std::string& p_inst_id,  const int p_rfu_count)
 : Classifier_instance_eliminate (p_csf, p_inst_id, p_rfu_count) {
 
 }
 
-Class_instance_association_eliminate::~Class_instance_association_eliminate() {
+Association_instance_wolo_eliminate::~Association_instance_wolo_eliminate() {
 
 }
 
-void Class_instance_association_eliminate::execute()
+void Association_instance_wolo_eliminate::execute()
 {
     auto assoc = std::dynamic_pointer_cast<const omm::Association>(csf_);
     int k= 0;

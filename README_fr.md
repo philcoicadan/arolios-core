@@ -18,5 +18,5 @@ Voir le fichier CONTRIBUTING.md
 # Licence
 
 AROLIOS Core est publié sous licence GNU LGPL (identifiant SPDX: LGPL-3.0-or-later).
-Voir le fichier COPYING.LESSER.txt
+Voir le fichier COPYING.LESSER
 

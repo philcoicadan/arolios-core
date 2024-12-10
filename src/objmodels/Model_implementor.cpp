@@ -519,12 +519,14 @@ void Model_implementor::visit (const Model_element_create<Class_property_t,omm::
     
 	const std::string table_name = table->full_name();
     bool is_root = !impl_csf->has_generalizations();
+
+    bool classifier_has_own_table  = impl_csf == p_store.stored()->classifier();
    
-    const std::string col_name = (impl_csf == p_store.stored()->classifier()) ?
+    const std::string col_name = (classifier_has_own_table) ?
     Util::make_logical_field_name (p_store.stored(), is_root) :
     Util::make_column_name_with_classifier (p_store.stored(), impl_csf);
     std::string stmt = "ALTER TABLE " + table_name + " ADD COLUMN " ;
-    prepare_declaration_for_column(stmt, p_store.stored(),col_name , (is_root && (p_store.stored()->min_occurs() == 1)));
+    prepare_declaration_for_column(stmt, p_store.stored(),col_name , (is_root && (p_store.stored()->min_occurs() == 1) && classifier_has_own_table)); // Not null only if classifier is root, classifier has own table and min=1
    
     
     auto enum_ptr = std::dynamic_pointer_cast<const omm::Enumeration>(p_store.stored()->type());
@@ -545,7 +547,7 @@ void Model_implementor::visit (const Model_element_create<Class_property_t,omm::
 
         execute_insert_for_property ( p_store.stored(), impl_csf );
 
-        if ( !is_root & ( p_store.stored()->min_occurs() == 1 ) ) {
+        if ( (!is_root || !classifier_has_own_table) && ( p_store.stored()->min_occurs() == 1 ) ) {
             auto && cctt =  omm::Model_factory::instance().make_column_constraint ( column, omm::Column_constraint::Type::not_null );
             execute_insert_column_constraint ( cctt );
         }

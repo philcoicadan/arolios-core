@@ -63,10 +63,13 @@
 
 	<xsd:complexType name="Association_tlt">
 		<xsd:complexContent>
-			<xsd:extension base="t:Type_tlt">
+			<xsd:extension base="t:Element_tlt">
 				<xsd:sequence>
-					<xsd:element name="memberEnd" type="t:Element_tlt" minOccurs="0" maxOccurs="2"/>
-				</xsd:sequence>			
+					<xsd:choice maxOccurs="unbounded">
+						<xsd:element name="property" type="t:Element_tlt" minOccurs="0" maxOccurs="unbounded"/>		
+						<xsd:element name="memberEnd" type="t:Element_tlt" minOccurs="0" maxOccurs="2"/>
+					</xsd:choice>
+				</xsd:sequence>				
 			</xsd:extension>	
 		</xsd:complexContent>
 	</xsd:complexType>

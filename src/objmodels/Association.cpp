@@ -138,7 +138,7 @@ template <> void Model_element<Association_t, omm::Association >::fill_children(
 template <> void Model_element<Association_t, omm::Association >::execute () {
 
     int count = xml_obj_.memberEnd().size();
-
+    bool ident_authorized = false;
 
     if ( action_ != Element_action::a_delete ) {
         // create or update action , check the consistency of the members ( 2 members are required)
@@ -159,6 +159,10 @@ template <> void Model_element<Association_t, omm::Association >::execute () {
                 max_occurs_i [k]= 1;
             }
         }
+
+        // identifier authorized only for many-many association
+        ident_authorized = (max_occurs_i[0] == -1) && ((max_occurs_i[1] == -1));
+
         // check if many-many association, no one is a composition
         for ( int k=0; k<2 && max_occurs_i[0] == -1 && max_occurs_i[1] == -1 ; ++k ) {
             if ( members[k]->isComposition() ) {
@@ -222,64 +226,88 @@ template <> void Model_element<Association_t, omm::Association >::execute () {
     // identifier
 
     if (xml_obj_.identifier().present()) {
-         auto ident = xml_obj_.identifier().get();
-         
-         std::unordered_map<std::string,std::shared_ptr<omm::Property>> ident_map;
-         auto pers_assoc = this->stored_;
-         
-         if (pers_assoc == nullptr ) {
-             std::string warn_msg = "Association " + xml_obj_.name() + " is not saved, identifier cannot be taken into account";
-             std::cout << "WARNING: " << warn_msg<< std::endl;
-             
-         } else {
-    
-            for (Classifier_identifier_t::property_const_iterator i (ident.property().begin ());
-                i != ident.property ().end ();
-                ++i)
-            {
-        
-                Util::add_identifier (*i, pers_assoc, ident_map);
+      if (ident_authorized) {
+        auto ident = xml_obj_.identifier().get();
+
+        std::unordered_map<std::string, std::shared_ptr<omm::Property>>
+            ident_map;
+        auto pers_assoc = this->stored_;
+
+        if (pers_assoc == nullptr) {
+          std::string warn_msg =
+              "Association " + xml_obj_.name() +
+              " is not saved, identifier cannot be taken into account";
+          std::cout << "WARNING: " << warn_msg << std::endl;
+
+        } else {
+
+          for (Classifier_identifier_t::property_const_iterator i(
+                   ident.property().begin());
+               i != ident.property().end(); ++i) {
+
+            Util::add_identifier(*i, pers_assoc, ident_map);
+          }
+
+          if (ident_map.size() > 0) {
+            // check one is not null
+            bool has_not_null = false;
+            for (auto [name, prop] : ident_map) {
+              if (prop->min_occurs() > 0) {
+                has_not_null = true;
+                break;
+              }
             }
-            
-            
+            if (has_not_null) {
+              Model_recorder mdl_rcd;
+              try {
+                mdl_rcd.update_identifier(pers_assoc, ident_map);
 
-            if ( ident_map.size() > 0 ) {
-                // check one is not null
-                bool has_not_null = false;
-                for ( auto [name, prop] : ident_map ) {
-                    if ( prop->min_occurs() > 0 ) {
-                        has_not_null = true;
-                        break;
-                    }
-                }
-                if ( has_not_null ) {
-                    Model_recorder mdl_rcd;
-                    try {
-                        mdl_rcd.update_identifier ( pers_assoc, ident_map );
+              } catch (const exception::Db_exception &e) {
+                mdl_rcd.rollback();
 
-                    } catch ( const exception::Db_exception &e ) {
-                        mdl_rcd.rollback();
-                         
-                        throw e;
-                    } catch ( const exception::Base_exception &e ) {
-                        mdl_rcd.rollback();
-                         
-                        throw e;
-                    } catch ( std::exception const &e ) {
-                        mdl_rcd.rollback();
-                         
-                        throw e;
-                    }
+                throw e;
+              } catch (const exception::Base_exception &e) {
+                mdl_rcd.rollback();
 
-                    pers_assoc->identifier ( ident_map );
-                    
-                } else {
-                    std::string error_msg = "The identifier of the association " + pers_assoc->name() + " cannot be saved because there is no required property ";
-                     
-                    throw exception::Failure ( error_msg );
-                }
+                throw e;
+              } catch (std::exception const &e) {
+                mdl_rcd.rollback();
+
+                throw e;
+              }
+
+            } else {
+              std::string error_msg =
+                  "The identifier of the association " + pers_assoc->name() +
+                  " cannot be saved because there is no required property ";
+
+              throw exception::Failure(error_msg);
             }
+          } else {
+            Model_recorder mdl_rcd;
+            try {
+              mdl_rcd.reset_identifier(pers_assoc);
+            } catch (const exception::Db_exception &e) {
+              mdl_rcd.rollback();
+
+              throw e;
+            } catch (const exception::Base_exception &e) {
+              mdl_rcd.rollback();
+
+              throw e;
+            } catch (std::exception const &e) {
+              mdl_rcd.rollback();
+
+              throw e;
+            }
+          }
+          pers_assoc->identifier(ident_map);
         }
+      } else {
+        std::string warn_msg = "Association " + xml_obj_.name() +
+                               " is not many-many, identifier ignored";
+        std::cout << "WARNING: " << warn_msg << std::endl;
+      }
     }
 }
 

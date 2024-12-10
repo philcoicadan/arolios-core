@@ -140,14 +140,33 @@ template <> void Model_element<Class_t, omm::Class >::execute () {
                         throw e;
                     }
 
-                    pers_cls->identifier ( ident_map );
+
                     
                 } else {
                     std::string error_msg = "The identifier of the class " + pers_cls->name() + " cannot be saved because there is no required property ";
                      
                     throw exception::Failure ( error_msg );
                 }
+            } else {
+                Model_recorder mdl_rcd;
+                try {
+                  mdl_rcd.reset_identifier(pers_cls);
+                } catch (const exception::Db_exception &e) {
+                  mdl_rcd.rollback();
+
+                  throw e;
+                } catch (const exception::Base_exception &e) {
+                  mdl_rcd.rollback();
+
+                  throw e;
+                } catch (std::exception const &e) {
+                  mdl_rcd.rollback();
+
+                  throw e;
+                }
             }
+            pers_cls->identifier ( ident_map );
+
         }
     }
 }

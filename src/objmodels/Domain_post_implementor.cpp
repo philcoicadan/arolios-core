@@ -100,21 +100,21 @@ void Domain_post_implementor::process_required_properties (const Model_element<D
     // iterate on all concrete classes 
     for ( auto && child : p_store.get_children() ) {
         auto stored = child->stored_element();
-        auto csf_ptr = std::dynamic_pointer_cast<omm::Classifier> ( stored );
-        if ( csf_ptr ) {
-            // classifier
+        auto cls_ptr = std::dynamic_pointer_cast<omm::Class> ( stored );
+        if ( cls_ptr ) {
+            // class
 
-            // only concrete classes require a table constraint
-            if ( ! csf_ptr->is_abstract() ) {
+            // only concrete classes and require a table constraint
+            if ( ! cls_ptr->is_abstract() ) {
 
                 std::vector<std::shared_ptr<omm::Column_constraint>> cctts;
                 // get the list of required properties in the classifier and its super-classifiers except the root one
-                fill_column_constraints_with_inheritance ( csf_ptr, cctts, omm::Column_constraint::Type::not_null, false ) ;
+                fill_column_constraints_with_inheritance ( cls_ptr, cctts, omm::Column_constraint::Type::not_null, false ) ;
                 if ( cctts.size() >0 ) {
-                    auto lo = csf_ptr->table();
+                    auto lo = cls_ptr->table();
                     auto table_name = lo->full_name ();
 
-                    auto csf_id = csf_ptr->id();
+                    auto csf_id = cls_ptr->id();
 
                     
 
@@ -133,9 +133,59 @@ void Domain_post_implementor::process_required_properties (const Model_element<D
                 }
             }
         }
+        auto assoc_ptr = std::dynamic_pointer_cast<omm::Association>(stored);
+        if (assoc_ptr) {
+          // association
+
+          // only one-one and one-many association can have a table constraint
+          if (assoc_ptr->table() == nullptr) { // not a many-many association
+
+            std::vector<std::shared_ptr<omm::Column_constraint>> cctts;
+            // get the list of required properties in the classifier
+            fill_column_constraints_for_not_many_many_association(assoc_ptr,
+                                                                  cctts);
+            if (cctts.size() > 0) {
+
+              // get the referencing column
+              auto members = assoc_ptr->member_ends();
+              std::shared_ptr<omm::Column> ref_column = nullptr;
+              for (int k = 0; k < 2; ++k) {
+                ref_column = (*members)[k]->column();
+                if (ref_column)
+                  break;
+              }
+
+              if (ref_column) {
+                auto lo = assoc_ptr->managing_table();
+                auto table_name = lo->full_name();
+                auto csf_id = assoc_ptr->id();
+
+                // Drop existing check expression if need - Assuming there is no
+                // concurrent access
+                std::string stmt = "ALTER TABLE " + table_name +
+                                   " DROP CONSTRAINT IF EXISTS _" + csf_id +
+                                   "_not_null_ctt ";
+                auto r = transPtr->execSqlSync(stmt);
+
+                stmt = "ALTER TABLE " + table_name + " ADD CONSTRAINT _" +
+                       csf_id + "_not_null_ctt CHECK (" + ref_column->name() +
+                       " IS NULL OR (";
+                for (auto &&cctt : cctts) {
+                  // get the column name
+                  stmt += " " + cctt->column()->name() + " IS NOT NULL AND";
+                }
+                stmt.replace(stmt.length() - 3, 3, ") )");
+
+                r = transPtr->execSqlSync(stmt);
+              } else {
+                std::cout << "WARNING: Association " << assoc_ptr->name() << " is not mapped to a table column" << std::endl;
+
+              }
+            }
+          }
+        }
     }
 }
-
 void Domain_post_implementor::process_id_properties ( const Model_element<Domain_t,omm::Package>& p_store ) const {
 
     std::shared_ptr<qry::Db_transaction> transPtr = transaction();
@@ -243,6 +293,31 @@ void Domain_post_implementor::fill_column_constraints_with_inheritance ( const s
 
 }
 
+void Domain_post_implementor::fill_column_constraints_for_not_many_many_association ( const std::shared_ptr<const omm::Classifier>& p_csf, std::vector<std::shared_ptr<omm::Column_constraint>>& p_columns)  const {
+
+    const auto & assoc = std::dynamic_pointer_cast<const omm::Association>(p_csf) ;
+    if (assoc) {
+
+
+        auto && assoc_table = assoc->managing_table();
+        for ( auto && prop : assoc->own_properties() ) {
+            auto && column = prop.second->column();
+            if ( column ) {
+                if ( column->table() == assoc_table ) {
+                    for ( auto & ctt : column->constraints() ) {
+                        if ( ctt->type() == omm::Column_constraint::Type::not_null  ) {
+                            p_columns.push_back ( ctt );
+                        }
+                    }
+                }
+            }
+        }
+
+     
+
+    }
+
+}
 void Domain_post_implementor::fill_column_constraints_for_many_to_many_association(  const std::shared_ptr<const omm::Classifier>& p_csf, std::vector<std::shared_ptr<omm::Column_constraint>>& p_columns) const {
    
     const auto & assoc = std::dynamic_pointer_cast<const omm::Association>(p_csf) ;

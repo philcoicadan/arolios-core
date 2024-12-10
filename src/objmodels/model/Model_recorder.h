@@ -60,7 +60,8 @@ public:
     void deprecate_classifier (const std::shared_ptr<omm::Classifier>& p_elt) const;
     bool eliminate_classifier (const std::shared_ptr<omm::Classifier>& p_elt) const;
     
-    void update_identifier ( const std::shared_ptr<omm::Classifier>& p_cls, const std::unordered_map<std::string,std::shared_ptr<omm::Property>>& p_ident_map) const ;
+    void update_identifier ( const std::shared_ptr<omm::Classifier>& p_csf, const std::unordered_map<std::string,std::shared_ptr<omm::Property>>& p_ident_map) const ;
+    void reset_identifier ( const std::shared_ptr<omm::Classifier>& p_csf) const ;
     
     
     void update_config_collection_props ( const std::shared_ptr<appcfg::App_domain>& p_app_dom );

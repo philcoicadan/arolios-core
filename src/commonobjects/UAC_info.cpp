@@ -47,10 +47,10 @@ bool UAC_info::check_role (const common::User_role p_user_role, const common::Us
         case common::User_role::admin: // admin has all rights
             result = true;
             break;
-        case common::User_role::author:
+        case common::User_role::producer:
             switch (p_required_role) {
                 case common::User_role::reader:
-                case common::User_role::author:
+                case common::User_role::producer:
                     result= true;
                     break;
                 default:
@@ -86,7 +86,7 @@ std::string UAC_info::standardize_role (const std::string& p_user_role) const  {
     
 common::User_role UAC_info::role_cast (const std::string& p_role_str) const {
     static std::unordered_map<std::string,common::User_role> m { {"no", common::User_role::no} , {"reader", common::User_role::reader}, 
-    {"author", common::User_role::author}, {"admin", common::User_role::admin} };
+    {"producer", common::User_role::producer}, {"admin", common::User_role::admin} };
     
     auto search = m.find(p_role_str);
     if (search == m.end()) {
@@ -99,7 +99,7 @@ common::User_role UAC_info::role_cast (const std::string& p_role_str) const {
 
 const std::string& UAC_info::string_cast ( const common::User_role p_role) const {
     
-    static std::string tab [4] = { "no", "reader", "author", "admin" };
+    static std::string tab [4] = { "no", "reader", "producer", "admin" };
     return tab[ static_cast<int>(p_role) ] ;
 }        
 

@@ -205,7 +205,7 @@ CREATE TABLE am_trash (
 	
 	);
 
-CREATE TYPE am_user_role AS ENUM ('no', 'reader', 'author', 'admin');
+CREATE TYPE am_user_role AS ENUM ('no', 'reader', 'producer', 'admin');
 
 
 CREATE TABLE am_user (

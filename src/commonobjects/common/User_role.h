@@ -10,7 +10,7 @@ namespace arolios {
 
 
 namespace common {
-enum User_role {  no = 0, reader = 1, author = 2, admin = 3 };
+enum User_role {  no = 0, reader = 1, producer = 2, admin = 3 };
 };
 }
 

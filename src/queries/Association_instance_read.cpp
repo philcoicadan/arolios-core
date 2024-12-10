@@ -84,6 +84,7 @@ void Association_instance_read::build_property_json ( const std::string& p_name,
         auto id = p_row[me_id_pair.second];
         auto csf_id = p_row[me_csf_id_pair.second];
         std::string iid = std::to_string(csf_id.as<unsigned int>()) + "." + std::to_string(id.as<unsigned long>());
+        linked_json["id"] = Json::Value( iid);
         linked_json["url"] = Json::Value(qry::Util::url_prefix("instance") + iid);
         
         auto class_ptr = om_ptr_->find_domain_element_by_id<omm::Class>(std::to_string(csf_id.as<unsigned int>()));

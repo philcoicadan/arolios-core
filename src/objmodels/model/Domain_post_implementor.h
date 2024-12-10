@@ -50,6 +50,8 @@ public:
     
     void fill_column_constraints_for_many_to_many_association(  const std::shared_ptr<const omm::Classifier>& p_csf, std::vector<std::shared_ptr<omm::Column_constraint>>& p_columns ) const ;
 
+    void fill_column_constraints_for_not_many_many_association ( const std::shared_ptr<const omm::Classifier>& p_csf, std::vector<std::shared_ptr<omm::Column_constraint>>& p_columns )  const ;
+
     void fill_column_constraints_for_uniqueness ( const std::shared_ptr<const omm::Classifier>& p_csf, std::vector<std::shared_ptr<omm::Column_constraint>>& p_columns )  const;
 };
 }

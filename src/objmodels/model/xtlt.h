@@ -563,9 +563,26 @@ namespace arolios
       property_sequence property_;
     };
 
-    class Association_tlt: public ::arolios::model::Type_tlt
+    class Association_tlt: public ::arolios::model::Element_tlt
     {
       public:
+      // property
+      //
+      typedef ::arolios::model::Element_tlt property_type;
+      typedef ::xsd::cxx::tree::sequence< property_type > property_sequence;
+      typedef property_sequence::iterator property_iterator;
+      typedef property_sequence::const_iterator property_const_iterator;
+      typedef ::xsd::cxx::tree::traits< property_type, char > property_traits;
+
+      const property_sequence&
+      property () const;
+
+      property_sequence&
+      property ();
+
+      void
+      property (const property_sequence& s);
+
       // memberEnd
       //
       typedef ::arolios::model::Element_tlt memberEnd_type;
@@ -614,6 +631,7 @@ namespace arolios
              ::xml_schema::flags);
 
       protected:
+      property_sequence property_;
       memberEnd_sequence memberEnd_;
     };
 

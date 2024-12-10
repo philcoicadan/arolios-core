@@ -6,7 +6,7 @@
     //dbname: Database name
     //"dbname" : "",
     //user: 'postgres' by default
-    "user" : "postgres"
+    //"user" : "postgres"
     //client_encoding: The character set used by the client. it is empty string by default which 
     //means use the default character set.
     //"client_encoding": ""

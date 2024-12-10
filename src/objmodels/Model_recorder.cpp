@@ -770,14 +770,13 @@ void Model_recorder::update_translation (const std::shared_ptr<omm::Persistent_o
 
 void Model_recorder::update_identifier ( const std::shared_ptr<omm::Classifier>& p_csf, const std::unordered_map<std::string,std::shared_ptr<omm::Property>>& p_ident_map) const {
     
-    int csf_id = util::String::stoui(p_csf->id());
     //clear identifier
-    std::string stmt = "DELETE FROM am_csf_ident WHERE i_csf = $1 RETURNING i_csf";
-    auto r = transPtr_->execSqlSync(stmt, csf_id);
+    reset_identifier(p_csf);
     
     //save new identifier
-    
-    stmt = "INSERT INTO am_csf_ident (i_csf, i_prop) VALUES ($1, $2) RETURNING i_csf";
+    int csf_id = util::String::stoui(p_csf->id());
+
+    std::string stmt = "INSERT INTO am_csf_ident (i_csf, i_prop) VALUES ($1, $2) RETURNING i_csf";
     
     for (auto [name, prop] : p_ident_map) {
         auto r = transPtr_->execSqlSync(stmt,csf_id, util::String::stoui(prop->id()));
@@ -790,6 +789,15 @@ void Model_recorder::update_identifier ( const std::shared_ptr<omm::Classifier>&
     }
 }
 
+void Model_recorder::reset_identifier ( const std::shared_ptr<omm::Classifier>& p_csf) const {
+    
+    int csf_id = util::String::stoui(p_csf->id());
+    //clear identifier
+    std::string stmt = "DELETE FROM am_csf_ident WHERE i_csf = $1 RETURNING i_csf";
+    auto r = transPtr_->execSqlSync(stmt, csf_id);
+    
+
+}
 void Model_recorder::clear_config_collection_props (const std::shared_ptr<omm::Package>& p_domain) {
     const std::string stmt = "DELETE FROM am_app_prop WHERE a_csf IN  (SELECT id FROM am_p_elem WHERE package = $1) RETURNING a_prop";
     auto r = transPtr_->execSqlSync(stmt, p_domain->id());

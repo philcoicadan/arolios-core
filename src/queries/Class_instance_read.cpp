@@ -115,6 +115,7 @@ void Class_instance_read::build_property_json ( const std::string& p_name, const
                 }
                 std::string target_iid = qry::Util::build_instance_id ( csf_id_field.as<unsigned int>() , field.as<unsigned long>() );
                     
+                target_json["id"] = Json::Value ( target_iid);
                 target_json["url"] = Json::Value (qry::Util::url_prefix("instance") + target_iid);
 
                

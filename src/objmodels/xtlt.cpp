@@ -243,6 +243,24 @@ namespace arolios
     // Association_tlt
     // 
 
+    const Association_tlt::property_sequence& Association_tlt::
+    property () const
+    {
+      return this->property_;
+    }
+
+    Association_tlt::property_sequence& Association_tlt::
+    property ()
+    {
+      return this->property_;
+    }
+
+    void Association_tlt::
+    property (const property_sequence& s)
+    {
+      this->property_ = s;
+    }
+
     const Association_tlt::memberEnd_sequence& Association_tlt::
     memberEnd () const
     {
@@ -720,8 +738,9 @@ namespace arolios
     Association_tlt::
     Association_tlt (const name_type& name,
                      const translation_type& translation)
-    : ::arolios::model::Type_tlt (name,
-                                  translation),
+    : ::arolios::model::Element_tlt (name,
+                                     translation),
+      property_ (this),
       memberEnd_ (this)
     {
     }
@@ -730,7 +749,8 @@ namespace arolios
     Association_tlt (const Association_tlt& x,
                      ::xml_schema::flags f,
                      ::xml_schema::container* c)
-    : ::arolios::model::Type_tlt (x, f, c),
+    : ::arolios::model::Element_tlt (x, f, c),
+      property_ (x.property_, f, this),
       memberEnd_ (x.memberEnd_, f, this)
     {
     }
@@ -739,7 +759,8 @@ namespace arolios
     Association_tlt (const ::xercesc::DOMElement& e,
                      ::xml_schema::flags f,
                      ::xml_schema::container* c)
-    : ::arolios::model::Type_tlt (e, f | ::xml_schema::flags::base, c),
+    : ::arolios::model::Element_tlt (e, f | ::xml_schema::flags::base, c),
+      property_ (this),
       memberEnd_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
@@ -753,13 +774,24 @@ namespace arolios
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
-      this->::arolios::model::Type_tlt::parse (p, f);
+      this->::arolios::model::Element_tlt::parse (p, f);
 
       for (; p.more_content (); p.next_content (false))
       {
         const ::xercesc::DOMElement& i (p.cur_element ());
         const ::xsd::cxx::xml::qualified_name< char > n (
           ::xsd::cxx::xml::dom::name< char > (i));
+
+        // property
+        //
+        if (n.name () == "property" && n.namespace_ ().empty ())
+        {
+          ::std::unique_ptr< property_type > r (
+            property_traits::create (i, f, this));
+
+          this->property_.push_back (::std::move (r));
+          continue;
+        }
 
         // memberEnd
         //
@@ -788,7 +820,8 @@ namespace arolios
     {
       if (this != &x)
       {
-        static_cast< ::arolios::model::Type_tlt& > (*this) = x;
+        static_cast< ::arolios::model::Element_tlt& > (*this) = x;
+        this->property_ = x.property_;
         this->memberEnd_ = x.memberEnd_;
       }
 

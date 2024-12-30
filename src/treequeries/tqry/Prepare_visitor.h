@@ -42,6 +42,8 @@ public:
 private:
     
     void add_filter (const std::string& p_filter, const Classifier& p_elem) ;
+    void visit_optional_association (Member_end& p_elem) ;
+
     
     Tree_query& query_;
     

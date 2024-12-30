@@ -60,17 +60,17 @@ void Query_stmt::add_column ( const Property& p_elem ) {
     }
 
     std::string col_name = alias + ".";
-
+    alias += "_";
     const auto column = p_elem.model_property()->column();
     if ( column ) {
         col_name += column->name();
-        alias += column->name();
+        alias +=  column->name();
         const auto nested = p_elem.nested_property();
         if ( nested ) {
             const auto nested_column = nested->model_property()->logical_field();
             col_name.insert ( 0,1, '(' );
             col_name += ")." + nested_column->name();
-            alias += nested_column->name();
+            alias += "_" + nested_column->name();
         }
         columns_.push_back ( col_name + " AS " + alias ) ;
 

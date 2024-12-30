@@ -105,6 +105,8 @@ void Execute_visitor::visit ( Class& p_elem ) {
         qry_stmt->build_sql_statement ();
         qry_stmts_.push ( qry_stmt );
 
+        std::cout << "INFO Export Class: " << p_elem.model_class()->name() << " Query: "<< qry_stmt->sql_statement() << std::endl;
+
         auto f = db_->execSqlAsyncFuture ( qry_stmt->sql_statement() );
 
         auto result = f.get();
@@ -271,6 +273,8 @@ void Execute_visitor::visit ( Member_end& p_elem ) {
             qry_stmt->build_sql_statement ();
 
             const std::string& query = qry_stmt->sql_statement();
+
+            std::cout << "INFO Export MemberEnd: " << p_elem.id_name() << " Query: "<< query << std::endl;
             
             auto f = db_->execSqlAsyncFuture ( query);
 
@@ -326,7 +330,9 @@ void Execute_visitor::visit ( Member_end& p_elem ) {
                 }
 
                 // process the type of the member end
-                p_elem.target()->accept ( *this );
+                if (p_elem.target()) {
+                    p_elem.target()->accept ( *this );
+                }
 
 
             }
@@ -362,7 +368,9 @@ void Execute_visitor::visit ( Member_end& p_elem ) {
             }
 
             // process the type of the member end
-            p_elem.target()->accept ( *this );
+            if (p_elem.target()) {
+                p_elem.target()->accept ( *this );
+            }
             current_jobj_ = csf_jobj;
         } else {
             // nothing to do
@@ -380,11 +388,11 @@ void Execute_visitor::visit ( Property& p_elem ) {
     auto key = p_elem.id_name ();
     auto column =terminal_prop->column() ;
     if ( column ) {
-        alias += column->name();
+        alias += "_"+ column->name();
         const auto nested = p_elem.nested_property();
         if ( nested ) {
             const auto nested_column = nested->model_property()->logical_field();
-            alias += nested_column->name();
+            alias += "_" + nested_column->name();
             terminal_prop = nested->model_property();
             
         }

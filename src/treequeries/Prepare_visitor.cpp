@@ -158,14 +158,20 @@ void Prepare_visitor::visit ( Member_end& p_elem ) {
             // referenced table is the target of the member end
             //new alias required
              // add alias for the target
-            p_elem.target()->table_alias(qry_stmts_.top()->new_alias() )  ;
-            const auto right_table = p_elem.target()->table_alias();
-            right_column = right_table + ".id";
-            
-            
-            join_stmt = Query_stmt::join_type_to_string ( qry_stmts_.top()->join_types().top() ) + " " + p_elem.target()->model_class()->table()->full_name() +
-                                 " AS " + right_table +
-                                 " ON " + left_column + "=" + right_column;
+            if (p_elem.target()) {
+              p_elem.target()->table_alias(qry_stmts_.top()->new_alias());
+              const auto right_table = p_elem.target()->table_alias();
+              right_column = right_table + ".id";
+
+              join_stmt = Query_stmt::join_type_to_string(
+                              qry_stmts_.top()->join_types().top()) +
+                          " " +
+                          p_elem.target()->model_class()->table()->full_name() +
+                          " AS " + right_table + " ON " + left_column + "=" +
+                          right_column;
+            } else {
+              throw exception::Failure("Member end has no target class");
+            }
         } else {
             // opposite must have a column
             auto prop_sub_field = me_model->property_by_sub_field();
@@ -181,26 +187,40 @@ void Prepare_visitor::visit ( Member_end& p_elem ) {
 
                 //referencing table is the target class 
                 // new alias required
-                p_elem.target()->table_alias(qry_stmts_.top()->new_alias() )  ;
-                const auto right_table = p_elem.target()->table_alias();
-            
-                right_column = right_table + "." + prop_sub_field->filtering_column()->name();
-                
-                join_stmt = Query_stmt::join_type_to_string ( qry_stmts_.top()->join_types().top() ) + " " + p_elem.target()->model_class()->table()->full_name() +
-                " AS " + right_table +
-                " ON " + left_column + "=" + right_column;
+                if (p_elem.target()) {
 
+                  p_elem.target()->table_alias(qry_stmts_.top()->new_alias());
+                  const auto right_table = p_elem.target()->table_alias();
+
+                  right_column = right_table + "." +
+                                 prop_sub_field->filtering_column()->name();
+
+                  join_stmt =
+                      Query_stmt::join_type_to_string(
+                          qry_stmts_.top()->join_types().top()) +
+                      " " +
+                      p_elem.target()->model_class()->table()->full_name() +
+                      " AS " + right_table + " ON " + left_column + "=" +
+                      right_column;
+                } else {
+                  throw exception::Failure("Member end has no target class");
+                }
             } else {
-                std::string error_msg = "Member end " + me_model->name()  + " is not mapped to a relational object";
-                 
-                throw exception::Failure ( error_msg );
+              std::string error_msg = "Member end " + me_model->name() +
+                                      " is not mapped to a relational object";
+
+              throw exception::Failure(error_msg);
             }
         }
 
         qry_stmts_.top()->add_join ( join_stmt );
 
-        p_elem.target()->accept (*this);
+        if ( p_elem.target()) {
+            p_elem.target()->accept (*this);
+        }
         qry_stmts_.top()->join_types().pop();
+
+        visit_optional_association (p_elem);
 
     } else {
         // target is Many, need a new qry_stmt
@@ -211,7 +231,7 @@ void Prepare_visitor::visit ( Member_end& p_elem ) {
         // FROM is the classifier owning the member end
         qry_stmt->add_from(*(p_elem.classifier()), true);
 
-  
+
 
         // the source of the member end is the FROM table
         // this source = target of the opposite
@@ -243,19 +263,25 @@ void Prepare_visitor::visit ( Member_end& p_elem ) {
                     const auto left_column = left_table + ".id";
 
                     //referencing table is the target
- 
-                    
-                    p_elem.target()->table_alias(qry_stmts_.top()->new_alias() )  ;
-                    const auto right_table = p_elem.target()->table_alias();
-                
-                    const auto right_column = right_table + "." + opposite->column()->name();
-                    
-                    const auto stmt = Query_stmt::join_type_to_string ( qry_stmts_.top()->join_types().top() ) + " " + p_elem.target()->model_class()->table()->full_name() +
-                    " AS " + right_table +
-                    " ON " + left_column + "=" + right_column;
-                    
-                    qry_stmts_.top()->add_join ( stmt );
 
+                    if (p_elem.target()) {
+                      p_elem.target()->table_alias(
+                          qry_stmts_.top()->new_alias());
+                      const auto right_table = p_elem.target()->table_alias();
+
+                      const auto right_column =
+                          right_table + "." + opposite->column()->name();
+
+                      const auto stmt =
+                          Query_stmt::join_type_to_string(
+                              qry_stmts_.top()->join_types().top()) +
+                          " " +
+                          p_elem.target()->model_class()->table()->full_name() +
+                          " AS " + right_table + " ON " + left_column + "=" +
+                          right_column;
+
+                      qry_stmts_.top()->add_join(stmt);
+                    }
 
                 } else  { // association Many to Many
                     // association has its own table , 2 JOINs are necessary
@@ -301,8 +327,6 @@ void Prepare_visitor::visit ( Member_end& p_elem ) {
                     {
                         // second JOIN with the target class
                         if ( me_model->column() ) {
-                            // add alias for target
-                             p_elem.target()->table_alias(qry_stmts_.top()->new_alias() )  ;
 
                             const auto join_type = ( me_model->min_occurs() == 1 )  ?
                                                    ( ( qry_stmts_.top()->join_types().top() == Query_stmt::Join_type::left ) ?
@@ -317,14 +341,25 @@ void Prepare_visitor::visit ( Member_end& p_elem ) {
                             const auto left_column = left_table + "." + me_model->column()->name();
 
                             // referenced table is the target of the member end
-                            p_elem.target()->table_alias ( qry_stmts_.top()->new_alias() )  ;
-                            const auto right_table = p_elem.target()->table_alias();
-                            const auto right_column = right_table + ".id";
-                            const std::string stmt = Query_stmt::join_type_to_string ( qry_stmts_.top()->join_types().top() ) + " " + p_elem.target()->model_class()->table()->full_name() +
-                                                     " AS " + right_table +
-                                                     " ON " + left_column + "=" + right_column;
-                            qry_stmts_.top()->add_join ( stmt );
-
+                            // add alias for target
+                            if (p_elem.target()) {
+                              p_elem.target()->table_alias(
+                                  qry_stmts_.top()->new_alias());
+                              const auto right_table =
+                                  p_elem.target()->table_alias();
+                              const auto right_column = right_table + ".id";
+                              const std::string stmt =
+                                  Query_stmt::join_type_to_string(
+                                      qry_stmts_.top()->join_types().top()) +
+                                  " " +
+                                  p_elem.target()
+                                      ->model_class()
+                                      ->table()
+                                      ->full_name() +
+                                  " AS " + right_table + " ON " + left_column +
+                                  "=" + right_column;
+                              qry_stmts_.top()->add_join(stmt);
+                            }
                         } else {
                             std::string error_msg = "Member end " + me_model->name()  + " is not mapped to a relational object";
                              
@@ -336,10 +371,13 @@ void Prepare_visitor::visit ( Member_end& p_elem ) {
 
                    
                 }
-
-                p_elem.target()->accept(*this);
+                if (p_elem.target()) {
+                  p_elem.target()->accept(*this);
+                }
                 qry_stmts_.top()->join_types().pop();
                 
+                visit_optional_association (p_elem);
+
                 qry_stmts_.pop();
 
             } else {
@@ -357,6 +395,11 @@ void Prepare_visitor::visit ( Member_end& p_elem ) {
 
     }
     
+
+
+}
+
+void Prepare_visitor::visit_optional_association (Member_end& p_elem) {
     if (p_elem.optional_association()) {
         if (p_elem.association()->table_alias().empty()) {
             // need new JOIN
@@ -369,7 +412,6 @@ void Prepare_visitor::visit ( Member_end& p_elem ) {
         p_elem.association()->accept(*this);
         
     }
-
 }
 void Prepare_visitor::visit (Property& p_elem) {
     

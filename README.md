@@ -10,8 +10,8 @@ If you have an issue or a suggestion for improvement, open a ticket in this proj
  
 # Contribution
 
-See the file CONTRIBUTING.md 
+See the CONTRIBUTING.md file
   
 # License
 
-AROLIOS Core is published under the GNU LGPL license (SPDX identifier: LGPL-3.0-or-later). View the file COPYING.LESSER
+AROLIOS Core is published under the GNU LGPL license (SPDX identifier: LGPL-3.0-or-later). See the COPYING.LESSER file

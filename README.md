@@ -1,2 +1,17 @@
+# General overview 
+See the presentation [here](https://lab.frogg.it/philcoicadan/arolios-doc/-/blob/main/src/Intro_fr.md) 
 
-See the [french version](./README_fr.md)
+# Documentation 
+See the documentation [here](https://lab.frogg.it/philcoicadan/arolios-doc) 
+
+# Support
+ 
+If you have an issue or a suggestion for improvement, open a ticket in this project. For any other request, you can send an email to [this address](mailto:philcoicadan@arolios.org). 
+ 
+# Contribution
+
+See the file CONTRIBUTING.md 
+  
+# License
+
+AROLIOS Core is published under the GNU LGPL license (SPDX identifier: LGPL-3.0-or-later). View the file COPYING.LESSER

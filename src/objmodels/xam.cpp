@@ -259,6 +259,52 @@ namespace arolios
       this->association_ = s;
     }
 
+    const Domain_t::primitive_sequence& Domain_t::
+    primitive () const
+    {
+      return this->primitive_;
+    }
+
+    Domain_t::primitive_sequence& Domain_t::
+    primitive ()
+    {
+      return this->primitive_;
+    }
+
+    void Domain_t::
+    primitive (const primitive_sequence& s)
+    {
+      this->primitive_ = s;
+    }
+
+
+    // Primitive_t
+    // 
+
+    const Primitive_t::native_type& Primitive_t::
+    native () const
+    {
+      return this->native_.get ();
+    }
+
+    Primitive_t::native_type& Primitive_t::
+    native ()
+    {
+      return this->native_.get ();
+    }
+
+    void Primitive_t::
+    native (const native_type& x)
+    {
+      this->native_.set (x);
+    }
+
+    void Primitive_t::
+    native (::std::unique_ptr< native_type > x)
+    {
+      this->native_.set (std::move (x));
+    }
+
 
     // Type_t
     // 
@@ -1062,7 +1108,8 @@ namespace arolios
       enumeration_ (this),
       type_ (this),
       class__ (this),
-      association_ (this)
+      association_ (this),
+      primitive_ (this)
     {
     }
 
@@ -1074,7 +1121,8 @@ namespace arolios
       enumeration_ (x.enumeration_, f, this),
       type_ (x.type_, f, this),
       class__ (x.class__, f, this),
-      association_ (x.association_, f, this)
+      association_ (x.association_, f, this),
+      primitive_ (x.primitive_, f, this)
     {
     }
 
@@ -1086,7 +1134,8 @@ namespace arolios
       enumeration_ (this),
       type_ (this),
       class__ (this),
-      association_ (this)
+      association_ (this),
+      primitive_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -1151,6 +1200,17 @@ namespace arolios
           continue;
         }
 
+        // primitive
+        //
+        if (n.name () == "primitive" && n.namespace_ ().empty ())
+        {
+          ::std::unique_ptr< primitive_type > r (
+            primitive_traits::create (i, f, this));
+
+          this->primitive_.push_back (::std::move (r));
+          continue;
+        }
+
         break;
       }
     }
@@ -1172,6 +1232,7 @@ namespace arolios
         this->type_ = x.type_;
         this->class__ = x.class__;
         this->association_ = x.association_;
+        this->primitive_ = x.primitive_;
       }
 
       return *this;
@@ -1179,6 +1240,93 @@ namespace arolios
 
     Domain_t::
     ~Domain_t ()
+    {
+    }
+
+    // Primitive_t
+    //
+
+    Primitive_t::
+    Primitive_t (const name_type& name,
+                 const native_type& native)
+    : ::arolios::model::Element_t (name),
+      native_ (native, this)
+    {
+    }
+
+    Primitive_t::
+    Primitive_t (const Primitive_t& x,
+                 ::xml_schema::flags f,
+                 ::xml_schema::container* c)
+    : ::arolios::model::Element_t (x, f, c),
+      native_ (x.native_, f, this)
+    {
+    }
+
+    Primitive_t::
+    Primitive_t (const ::xercesc::DOMElement& e,
+                 ::xml_schema::flags f,
+                 ::xml_schema::container* c)
+    : ::arolios::model::Element_t (e, f | ::xml_schema::flags::base, c),
+      native_ (this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void Primitive_t::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      this->::arolios::model::Element_t::parse (p, f);
+
+      p.reset_attributes ();
+
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "native" && n.namespace_ ().empty ())
+        {
+          this->native_.set (native_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!native_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "native",
+          "");
+      }
+    }
+
+    Primitive_t* Primitive_t::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class Primitive_t (*this, f, c);
+    }
+
+    Primitive_t& Primitive_t::
+    operator= (const Primitive_t& x)
+    {
+      if (this != &x)
+      {
+        static_cast< ::arolios::model::Element_t& > (*this) = x;
+        this->native_ = x.native_;
+      }
+
+      return *this;
+    }
+
+    Primitive_t::
+    ~Primitive_t ()
     {
     }
 

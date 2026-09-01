@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -24,7 +24,7 @@ using namespace std::chrono_literals;
 int main(int argc, char *argv[]) {
   std::cout << "AROLIOS is a trademark registered in France." << std::endl
   << "AROLIOS Core is a software library implementing the AROLIOS features." << std::endl
-  << "Copyright (C) 2024 Philippe Coicadan. All rights reserved." << std::endl 
+  << "Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved." << std::endl 
   << "License: LGPL-3.0-or-later" << std::endl
   ;
     int expected_args = 3 ;
@@ -40,9 +40,6 @@ int main(int argc, char *argv[]) {
       auto clientPtr = drogon::orm::DbClient::newPgClient(
                db_info.connection(),
                1) ;
-           // DbClient::newPgClient("host=127.0.0.1 port=5432 dbname=test
-           // user=antao",
-           //                      3);
 
         std::this_thread::sleep_for(1s);
 

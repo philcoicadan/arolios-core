@@ -1,15 +1,17 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
 #pragma once
 #include <omm/Classifier.h>
 #include <omm/Data_type.h>
+#include <omm/Composite_type.h>
+#include <omm/Primitive_type.h>
 #include <omm/Property.h>
 #include <omm/Enum_value.h>
-#include <qry/Native_type.h>
+#include <util/Native_type.h>
 
 namespace arolios {
 
@@ -30,10 +32,6 @@ class Object_model_info
     virtual ~Object_model_info ();
     
 
-    const std::unordered_map<std::string, qry::Native_type>& primitive_native_types_map () const { return prim_native_types_map_; }
-
-    
-    std::shared_ptr<omm::Data_type> find_primitive_type_by_name (const std::string& p_type_name, const bool p_only_active=true) const ;
     std::shared_ptr<omm::Data_type> find_standard_type_by_name (const std::string& p_type_name, const bool p_only_active=true) const ;
 
     
@@ -54,8 +52,7 @@ class Object_model_info
     void insert_property (const std::shared_ptr<omm::Property>& p_prop) ;
     void insert_enum_value (const std::shared_ptr<omm::Enum_value>& p_prop) ;
 
-    void map_native_primitive_type (const std::string& p_prim, const std::string& p_native) ;
-    
+ 
     
     
     const std::shared_ptr<omm::Package>& root_domain () const { return root_pk_; }
@@ -86,8 +83,7 @@ protected:
     std::unordered_map<std::string, std::shared_ptr<omm::Enum_value>> enum_val_id_map_;
 
     
-    std::unordered_map<std::string, qry::Native_type> prim_native_types_map_;
- 
+
 
    
   private:

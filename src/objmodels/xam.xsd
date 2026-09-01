@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--                                                           
  
-  Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+  Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
   License: LGPL-3.0-or-later
  
  -->
@@ -50,19 +50,26 @@
 						<xsd:element name="type" type="t:Type_t" minOccurs="0" maxOccurs="unbounded"/>
 						<xsd:element name="class" type="t:Class_t" minOccurs="0" maxOccurs="unbounded"/>
 						<xsd:element name="association" type="t:Association_t" minOccurs="0" maxOccurs="unbounded"/>	
+						<xsd:element name="primitive" type="t:Primitive_t" minOccurs="0" maxOccurs="unbounded"/>	
 					</xsd:choice>
 				</xsd:sequence>
 			</xsd:extension>	
 		</xsd:complexContent>
 	</xsd:complexType>
 	
+	<xsd:complexType name="Primitive_t">
+		<xsd:complexContent>
+			<xsd:extension base="t:Element_t">
+			<xsd:attribute name="native" type="xsd:string" use="required"/> 
+			</xsd:extension>	
+		</xsd:complexContent>	
+	</xsd:complexType>
 
-
-<xsd:complexType name="Type_t">
+	<xsd:complexType name="Type_t">
 		<xsd:complexContent>
 			<xsd:extension base="t:Element_t">
 				<xsd:sequence>
-					<xsd:element name="property" type="t:Type_property_t" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element name="property" type="t:Type_property_t" minOccurs="1" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension>	
 		</xsd:complexContent>	
@@ -102,10 +109,7 @@
 	<xsd:complexType name="Type_property_t">
 		<xsd:complexContent>
 			<xsd:extension base="t:Element_t">
-				<xsd:attribute name="type" type="xsd:NCName" use="required"/>
-
-
-				
+				<xsd:attribute name="type" type="xsd:NCName" use="required"/>	
 			</xsd:extension>	
 		</xsd:complexContent>
 	</xsd:complexType>

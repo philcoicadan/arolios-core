@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -13,7 +13,7 @@
 #include <omm/Logical_field.h>
 #include <util/String.h>
 #include <qry/Util.h>
-#include <qry/Native_type.h>
+#include <util/Native_type.h>
 #include <exception/Exceptions.h>
 #include <json/value.h>
 
@@ -44,7 +44,7 @@ void Class_instance_read::build_ids_json ( const qry::Db_row& p_row, Json::Value
    
     if (usage_ ==  qry::Util::Read_mode::read_for_update ) {
         auto && field3 = p_row["upd_count"];
-        qry::Native_type native_type = qry::Native_type::_integer;
+        util::Native_type native_type = util::Native_type::integer;
         p_root_json["upd_count"] = qry::Util::native_to_json ( native_type, field3 ) ; ;
     }
     
@@ -127,10 +127,10 @@ void Class_instance_read::build_property_json ( const std::string& p_name, const
         auto && column_name = p_column_path+ p_prop->logical_field()->name();
         auto && field = p_row[column_name];
         if ( !field.isNull() ) {
-            qry::Native_type native_type;
+            util::Native_type native_type;
             if ( p_prop->has_enum_type() ) {
                 // enum value is like a char string
-                native_type = qry::Native_type::_character_varying;
+                native_type = util::Native_type::character_varying;
                 // add translation of the enum value
                 auto field_enum_id = p_row[ column_name + "_val_id"];
                 if (!field_enum_id.isNull()) {
@@ -144,7 +144,7 @@ void Class_instance_read::build_property_json ( const std::string& p_name, const
                 }
             } else {
                 // prop type is a primitive
-                native_type = static_cast<qry::Native_type> ( p_prop->logical_field()->native_type() );
+                native_type = static_cast<util::Native_type> ( p_prop->logical_field()->native_type() );
             }
                p_root_json [p_name] = qry::Util::native_to_json ( native_type, field ) ;
 

@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -386,15 +386,13 @@ void Domain_post_implementor::prepare_declaration_for_fts_column ( const std::sh
                 }
             }
 
-        } else {
+        } else if ( prop->has_primitive_type ()){
         
-            if ( mdl_info->find_primitive_type_by_name(prop->type()->name() )) {
                 
                 auto && fragment_str = Util::make_fts_fragment_from_field ( p_field, p_path );
                 if (!fragment_str.empty()) {
                     p_fts_fragments_str += fragment_str + p_fragment_sep ;
                 }
-            }
         }
     }
 }

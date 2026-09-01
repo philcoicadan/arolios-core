@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -11,10 +11,6 @@
 using namespace arolios;
 using namespace arolios::omm;
 
-
-std::unordered_set<std::shared_ptr<Constraint>>& Packageable_element::constraints()  {
-	return constraints_;
-}
 
 Lc_status Packageable_element::lc_status() const  {
     return lc_status_;

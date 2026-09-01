@@ -1,13 +1,16 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
+#include "util/Native_type.h"
 #include <omm/Model_factory.h>
 #include <omm/Column.h>
 #include <omm/Class_attributes.h>
 #include <omm/Property_attributes.h>
+#include <omm/Primitive_attributes.h>
+#include <omm/Primitive_type.h>
 #include <iostream>
 
 
@@ -56,11 +59,21 @@ template <>  std::shared_ptr<omm::Class> Model_factory::make<omm::Class>(const s
     return result;
 }
 
-template <>  std::shared_ptr<omm::Data_type> Model_factory::make<omm::Data_type>(const std::shared_ptr<omm::Persistent_object>& p_pers_elem, const std::string& p_name, const std::shared_ptr<omm::Packageable_element>& p_parent, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status, const std::string& p_desc ) {
+template <>  std::shared_ptr<omm::Composite_type> Model_factory::make<omm::Composite_type>(const std::shared_ptr<omm::Persistent_object>& p_pers_elem, const std::string& p_name, const std::shared_ptr<omm::Packageable_element>& p_parent, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status, const std::string& p_desc ) {
     
     auto parent = std::dynamic_pointer_cast<omm::Package>(p_parent);
     
-    auto result = make_data_type (p_name, parent, p_status, p_desc);
+    auto result = make_composite_type (p_name, parent, p_status, p_desc);
+    result->persistent_attributes (p_pers_elem->id(), p_pers_elem->id_scope());
+    return result;
+}
+
+template <>  std::shared_ptr<omm::Primitive_type> Model_factory::make<omm::Primitive_type>(const std::shared_ptr<omm::Persistent_object>& p_pers_elem, const std::string& p_name, const std::shared_ptr<omm::Packageable_element>& p_parent, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status, const std::string& p_desc ) {
+    
+    auto parent = std::dynamic_pointer_cast<omm::Package>(p_parent);
+    const omm::Primitive_attributes& attrs =dynamic_cast<const omm::Primitive_attributes&> (p_attrs);
+
+    auto result = make_primitive_type (p_name, parent, attrs.native_type_, p_status, p_desc);
     result->persistent_attributes (p_pers_elem->id(), p_pers_elem->id_scope());
     return result;
 }
@@ -137,12 +150,22 @@ std::shared_ptr<omm::Class> Model_factory::make_class(const std::string& p_name,
 	return result;
 }
 
-std::shared_ptr<omm::Data_type> Model_factory::make_data_type(const std::string& p_name, const std::shared_ptr<omm::Package>& p_package, const omm::Lc_status p_status, const std::string& p_desc ) {
-	std::shared_ptr<omm::Data_type> result = std::make_shared<omm::Data_type>();
+std::shared_ptr<omm::Composite_type> Model_factory::make_composite_type(const std::string& p_name, const std::shared_ptr<omm::Package>& p_package, const omm::Lc_status p_status, const std::string& p_desc ) {
+	std::shared_ptr<omm::Composite_type> result = std::make_shared<omm::Composite_type>();
 	package_element_attributes ( result, p_name, p_package,p_status, p_desc );
-	p_package->insert<omm::Data_type>(result);
+	p_package->insert<omm::Composite_type>(result);
     return result;
 }
+
+std::shared_ptr<omm::Primitive_type> Model_factory::make_primitive_type(const std::string& p_name, const std::shared_ptr<omm::Package>& p_package, const util::Native_type& p_native_type, const omm::Lc_status p_status, const std::string& p_desc ) {
+    std::shared_ptr<omm::Primitive_type> result = std::make_shared<omm::Primitive_type>();
+	package_element_attributes ( result, p_name, p_package,p_status, p_desc );
+    result->native_type(p_native_type);
+	p_package->insert<omm::Primitive_type>(result);
+    return result;
+
+}
+
 std::shared_ptr<omm::Enumeration> Model_factory::make_enumeration(const std::string& p_name, const std::shared_ptr<omm::Package>& p_package, const omm::Lc_status p_status, const std::string& p_desc ) {
 	std::shared_ptr<omm::Enumeration> result = std::make_shared<omm::Enumeration>();
 	package_element_attributes ( result, p_name, p_package,p_status, p_desc);
@@ -178,16 +201,14 @@ std::shared_ptr<omm::Property> Model_factory::make_member_end(const std::string&
 	return result;
 }
 
-std::shared_ptr<omm::Constraint> Model_factory::make_constraint( const std::string& p_name, const std::shared_ptr<omm::Namespace>& p_namespace, const std::shared_ptr<omm::Packageable_element>& p_constrained_elem, const std::string& p_expression , const omm::Lc_status p_status, const std::string& p_desc ) {
+std::shared_ptr<omm::Constraint> Model_factory::make_constraint( const std::string& p_name, const std::shared_ptr<omm::Classifier>& p_classifier, const std::string& p_expression , const omm::Lc_status p_status, const std::string& p_desc ) {
 	std::shared_ptr<omm::Constraint> result = std::make_shared<omm::Constraint>();
 	result->name(p_name);
     result->lc_status(p_status);
     result->expression(p_expression);
 	result->description (p_desc);
-	result->own_namespace(p_namespace);
-	p_namespace->insert_element (result);
-	result->constrained_elements().insert(p_constrained_elem);
-	p_constrained_elem->constraints().insert(result);
+	result->classifier(p_classifier);
+	p_classifier->insert_constraint(result);
 	return result;
 }
 
@@ -410,7 +431,9 @@ template void Model_factory::update<omm::Class> ( const std::shared_ptr<omm::Cla
 
 template void Model_factory::update<omm::Association> ( const std::shared_ptr<omm::Association>& p_elem, const std::string& p_new_name,  const std::string& p_new_desc, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status ) ;
 
-template void Model_factory::update<omm::Data_type> ( const std::shared_ptr<omm::Data_type>& p_elem, const std::string& p_new_name,  const std::string& p_new_desc, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status ) ;
+template void Model_factory::update<omm::Composite_type> ( const std::shared_ptr<omm::Composite_type>& p_elem, const std::string& p_new_name,  const std::string& p_new_desc, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status ) ;
+
+template void Model_factory::update<omm::Primitive_type> ( const std::shared_ptr<omm::Primitive_type>& p_elem, const std::string& p_new_name,  const std::string& p_new_desc, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status ) ;
 
 template void Model_factory::update<omm::Enumeration> ( const std::shared_ptr<omm::Enumeration>& p_elem, const std::string& p_new_name,  const std::string& p_new_desc, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status ) ;
 
@@ -473,6 +496,19 @@ void Model_factory::specific_attributes_update ( const std::shared_ptr<omm::Prop
                p_elem->min_occurs ( attrs.min_ ) ;
           }
      }
+
+}
+
+void Model_factory::specific_attributes_update ( const std::shared_ptr<omm::Primitive_type>& p_elem,  const omm::Element_attributes& p_attrs ) {
+    
+    
+    const omm::Primitive_attributes& attrs =dynamic_cast<const omm::Primitive_attributes&> (p_attrs);
+    
+    if (attrs.native_type_ != p_elem->native_type()) {
+        std::cerr << "Update of the primitive type " + p_elem->name() + " : the native type cannot be modified. Delete the primitive and create again with another primitive type " << std::endl;
+        
+    } 
+
 
 }
 

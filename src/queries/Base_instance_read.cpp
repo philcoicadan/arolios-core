@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -8,7 +8,7 @@
 #include <omm/Logical_field.h>
 #include <util/String.h>
 #include <exception/Exceptions.h>
-#include <qry/Native_type.h>
+#include <util/Native_type.h>
 #include <qry/Util.h>
 
 
@@ -60,7 +60,7 @@ void Base_instance_read::build_linked_property_json (const std::string& p_key, c
 
         const auto field = p_row[ field_key];
         if ( ! field.isNull() ) {
-            qry::Native_type native_type;
+            util::Native_type native_type;
             if ( p_prop->has_referencing_type() ) {
                 jrow[jkey] = Json::Value ( Json::objectValue );
                 Json::Value& ref_jrow = jrow[jkey];
@@ -77,7 +77,7 @@ void Base_instance_read::build_linked_property_json (const std::string& p_key, c
             } else {
                 if ( p_prop->has_enum_type() ) {
                     // enum value is like a char string
-                    native_type = qry::Native_type::_character_varying;
+                    native_type = util::Native_type::character_varying;
                     // add translation of the enum value
                     auto field_enum_id = p_row[ field_key + "_val_id"];
                     if (!field_enum_id.isNull()) {
@@ -91,7 +91,7 @@ void Base_instance_read::build_linked_property_json (const std::string& p_key, c
                     }
                 } else {
                     // prop type is a primitive
-                    native_type = static_cast<qry::Native_type> ( p_prop->logical_field()->native_type() );
+                    native_type = static_cast<util::Native_type> ( p_prop->logical_field()->native_type() );
                 }
 
                 jrow[jkey] =  qry::Util::native_to_json ( native_type, field ) ;

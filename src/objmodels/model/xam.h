@@ -233,6 +233,7 @@ namespace arolios
     class Model_t;
     class Element_t;
     class Domain_t;
+    class Primitive_t;
     class Type_t;
     class Class_t;
     class Classifier_identifier_t;
@@ -510,6 +511,23 @@ namespace arolios
       void
       association (const association_sequence& s);
 
+      // primitive
+      //
+      typedef ::arolios::model::Primitive_t primitive_type;
+      typedef ::xsd::cxx::tree::sequence< primitive_type > primitive_sequence;
+      typedef primitive_sequence::iterator primitive_iterator;
+      typedef primitive_sequence::const_iterator primitive_const_iterator;
+      typedef ::xsd::cxx::tree::traits< primitive_type, char > primitive_traits;
+
+      const primitive_sequence&
+      primitive () const;
+
+      primitive_sequence&
+      primitive ();
+
+      void
+      primitive (const primitive_sequence& s);
+
       // Constructors.
       //
       Domain_t (const name_type&);
@@ -544,6 +562,61 @@ namespace arolios
       type_sequence type_;
       class_sequence class__;
       association_sequence association_;
+      primitive_sequence primitive_;
+    };
+
+    class Primitive_t: public ::arolios::model::Element_t
+    {
+      public:
+      // native
+      //
+      typedef ::xml_schema::string native_type;
+      typedef ::xsd::cxx::tree::traits< native_type, char > native_traits;
+
+      const native_type&
+      native () const;
+
+      native_type&
+      native ();
+
+      void
+      native (const native_type& x);
+
+      void
+      native (::std::unique_ptr< native_type > p);
+
+      // Constructors.
+      //
+      Primitive_t (const name_type&,
+                   const native_type&);
+
+      Primitive_t (const ::xercesc::DOMElement& e,
+                   ::xml_schema::flags f = 0,
+                   ::xml_schema::container* c = 0);
+
+      Primitive_t (const Primitive_t& x,
+                   ::xml_schema::flags f = 0,
+                   ::xml_schema::container* c = 0);
+
+      virtual Primitive_t*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      Primitive_t&
+      operator= (const Primitive_t& x);
+
+      virtual 
+      ~Primitive_t ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      ::xsd::cxx::tree::one< native_type > native_;
     };
 
     class Type_t: public ::arolios::model::Element_t

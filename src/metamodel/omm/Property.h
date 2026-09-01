@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -71,6 +71,8 @@ namespace omm {
         virtual bool has_composite_type() const ;
         
         virtual bool has_enum_type () const;   
+
+        virtual bool has_primitive_type () const;
         
         virtual bool has_referencing_type () const;
         

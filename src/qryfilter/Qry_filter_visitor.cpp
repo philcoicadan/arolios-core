@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -176,13 +176,13 @@ std::any Qry_filter_visitor::visitBindParameter(FilterParser::BindParameterConte
     auto search = param_values_.find(ctx->Identifier()->getText());
     if (search != param_values_.end()) {
         if (last_field_) {
-            qry::Native_type native_type;
+            util::Native_type native_type;
             if ( last_field_->property()->has_enum_type() ) {
                 // enum value is like a char string
-                native_type = qry::Native_type::_character_varying;
+                native_type = util::Native_type::character_varying;
             } else {
                 // prop type is a primitive
-                native_type = static_cast<qry::Native_type> ( last_field_->native_type() );
+                native_type = static_cast<util::Native_type> ( last_field_->native_type() );
             }
             filter_+= qry::Util::json_to_native (native_type, search->second);
         } else {
@@ -208,13 +208,13 @@ std::any Qry_filter_visitor::visitValue(FilterParser::ValueContext *ctx) {
     //filter_ += ctx->getText() ;
     
     if ( last_field_ ) {
-        qry::Native_type native_type;
+        util::Native_type native_type;
         if ( last_field_->property()->has_enum_type() ) {
             // enum value is like a char string
-            native_type = qry::Native_type::_character_varying;
+            native_type = util::Native_type::character_varying;
         } else {
             // prop type is a primitive
-            native_type = static_cast<qry::Native_type> ( last_field_->native_type() );
+            native_type = static_cast<util::Native_type> ( last_field_->native_type() );
         }
         std::string text = ctx->getText();
         if (text.front() == '\'' || text.front() == '"' ) {
@@ -224,7 +224,7 @@ std::any Qry_filter_visitor::visitValue(FilterParser::ValueContext *ctx) {
             text.erase(text.length()-1,1);
         };
         
-        filter_+= qry::Util::string_to_native ( native_type, text );
+        filter_+= qry::Util::native_data_to_string ( native_type, text );
     } else {
         std::string error_msg = "error in the query filter: " + ctx->getText();
          

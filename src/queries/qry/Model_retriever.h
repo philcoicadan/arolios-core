@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -39,9 +39,7 @@ public:
     void retrieve_init(const std::string& p_root_pk_id, const std::string& p_std_pk_id) const ;
     
     void retrieve_user_domains () const ;
-
-    void retrieve_standard_types () const;
-    
+ 
     void retrieve_classifiers ( const std::shared_ptr<omm::Package>& p_pk ) const;
     
     void retrieve_properties ( const std::shared_ptr<omm::Package>& p_pk ) const;

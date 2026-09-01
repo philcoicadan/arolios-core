@@ -1,9 +1,11 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
+#include "omm/Primitive_type.h"
+#include <omm/Composite_type.h>
 #include <omm/Enumeration.h>
 #include <omm/Class.h>
 #include <omm/Association.h>
@@ -226,6 +228,8 @@ void Model_implementor::visit(const Model_element_delete<Enumeration_t,omm::Enum
     
         
     const auto stored = p_store.stored();
+
+    // enumeration implemented in a type ( ... as enum ...)
     
     delete_classifier (stored, "TYPE");
 
@@ -235,15 +239,13 @@ void Model_implementor::visit(const Model_element_delete<Enumeration_t,omm::Enum
 
 
 
-void Model_implementor::visit (const Model_element_create<Type_t,omm::Data_type >& p_store) {
+void Model_implementor::visit (const Model_element_create<Type_t,omm::Composite_type >& p_store) {
 
 
      std::shared_ptr<qry::Db_transaction> transPtr = mdl_rcd_.transaction();
     
     auto type_stored = p_store.stored();
-    auto  mdl_info = common::Singleton<common::Object_model_info>::instance().object();
-     if (  mdl_info->find_primitive_type_by_name(type_stored->name()) == nullptr ) { //if  primitive => no RDB object
-         
+
         std::string qualified_name = Util::make_logical_struct_full_name (type_stored);
         // create composite type empty
         std::string stmt = "CREATE TYPE " + qualified_name + " AS ()" ;
@@ -263,24 +265,37 @@ void Model_implementor::visit (const Model_element_create<Type_t,omm::Data_type 
              
             throw e;
         }
-     }
 
 	
 
 }
 
 
-void Model_implementor::visit(const Model_element_update<Type_t,omm::Data_type >& p_store) {
+void Model_implementor::visit(const Model_element_update<Type_t,omm::Composite_type >& p_store) {
          //  no impact, the type keeps the same name
 
 }
 
-void Model_implementor::visit(const Model_element_delete<Type_t,omm::Data_type >& p_store) {
+void Model_implementor::visit(const Model_element_delete<Type_t,omm::Composite_type >& p_store) {
     
         
     const auto stored = p_store.stored();
     
     delete_classifier (stored, "TYPE");
+} 
+
+void Model_implementor::visit (const Model_element_create<Primitive_t,omm::Primitive_type >& p_store) {
+    // primitive type : native type, no RDB object
+}
+
+void Model_implementor::visit(const Model_element_update<Primitive_t,omm::Primitive_type >& p_store) {
+    //  no impact, the type keeps the same name
+}
+
+void Model_implementor::visit(const Model_element_delete<Primitive_t,omm::Primitive_type >& p_store) {
+    
+    // nothing to do for a primitive    
+
 } 
 
 
@@ -637,7 +652,7 @@ void Model_implementor::visit ( const Model_element_create<Member_end_t,omm::Pro
             
             auto r = transPtr->execSqlSync ( stmt );
 
-            qry::Native_type ref_type = qry::Native_type::_bigint;
+            util::Native_type ref_type = util::Native_type::bigint;
             auto column = omm::Model_factory::instance().make_column ( p_store.stored(), column_name, assoc->table(), static_cast<int> ( ref_type ) );
 
             auto && cctt =  omm::Model_factory::instance().make_column_constraint ( column, omm::Column_constraint::Type::unique );
@@ -682,7 +697,7 @@ void Model_implementor::visit ( const Model_element_create<Member_end_t,omm::Pro
                 const std::string column_name = Util::make_column_name_for_association ( p_store.stored(), impl_class, assoc );
 
                 // the reference is  a column, column type is bigint
-                qry::Native_type ref_type = qry::Native_type::_bigint;
+                util::Native_type ref_type = util::Native_type::bigint;
                 auto && column = omm::Model_factory::instance().make_column ( p_store.stored(), column_name, assoc->managing_table(), static_cast<int> ( ref_type ) );
 
                 prepare_declaration_for_reference_column ( stmt, p_store.stored(), column_name, table_name,  is_root,  members[pos]->isComposition(), ( p_store.stored()->min_occurs() >0 ), ( members[pos]->maxOccurs() == "one" ), impl_class );
@@ -953,7 +968,7 @@ void Model_implementor::add_complementary_table (const std::shared_ptr<omm::Asso
 
       
             //  column type is bigint
-            qry::Native_type ref_type = qry::Native_type::_bigint;
+            util::Native_type ref_type = util::Native_type::bigint;
             columns[k] = omm::Model_factory::instance().make_column ( ( *members_vec ) [k], column_names[k], table, static_cast<int>(ref_type) );
 
     

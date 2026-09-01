@@ -1,11 +1,12 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
 #include <mttr/Field_maker.h>
 #include <omm/Enumeration.h>
+#include <omm/Primitive_type.h>
 #include <util/String.h>
 #include <mttr/Instance_field.h>
 #include <mttr/Classifier_instance_row.h>
@@ -18,7 +19,7 @@
 #include <exception/Exceptions.h>
 #include <util/String.h>
 #include <qry/Util.h>
-#include <qry/Native_type.h>
+#include <util/Native_type.h>
 
 
 
@@ -75,7 +76,7 @@ void Field_maker::visit (const omm::Class& p_elem) {
                 const std::shared_ptr<const Json::Value> row_id_value = std::make_shared<const Json::Value>(Json::Value::UInt64(row_id));
 
                 
-                auto && field = std::make_shared<mttr::Instance_field> ( column_name, qry::Native_type::_bigint, row_id_value) ;
+                auto && field = std::make_shared<mttr::Instance_field> ( column_name, util::Native_type::bigint, row_id_value) ;
                 
                 check_instance_value (field->value_expression(), p_elem);
                 
@@ -84,7 +85,7 @@ void Field_maker::visit (const omm::Class& p_elem) {
                 
                 const std::shared_ptr<const Json::Value> csf_id_value = std::make_shared<const Json::Value>(csf_id);
                 
-                auto && csf_field = std::make_shared<mttr::Instance_field> ( column_name + "_csf_id", qry::Native_type::_integer, csf_id_value) ;
+                auto && csf_field = std::make_shared<mttr::Instance_field> ( column_name + "_csf_id", util::Native_type::integer, csf_id_value) ;
                 
                 row_.add_field ( csf_field );
             } else {
@@ -160,7 +161,7 @@ void Field_maker::visit (const omm::Enumeration& p_elem) {
     const auto enum_value = util::String::standardize(data_->asString());
     std::shared_ptr<Json::Value> value = std::make_shared<Json::Value>(enum_value);
     auto column_name = path_name_.length()>0 ? path_name_+"."+ lf_->name(): lf_->name();
-    auto field = std::make_shared<mttr::Instance_field> (column_name, qry::Native_type::_character_varying, value);
+    auto field = std::make_shared<mttr::Instance_field> (column_name, util::Native_type::character_varying, value);
     row_.add_field (field);
 
     // additional field for translation
@@ -168,7 +169,7 @@ void Field_maker::visit (const omm::Enumeration& p_elem) {
     const auto enum_val_ptr = p_elem.find_element_by_name<omm::Enum_value>(enum_value);
     if (enum_val_ptr) {
         value = std::make_shared<Json::Value>(util::String::stoui(enum_val_ptr->id()));
-        field = std::make_shared<mttr::Instance_field> (column_name, qry::Native_type::_integer, value);
+        field = std::make_shared<mttr::Instance_field> (column_name, util::Native_type::integer, value);
         row_.add_field (field);
     }
     else {
@@ -179,49 +180,38 @@ void Field_maker::visit (const omm::Enumeration& p_elem) {
 
 }
 
-void Field_maker::visit (const omm::Data_type& p_type) {
+void Field_maker::visit (const omm::Composite_type& p_type) {
      
-    const auto & elements =  mdl_info_->standard_domain()->data_types();
-
-    auto && search = elements.find(p_type.name());
-    bool has_properties = true;
-    if (search != elements.end()) {
-        auto && std_type = (*search).second;
-        has_properties = std_type->has_properties();
-    }
-    if (!has_properties) { // no properties => primitive type
-
-       auto && prim_map =  mdl_info_->primitive_native_types_map();
-       auto && search2 = prim_map.find ( p_type.name() );
-       if ( search2 != prim_map.end()) {
-           auto && native_type = (*search2).second;
-           auto && column_name = path_name_.length()>0 ? path_name_+"."+ lf_->name(): lf_->name();
-           auto && field = std::make_shared<mttr::Instance_field> (column_name, native_type, data_);
-           row_.add_field (field);
-       } else {
-           std::string error_msg = "Native type for primitive type " + p_type.name() + " not found";
-            throw exception::Not_found ( error_msg );
-       }
-    } else {
         //composite type
         auto path_name = path_name_.length()>0 ? path_name_+"."+ lf_->name(): lf_->name();
         auto && lo = type_->logical_struct();
         if (!lo) {
-            std::string error_msg = "data type " + type_->name() + " cannot accept values";
+            std::string error_msg = "composite type " + type_->name() + " cannot accept values";
             throw exception::Not_found ( error_msg );
         }
     
         if ( !lo->is_logical_type()) {
-            std::string error_msg = "data_type " + type_->name() + " doesn't map correctly to a relational object";
+            std::string error_msg = "composite type " + type_->name() + " doesn't map correctly to a relational object";
             throw exception::Not_found ( error_msg );
         }
     
         auto nested_row = std::make_shared<mttr::Classifier_instance_row>(lo, type_, row_.import_cache());
         nested_row->build_fields ( *data_ , prop_v_->nested_property_views() , path_name) ;
         row_.add_nested_row (nested_row);
-    }
+    
         
 
+}
+
+void Field_maker::visit (const omm::Primitive_type& p_type) {
+     
+
+    auto native_type = p_type.native_type();
+    auto && column_name = path_name_.length()>0 ? path_name_+"."+ lf_->name(): lf_->name();
+
+    auto && field = std::make_shared<mttr::Instance_field> (column_name, native_type, data_);
+    row_.add_field (field);
+        
 }
 
 

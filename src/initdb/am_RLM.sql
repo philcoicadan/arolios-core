@@ -1,6 +1,6 @@
 --
 --
--- Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+-- Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
 -- License: LGPL-3.0-or-later
 --
 --
@@ -27,7 +27,7 @@ CREATE TABLE am_pk (
 	UNIQUE (name, nesting)
 	);
 
-CREATE TYPE am_elem_t AS ENUM ('type', 'class', 'association', 'enum');
+CREATE TYPE am_elem_t AS ENUM ('type', 'class', 'association', 'enum', 'primitive');
 
 CREATE TABLE am_p_elem (
 	id serial PRIMARY KEY,

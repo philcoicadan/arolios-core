@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -400,7 +400,7 @@ void Execute_visitor::visit ( Property& p_elem ) {
 
         const auto field = (*current_row_)[ alias];
         if ( ! field.isNull() ) {
-            qry::Native_type native_type;
+            util::Native_type native_type;
             Json::Value* prop_jobj = current_jobj_;
             if (nested) {
                 if (! current_jobj_->isMember(key)) {
@@ -419,10 +419,10 @@ void Execute_visitor::visit ( Property& p_elem ) {
             } else {
                 if ( terminal_prop->has_enum_type() ) {
                     // enum value is like a char string
-                    native_type = qry::Native_type::_character_varying;
+                    native_type = util::Native_type::character_varying;
                 } else {
                     // prop type is a primitive
-                    native_type = static_cast<qry::Native_type> ( terminal_prop->logical_field()->native_type() );
+                    native_type = static_cast<util::Native_type> ( terminal_prop->logical_field()->native_type() );
                 }
 
                 (*prop_jobj)[key] =  qry::Util::native_to_json ( native_type, field ) ;

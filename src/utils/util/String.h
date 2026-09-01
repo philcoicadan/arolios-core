@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -10,7 +10,7 @@
 #include <omm/Class.h>
 #include <omm/Association.h>
 #include <omm/Logical_field.h>
-#include <qry/Native_type.h>
+#include <util/Native_type.h>
 #include <qry/Db_types.h>
 #include <json/json.h>
 

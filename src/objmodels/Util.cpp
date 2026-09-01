@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -9,6 +9,7 @@
 #include <omm/Property.h>
 #include <omm/Class.h>
 #include <omm/Association.h>
+#include <omm/Primitive_type.h>
 #include <omm/Generalization.h>
 #include <omm/Logical_struct.h>
 #include <omm/Logical_field.h>
@@ -198,11 +199,11 @@ std::shared_ptr<const omm::Classifier> Util::find_root_classifier ( const std::s
 
 std::string Util::search_in_standard_domain (const std::shared_ptr<const omm::Classifier>& p_type) {
 
-        auto model_info = common::Singleton<common::Object_model_info>::instance().object();
-        auto search = model_info->primitive_native_types_map().find (p_type->name());
-        if (search == model_info->primitive_native_types_map().end() ) { // standard type is not a primitive
+        const std::shared_ptr<const omm::Primitive_type> prim_type = std::dynamic_pointer_cast<const omm::Primitive_type>(p_type);
+        if ( prim_type == nullptr) {
             return p_type->logical_struct()->full_name();
         } else {
-            return qry::Util::get_native_name( search->second);
+            //return qry::Util::get_native_name( search->second);
+            return qry::Util::get_native_name( prim_type->native_type());
         }
 }

@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -185,14 +185,13 @@ std::shared_ptr<omm::Property_view> Base_classifier_config::add_property_view (c
 {
     
 
-        auto  mdl_info = common::Singleton<common::Object_model_info>::instance().object();
         auto prop_view = std::make_shared<omm::Property_view> ( p_prop, p_id_name );
         prop_view->is_inherited (p_is_inherited);
-        if ( mdl_info->find_primitive_type_by_name(p_prop->type()->name() ) ) {
+        if ( p_prop->has_primitive_type() ) {
             prop_view->metatype(omm::Property_view::Metatype::_primitive);
         } else if (p_prop->has_referencing_type()) {
                 prop_view->metatype(omm::Property_view::Metatype::_class);
-                  } else if  (p_prop->has_enum_type()) {
+        } else if  (p_prop->has_enum_type()) {
             prop_view->metatype(omm::Property_view::Metatype::_enumeration);
         } else if  (p_prop->has_composite_type() ) {
             prop_view->metatype(omm::Property_view::Metatype::_composite_type);
@@ -208,7 +207,7 @@ std::shared_ptr<omm::Property_view> Base_classifier_config::add_property_view (c
         }
         
         return prop_view;
-   // }
+   
 }
 
 

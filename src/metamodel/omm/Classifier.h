@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -90,6 +90,10 @@ namespace omm {
 
         virtual void rename_element ( const std::shared_ptr<Packageable_element>& p_elem, const std::string& p_new_name) override;
 
+        virtual const std::unordered_map<std::string,std::shared_ptr<Constraint>>& constraints () const { return constraints_; }
+        virtual void insert_constraint (const std::shared_ptr<Constraint>& p_ctt);
+        virtual void erase_constraint (const std::shared_ptr<Constraint>& p_ctt);
+
     protected:
 
         std::unordered_map<std::string, std::shared_ptr<Property>> all_props_;
@@ -110,6 +114,7 @@ namespace omm {
                 
         std::unordered_map<std::string,std::shared_ptr<Property>> ident_map_;
 
+        std::unordered_map<std::string,std::shared_ptr<Constraint>> constraints_;
 
 	};
 }

@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -32,7 +32,8 @@ public:
 
 		virtual void visit (const omm::Class& p_elem) override;
 		virtual void visit (const omm::Enumeration& p_elem)  override;
-		virtual void visit (const omm::Data_type& p_elem)  override;
+		virtual void visit (const omm::Primitive_type& p_elem)  override;
+		virtual void visit (const omm::Composite_type& p_elem)  override;
         
         void data (const std::shared_ptr<const Json::Value>& p_data);
         void type (const std::shared_ptr<const omm::Classifier>& p_type);

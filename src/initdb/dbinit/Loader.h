@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -49,12 +49,8 @@ private:
     void create_default_app (const std::string& p_name) const;
     const std::shared_ptr<common::User> create_super_user (const std::string& p_name) const;
     void create_language ( const std::string& p_code, const std::string& p_name, const std::string& p_fts_config, const std::string& p_descr) const ;
-    void map_primitive_types (const Json::Value& p_root) const;
-    void associate_primitive_native_types () const;
     void set_default_language ( const std::string& p_code) const ;
     void insert_param ( const std::string& p_key, const std::string& p_value) const ;
-    void add_multi_languages (const std::string&  p_type_name, const std::string& p_prop_type_name, const model::Model_recorder& p_mdl_rcd) const ;
-    void process_multilingual_types ( const Json::Value& p_jroot ) const;
     
     const std::string json_file_;
     const std::string xml_file_;

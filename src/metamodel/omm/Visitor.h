@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -35,10 +35,15 @@ namespace omm {
     class Column;
     class Attribute;
     class Property_by_sub_field;
-    class Enum_value;
-    class Language;
-    
-    
+	class Enum_value;
+	class Language;
+	class Restriction_type;
+	class Collection_type;
+	class Select_type;
+	class Primitive_type;
+	class Composite_type;
+	
+	
 	class Visitor {
 	public:
 		virtual ~Visitor () {};
@@ -60,6 +65,11 @@ namespace omm {
         virtual void visit (const Property_by_sub_field& p_elem);
         virtual void visit (const Enum_value& p_elem);
         virtual void visit (const Language& p_elem);
+        virtual void visit (const Restriction_type& p_elem);
+        virtual void visit (const Collection_type& p_elem);
+        virtual void visit (const Select_type& p_elem);
+        virtual void visit (const Primitive_type& p_elem);
+        virtual void visit (const Composite_type& p_elem);
 
 	protected:
 		Visitor () {};

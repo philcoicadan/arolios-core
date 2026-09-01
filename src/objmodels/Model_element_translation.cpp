@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -17,6 +17,7 @@
 #include <common/Object_model_info.h>
 #include <common/Singleton.h>
 #include <omm/Packageable_element.h>
+#include <omm/Primitive_type.h>
 #include <model/xtlt.h>
 #include "Model_element.tpp"
 
@@ -105,8 +106,20 @@ template <> void Model_element_translation<Domain_tlt, omm::Package >::fill_chil
 
 	}
 
+	//primitives
+    Model_tlt_composite<Primitive_tlt, omm::Primitive_type, Model_element_translation > cont_prim (*this, language_);
+
+	for (Domain_tlt::primitive_const_iterator i (this->xml_obj_.primitive().begin ());
+			i != this->xml_obj_.primitive ().end () ;
+			++i)
+	{
+        
+		cont_prim.insert_child(*i);
+
+	}
+	
 	//types
-    Model_tlt_composite<Type_tlt, omm::Data_type, Model_element_translation > cont_type (*this, language_);
+    Model_tlt_composite<Type_tlt, omm::Composite_type, Model_element_translation > cont_type (*this, language_);
 
 	for (Domain_tlt::type_const_iterator i (this->xml_obj_.type().begin ());
 			i != this->xml_obj_.type ().end () ;
@@ -116,6 +129,7 @@ template <> void Model_element_translation<Domain_tlt, omm::Package >::fill_chil
 		cont_type.insert_child(*i);
 
 	}
+
 
 	//Classes
     Model_tlt_composite<Type_tlt, omm::Class, Model_element_translation > cont_class (*this, language_);
@@ -197,7 +211,7 @@ template <> void Model_element_translation<Type_tlt, omm::Class >::fill_children
 	
 }
 
-template <> void Model_element_translation<Type_tlt, omm::Data_type >::fill_children() {
+template <> void Model_element_translation<Type_tlt, omm::Composite_type >::fill_children() {
  
     
 
@@ -228,12 +242,17 @@ template <> void Model_element_translation<Enumeration_tlt, omm::Enumeration >::
         
 }
 
+template <> void Model_element_translation<Primitive_tlt, omm::Primitive_type >::fill_children() {
+
+}
+
 
 
 template class Model_element_translation<Domain_tlt, omm::Package> ;
 template class Model_element_translation<Association_tlt, omm::Association> ;
 template class Model_element_translation<Type_tlt, omm::Class> ;
-template class Model_element_translation<Type_tlt, omm::Data_type> ;
+template class Model_element_translation<Type_tlt, omm::Composite_type> ;
+template class Model_element_translation<Primitive_tlt, omm::Primitive_type> ;
 template class Model_element_translation<Enumeration_tlt, omm::Enumeration> ;
 template class Model_element_translation<Element_tlt, omm::Property> ;
 template class Model_element_translation<Element_tlt, omm::Enum_value> ;
@@ -242,7 +261,8 @@ template class Model_element_translation<Element_tlt, omm::Enum_value> ;
 template class Model_element<Domain_tlt, omm::Package> ;
 template class Model_element<Association_tlt, omm::Association> ;
 template class Model_element<Type_tlt, omm::Class> ;
-template class Model_element<Type_tlt, omm::Data_type> ;
+template class Model_element<Type_tlt, omm::Composite_type> ;
+template class Model_element<Primitive_tlt, omm::Primitive_type> ;
 template class Model_element<Enumeration_tlt, omm::Enumeration> ;
 template class Model_element<Element_tlt, omm::Property> ;
 template class Model_element<Element_tlt, omm::Enum_value> ;

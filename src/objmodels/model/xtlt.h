@@ -234,6 +234,7 @@ namespace arolios
     class Element_tlt;
     class Domain_tlt;
     class Type_tlt;
+    class Primitive_tlt;
     class Association_tlt;
     class Enumeration_tlt;
   }
@@ -438,6 +439,23 @@ namespace arolios
       void
       type (const type_sequence& s);
 
+      // primitive
+      //
+      typedef ::arolios::model::Primitive_tlt primitive_type;
+      typedef ::xsd::cxx::tree::sequence< primitive_type > primitive_sequence;
+      typedef primitive_sequence::iterator primitive_iterator;
+      typedef primitive_sequence::const_iterator primitive_const_iterator;
+      typedef ::xsd::cxx::tree::traits< primitive_type, char > primitive_traits;
+
+      const primitive_sequence&
+      primitive () const;
+
+      primitive_sequence&
+      primitive ();
+
+      void
+      primitive (const primitive_sequence& s);
+
       // class
       //
       typedef ::arolios::model::Type_tlt class_type;
@@ -505,6 +523,7 @@ namespace arolios
       protected:
       enumeration_sequence enumeration_;
       type_sequence type_;
+      primitive_sequence primitive_;
       class_sequence class__;
       association_sequence association_;
     };
@@ -561,6 +580,30 @@ namespace arolios
 
       protected:
       property_sequence property_;
+    };
+
+    class Primitive_tlt: public ::arolios::model::Element_tlt
+    {
+      public:
+      // Constructors.
+      //
+      Primitive_tlt (const name_type&,
+                     const translation_type&);
+
+      Primitive_tlt (const ::xercesc::DOMElement& e,
+                     ::xml_schema::flags f = 0,
+                     ::xml_schema::container* c = 0);
+
+      Primitive_tlt (const Primitive_tlt& x,
+                     ::xml_schema::flags f = 0,
+                     ::xml_schema::container* c = 0);
+
+      virtual Primitive_tlt*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      virtual 
+      ~Primitive_tlt ();
     };
 
     class Association_tlt: public ::arolios::model::Element_tlt

@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -9,7 +9,7 @@
 #include <json/json.h>
 #include <omm/Lc_status.h>
 #include <qry/Db_types.h>
-#include <qry/Native_type.h>
+#include <util/Native_type.h>
 
 namespace arolios {
 
@@ -45,40 +45,16 @@ public:
 
     static int property_native_type (const std::shared_ptr<const omm::Property>& p_prop);
 
-    static std::string string_to_native(const Native_type p_type, const std::string& p_data, bool p_double_quote=true) ;
-    static std::string json_to_native(const Native_type p_type, const Json::Value& p_data, bool p_double_quote=true) ;
-    static Json::Value native_to_json(const Native_type p_type, const qry::Db_field& p_data) ;
+    static std::string native_data_to_string(const util::Native_type p_type, const std::string& p_data, bool p_double_quote=true) ;
+    static std::string json_to_native(const util::Native_type p_type, const Json::Value& p_data, bool p_double_quote=true) ;
+    static Json::Value native_to_json(const util::Native_type p_type, const qry::Db_field& p_data) ;
 
-   static Native_type get_native_type (const std::string& p_native_name) ;
-    static bool has_native_type_name (const std::string& p_native_name) ;
-    static std::string get_native_name (const Native_type p_native_type);
+   static util::Native_type get_native_type (const std::string& p_native_name) ;
+    static std::string get_native_name (const util::Native_type p_native_type);
 
 private:
 
-    class Internal {
-    public:
-        static Internal& instance();
-
-        Native_type native_type( const std::string& p_type_name) const ;
-        bool has_native_type (const std::string& p_type_name) const;
-
-
-    private:
-        /**
-        * Constructor
-        */
-        Internal();
-
-        /**
-        * Destructor
-        */
-        ~Internal();
-
-
-        std::unordered_map<std::string,Native_type> native_name_type_map_;
-
-    };
-};
+}; 
 }
 }
 

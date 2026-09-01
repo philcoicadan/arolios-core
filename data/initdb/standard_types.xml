@@ -4,26 +4,28 @@
 	xmlns:a="http://arolios.org/arolios/model">
 	<domain name="std">
 
-        <type name="integer"></type>
-		<type name="bigint"></type>
-        <type name="smallint"></type>
-		<type name="boolean"></type>
-		<type name="decimal"></type>
-		<type name="real"></type>
-		<type name="doubleprecision"></type>
-		<type name="charstring"></type>
-		<type name="text"></type>
-		<type name="date"></type>
-		<type name="time"></type>
-		<type name="timestamp"></type>
-		<type name="timetz"></type>
-		<type name="timestamptz"></type>
-		<type name="mlangcharstring">
+        <primitive name="integer" native="integer"/>
+		<primitive name="bigint" native="bigint"/>
+        <primitive name="smallint" native="smallint"/>
+		<primitive name="boolean" native="boolean"/>
+		<primitive name="decimal" native="numeric"/>
+		<primitive name="real" native="real"/>
+		<primitive name="doubleprecision" native="double precision"/>
+		<primitive name="charstring" native="character varying"/>
+		<primitive name="text" native="text"/>
+		<primitive name="date" native="date"/>
+		<primitive name="time" native="time"/>
+		<primitive name="timestamp" native="timestamp"/>
+		<primitive name="timetz" native="time with time zone"/>
+		<primitive name="timestamptz" native="timestamp with time zone"/>
+
+        <type name="mlangcharstring">
+			<property name="fr" type="charstring"/>
+			<property name="en" type="charstring"/>
         </type>
         <type name="mlangtext">
+			<property name="fr" type="text"/>
+			<property name="en" type="text"/>
         </type>
 	</domain>
 </a:model>
-
-
-	

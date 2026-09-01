@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -8,7 +8,8 @@
 #include "Model_element.tpp"
 #include <omm/Package.h>
 #include <omm/Enumeration.h>
-#include <omm/Data_type.h>
+#include <omm/Composite_type.h>
+#include <omm/Primitive_type.h>
 #include <omm/Class.h>
 #include <omm/Association.h>
 #include <model/xam.h>
@@ -45,8 +46,20 @@ template <> void Model_element<Domain_t, omm::Package >::fill_children() {
 
 	}
 
+	//primitives
+    Model_composite<Primitive_t, omm::Primitive_type, Model_element > cont_prim (*this);
+
+	for (Domain_t::primitive_const_iterator i (this->xml_obj_.primitive().begin ());
+			i != this->xml_obj_.primitive ().end () ;
+			++i)
+	{
+        
+		cont_prim.insert_child(*i);
+
+	}
+
 	//types
-    Model_composite<Type_t, omm::Data_type, Model_element > cont_type (*this);
+    Model_composite<Type_t, omm::Composite_type, Model_element > cont_type (*this);
 
 	for (Domain_t::type_const_iterator i (this->xml_obj_.type().begin ());
 			i != this->xml_obj_.type ().end () ;
@@ -138,7 +151,9 @@ template class Model_element<Domain_t, omm::Package > ;
 
 template class Model_composite<Enumeration_t, omm::Enumeration, Model_element >;
 
-template class Model_composite<Type_t, omm::Data_type,  Model_element>;
+template class Model_composite<Type_t, omm::Composite_type,  Model_element>;
+
+template class Model_composite<Primitive_t, omm::Primitive_type,  Model_element>;
 
 template class Model_composite<Class_t, omm::Class,  Model_element>;
 

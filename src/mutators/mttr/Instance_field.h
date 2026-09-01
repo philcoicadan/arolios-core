@@ -1,12 +1,12 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
 #pragma once
 #include <json/json.h>
-#include <qry/Native_type.h>
+#include <util/Native_type.h>
 #include <memory>
 
 namespace arolios {
@@ -17,7 +17,7 @@ public:
     /**
      * Constructor
      */
-    Instance_field( const std::string& p_column_name, const qry::Native_type p_type, const std::shared_ptr<const Json::Value>& p_data);
+    Instance_field( const std::string& p_column_name, const util::Native_type p_type, const std::shared_ptr<const Json::Value>& p_data);
 
     /**
      * Destructor
@@ -30,7 +30,7 @@ public:
 private:
 
     std::string column_name_;
-    qry::Native_type type_;
+    util::Native_type type_;
     std::shared_ptr<const Json::Value> data_;
 
 

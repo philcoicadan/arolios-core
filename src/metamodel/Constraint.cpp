@@ -1,28 +1,53 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
 #include <omm/Constraint.h>
+#include <omm/Classifier.h>
 #include <omm/Package.h>
 #include <omm/Visitor.h>
+#include <exception/Exceptions.h>
 
 
 using namespace arolios;
 using namespace arolios::omm;
 
 
-Constraint::Constraint () { namespace_ = nullptr;  }
+Constraint::Constraint () { classifier_ = nullptr;  }
 
 std::shared_ptr<Namespace> Constraint::own_namespace() const
 {
-	return namespace_;
+	return classifier();
 };
 
+const std::shared_ptr<Classifier>& Constraint::classifier () const {
+	return classifier_;
+}
+
+void Constraint::classifier (const std::shared_ptr<Classifier>& p_csf) {
+	classifier_ = p_csf;
+}
+
 std::shared_ptr<Package> Constraint::package() const {
-    //TODO temporary implementation
-    return std::dynamic_pointer_cast<Package>(namespace_);
+    return (classifier_) ? classifier_->package() : nullptr;
+}
+
+void Constraint::own_namespace( const std::shared_ptr<Namespace>& p_parent) {
+
+    if (!p_parent) {
+        classifier(nullptr);
+    }
+    else {
+        const auto & parent = std::dynamic_pointer_cast<omm::Classifier> (p_parent);
+        if (parent) {
+            classifier(parent);
+        } else {
+            throw exception::Failure ("bad type for parent object");
+        }
+        
+    }
 }
 
 void Constraint::accept (Visitor& p_visitor) const {

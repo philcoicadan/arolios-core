@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -13,7 +13,7 @@
 using namespace arolios;
 using namespace arolios::mttr;
 
-Instance_field::Instance_field(const std::string& p_column_name, const qry::Native_type p_type, const  std::shared_ptr<const Json::Value>& p_data) 
+Instance_field::Instance_field(const std::string& p_column_name, const util::Native_type p_type, const  std::shared_ptr<const Json::Value>& p_data) 
 : column_name_ (p_column_name){
     type_ = p_type;
     data_ = p_data;

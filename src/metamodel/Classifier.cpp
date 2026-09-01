@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -181,6 +181,19 @@ void Classifier::insert_own_property( const std::shared_ptr<Property>& p_prop) {
 
 void Classifier::insert_generalization (const std::string& p_name, const std::shared_ptr<Generalization>& p_general) {
     generalizations_.insert(std::pair<const std::string,const std::shared_ptr<Generalization>>(p_name, p_general));
+}
+
+void Classifier::insert_constraint (const std::shared_ptr<Constraint>& p_ctt) {
+    constraints_ [p_ctt->name()] = p_ctt;
+}
+
+void Classifier::erase_constraint (const std::shared_ptr<Constraint>& p_ctt) {
+    auto search = constraints_.find(p_ctt->name());
+    if ( search != constraints_.end() ) {
+        constraints_.erase (search->first) ;
+    } else {
+        throw exception::Failure("constraint " + p_ctt->name() + " not found" );
+    }
 }
 
 bool Classifier::has_elements (bool p_active_only) const {

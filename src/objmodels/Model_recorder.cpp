@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -14,6 +14,9 @@
 #include <model/Root_loader.h>
 #include <omm/Class_attributes.h>
 #include <omm/Property_attributes.h>
+#include <omm/Primitive_attributes.h>
+#include <omm/Primitive_type.h>
+#include <qry/Util.h>
 #include <exception/Exceptions.h>
 #include <common/Db_client.h>
 #include <common/Singleton.h>
@@ -226,9 +229,15 @@ template <> std::shared_ptr<omm::Persistent_object> Model_recorder::create<omm::
     return store_classifier (p_name, "enum", util::String::stoui(p_pk->id()), p_desc) ;
 }
 
-template <> std::shared_ptr<omm::Persistent_object> Model_recorder::create<omm::Data_type >( const std::string& p_name, const std::shared_ptr<omm::Packageable_element>& p_pk, const std::string& p_desc, const omm::Element_attributes& p_attrs) const {
+template <> std::shared_ptr<omm::Persistent_object> Model_recorder::create<omm::Composite_type >( const std::string& p_name, const std::shared_ptr<omm::Packageable_element>& p_pk, const std::string& p_desc, const omm::Element_attributes& p_attrs) const {
     
     return store_classifier (p_name, "type", util::String::stoui(p_pk->id()), p_desc) ;
+}
+
+template <> std::shared_ptr<omm::Persistent_object> Model_recorder::create<omm::Primitive_type >( const std::string& p_name, const std::shared_ptr<omm::Packageable_element>& p_pk, const std::string& p_desc, const omm::Element_attributes& p_attrs) const {
+    
+    const omm::Primitive_attributes& attrs = dynamic_cast<const omm::Primitive_attributes&> (p_attrs);
+    return store_primitive (p_name, util::String::stoui(p_pk->id()), p_desc, qry::Util::get_native_name(attrs.native_type_)) ;
 }
 
 template <> std::shared_ptr<omm::Persistent_object> Model_recorder::create<omm::Association >( const std::string& p_name, const std::shared_ptr<omm::Packageable_element>& p_pk, const std::string& p_desc, const omm::Element_attributes& p_attrs) const {
@@ -280,6 +289,38 @@ std::shared_ptr<omm::Persistent_object> Model_recorder::store_classifier ( const
 
 }
 
+std::shared_ptr<omm::Persistent_object> Model_recorder::store_primitive ( const std::string& p_name, const unsigned int p_pk_id, const std::string& p_desc, const std::string& p_native_name ) const {
+
+    std::shared_ptr<omm::Persistent_object> result ;
+    try {
+        const std::string name = util::String::standardize(p_name);
+        auto r = transPtr_->execSqlSync ( "INSERT INTO am_p_elem (name, elem_type, package) VALUES ($1,'primitive',$2) RETURNING id", name, p_pk_id );
+        if ( r.size() >0 ) {
+            auto row = r[0];
+            result = omm::Model_factory::instance().make_persistent_object ( std::to_string(row["id"].as<unsigned int>()), "am_p_elem" );
+
+            auto r2 = transPtr_->execSqlSync ( "INSERT INTO am_primitive_type (primitive, native) VALUES ($1,$2) RETURNING primitive", row["id"].as<unsigned int>(), p_native_name );
+            if ( r2.size() == 0 ) {
+                std::string error_msg = "Error in recording primitive native type for " + p_name;
+                throw exception::Sql_error ( error_msg );
+            }
+
+            store_optional_description (p_desc, result);
+        }
+        else {
+            std::string error_msg = "Error in recording primitive " + p_name;
+            throw exception::Sql_error ( error_msg );
+        }
+    }
+    catch ( const exception::Db_exception &e ) {
+          
+        throw e;
+    }
+
+    return result;
+
+}
+
 template<> void Model_recorder::update<omm::Class> ( const std::shared_ptr<omm::Class>& p_elt, const std::string& p_new_name, const std::string& p_new_desc, const omm::Element_attributes& p_attrs ) const {
     
     update_classifier (p_elt, p_new_name, p_new_desc) ;
@@ -319,7 +360,11 @@ template<> void Model_recorder::update<omm::Association> ( const std::shared_ptr
     
     update_classifier (p_elt, p_new_name, p_new_desc) ;
 }
-template<> void Model_recorder::update<omm::Data_type> ( const std::shared_ptr<omm::Data_type>& p_elt, const std::string& p_new_name, const std::string& p_new_desc, const omm::Element_attributes& p_attrs ) const {
+template<> void Model_recorder::update<omm::Composite_type> ( const std::shared_ptr<omm::Composite_type>& p_elt, const std::string& p_new_name, const std::string& p_new_desc, const omm::Element_attributes& p_attrs ) const {
+    
+    update_classifier (p_elt, p_new_name, p_new_desc) ;
+}
+template<> void Model_recorder::update<omm::Primitive_type> ( const std::shared_ptr<omm::Primitive_type>& p_elt, const std::string& p_new_name, const std::string& p_new_desc, const omm::Element_attributes& p_attrs ) const {
     
     update_classifier (p_elt, p_new_name, p_new_desc) ;
 }
@@ -470,7 +515,12 @@ template<> void Model_recorder::deprecate<omm::Association> ( const std::shared_
     deprecate_classifier (p_elt);
 }
 
-template<> void Model_recorder::deprecate<omm::Data_type> ( const std::shared_ptr<omm::Data_type>& p_elt ) const {
+template<> void Model_recorder::deprecate<omm::Composite_type> ( const std::shared_ptr<omm::Composite_type>& p_elt ) const {
+    
+    deprecate_classifier (p_elt);
+}
+
+template<> void Model_recorder::deprecate<omm::Primitive_type> ( const std::shared_ptr<omm::Primitive_type>& p_elt ) const {
     
     deprecate_classifier (p_elt);
 }
@@ -541,7 +591,12 @@ template<> bool Model_recorder::eliminate<omm::Association> ( const std::shared_
     return eliminate_classifier (p_elt);
 }
 
-template<> bool Model_recorder::eliminate<omm::Data_type> ( const std::shared_ptr<omm::Data_type>& p_elt ) const {
+template<> bool Model_recorder::eliminate<omm::Composite_type> ( const std::shared_ptr<omm::Composite_type>& p_elt ) const {
+    
+    return eliminate_classifier (p_elt);
+}
+
+template<> bool Model_recorder::eliminate<omm::Primitive_type> ( const std::shared_ptr<omm::Primitive_type>& p_elt ) const {
     
     return eliminate_classifier (p_elt);
 }

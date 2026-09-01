@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--                                                           
  
-  Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+  Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
   License: LGPL-3.0-or-later
  
  -->
@@ -41,6 +41,7 @@
 					<xsd:choice maxOccurs="unbounded">
 						<xsd:element name="enumeration" type="t:Enumeration_tlt" minOccurs="0" maxOccurs="unbounded"/>
 						<xsd:element name="type" type="t:Type_tlt" minOccurs="0" maxOccurs="unbounded"/>
+						<xsd:element name="primitive" type="t:Primitive_tlt" minOccurs="0" maxOccurs="unbounded"/>
 						<xsd:element name="class" type="t:Type_tlt" minOccurs="0" maxOccurs="unbounded"/>
 						<xsd:element name="association" type="t:Association_tlt" minOccurs="0" maxOccurs="unbounded"/>	
 					</xsd:choice>
@@ -60,6 +61,12 @@
 		</xsd:complexContent>	
 	</xsd:complexType>
 
+	<xsd:complexType name="Primitive_tlt">
+		<xsd:complexContent>
+			<xsd:extension base="t:Element_tlt">
+			</xsd:extension>	
+		</xsd:complexContent>	
+	</xsd:complexType>
 
 	<xsd:complexType name="Association_tlt">
 		<xsd:complexContent>

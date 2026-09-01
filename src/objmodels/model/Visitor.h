@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -17,6 +17,8 @@ namespace omm {
     class Enumeration;
     class Enum_value;
     class Data_type;
+    class Composite_type;
+    class Primitive_type;
     class Class;
     class Association;
     class Property;
@@ -57,9 +59,12 @@ public:
     virtual void visit (const Model_element_create<Element_t, omm::Enum_value >& p_obj)  = 0 ;
     virtual void visit (const Model_element_delete<Element_t, omm::Enum_value >& p_obj)  = 0 ;
     virtual void visit (const Model_element_update<Element_t, omm::Enum_value >& p_obj)  = 0 ; 
-    virtual void visit (const Model_element_create<Type_t, omm::Data_type >& p_obj)  = 0;
-    virtual void visit (const Model_element_delete<Type_t, omm::Data_type >& p_obj)  = 0;
-    virtual void visit (const Model_element_update<Type_t, omm::Data_type >& p_obj)  = 0;
+    virtual void visit (const Model_element_create<Type_t, omm::Composite_type >& p_obj)  = 0;
+    virtual void visit (const Model_element_delete<Type_t, omm::Composite_type >& p_obj)  = 0;
+    virtual void visit (const Model_element_update<Type_t, omm::Composite_type >& p_obj)  = 0;
+    virtual void visit (const Model_element_create<Primitive_t, omm::Primitive_type >& p_obj)  = 0;
+    virtual void visit (const Model_element_delete<Primitive_t, omm::Primitive_type >& p_obj)  = 0;
+    virtual void visit (const Model_element_update<Primitive_t, omm::Primitive_type >& p_obj)  = 0;
     virtual void visit (const Model_element_create<Class_t, omm::Class >& p_obj)  = 0;
     virtual void visit (const Model_element_delete<Class_t, omm::Class >& p_obj)  = 0;
     virtual void visit (const Model_element_update<Class_t, omm::Class >& p_obj)  = 0;

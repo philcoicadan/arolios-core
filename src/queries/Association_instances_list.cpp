@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -67,10 +67,10 @@ template <> void Classifier_instances_list<omm::Association>::build_json_from_ro
 
 
         if ( ! field.isNull() ) {
-            qry::Native_type native_type;
+            util::Native_type native_type;
             if ( value->has_enum_type() ) {
                 // enum value is like a char string
-                native_type = qry::Native_type::_character_varying;
+                native_type = util::Native_type::character_varying;
                 // add translation of the enum value
                 auto field_enum_id = p_row[ field_key + "_val_id"];
                 if (!field_enum_id.isNull()) {
@@ -84,7 +84,7 @@ template <> void Classifier_instances_list<omm::Association>::build_json_from_ro
                 }
             } else {
                 // prop type is a primitive
-                native_type = static_cast<qry::Native_type> ( value->logical_field()->native_type() );
+                native_type = static_cast<util::Native_type> ( value->logical_field()->native_type() );
             }
             jrow[jkey] =  qry::Util::native_to_json ( native_type, field ) ;
         }

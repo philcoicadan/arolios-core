@@ -1,12 +1,13 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
 #include <model/Model_element.h>
 #include "Model_element.tpp"
 #include <omm/Property.h>
+#include <omm/Primitive_type.h>
 #include <omm/Property_attributes.h>
 #include <model/Classifier_search.h>
 #include <common/Object_model_info.h>
@@ -44,10 +45,10 @@ template <> void Model_element<Type_property_t, omm::Property >::execute () {
     Classifier_search search ( xml_obj_.type(), search_pk);
     
     auto prop_type = search.execute<omm::Data_type>();
+    auto prim_type = std::dynamic_pointer_cast<omm::Primitive_type>(prop_type);
     auto enum_type = std::dynamic_pointer_cast<omm::Enumeration>(prop_type);
-    auto  mdl_info = common::Singleton<common::Object_model_info>::instance().object();
 
-    if (!enum_type && (prop_type->package()->id() !=  mdl_info->standard_domain()->id())) {
+    if (!enum_type && !prim_type) {
 
             std::string error_msg = "Property type " + xml_obj_.type() + " cannot be nested" ;
             throw exception::Model_error ( error_msg );

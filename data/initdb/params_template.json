@@ -16,36 +16,6 @@
             "fts_config": "english"
         }
     ],
-    "default_language": "fr",
+    "default_language": "fr"
     
-    // DO NOT MODIFY THE FOLLOWING OBJECT
-    "primitives_map": {
-		"integer" :"integer" ,
-		"bigint" :"bigint" ,
-		"smallint" :"smallint" ,
-		"boolean" :"boolean" ,
-		"decimal" :"numeric" ,
-		"real" :"real" ,
-		"doubleprecision" :"double precision" ,
-		"charstring" :"character varying" ,
-		"text" :"text" ,
-		"date" :"date" ,
-		"time" :"time" ,
-		"timestamp" :"timestamp" ,
-		"timetz" :"time with time zone" ,
-		"timestamptz" :"timestamp with time zone"
-    },
-    
-    // DO NOT MODIFY THE FOLLOWING OBJECT
-    "multilingual": [
-        {
-        "type_name": "mlangcharstring",
-        "property_type": "charstring"
-        },
-        {
-        "type_name": "mlangtext",
-        "property_type": "text"
-        }
-        ]
-        
 }

@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -14,6 +14,8 @@
 #include <omm/Association.h>
 #include <omm/Class.h>
 #include <omm/Data_type.h>
+#include <omm/Composite_type.h>
+#include <omm/Primitive_type.h>
 #include <omm/Enumeration.h>
 #include <omm/Property.h>
 #include <omm/Enum_value.h>
@@ -68,14 +70,16 @@ template < typename T1, typename T2, template<typename M1, typename M2> typename
 namespace arolios::model {
     template class Model_tlt_composite<Association_tlt, omm::Association, Model_element_translation> ;
     template class Model_tlt_composite<Type_tlt, omm::Class, Model_element_translation> ;
-    template class Model_tlt_composite<Type_tlt, omm::Data_type, Model_element_translation> ;
+    template class Model_tlt_composite<Type_tlt, omm::Composite_type, Model_element_translation> ;
+    template class Model_tlt_composite<Primitive_tlt, omm::Primitive_type, Model_element_translation> ;
     template class Model_tlt_composite<Enumeration_tlt, omm::Enumeration, Model_element_translation> ;
     template class Model_tlt_composite<Element_tlt, omm::Property, Model_element_translation> ;
     template class Model_tlt_composite<Element_tlt, omm::Enum_value, Model_element_translation> ;
 
     template class Model_tlt_composite<Association_tlt, omm::Association, Model_element> ;
     template class Model_tlt_composite<Type_tlt, omm::Class, Model_element> ;
-    template class Model_tlt_composite<Type_tlt, omm::Data_type, Model_element> ;
+    template class Model_tlt_composite<Type_tlt, omm::Composite_type, Model_element> ;
+    template class Model_tlt_composite<Primitive_tlt, omm::Primitive_type, Model_element> ;
     template class Model_tlt_composite<Enumeration_tlt, omm::Enumeration, Model_element> ;
     template class Model_tlt_composite<Element_tlt, omm::Property, Model_element> ;
     template class Model_tlt_composite<Element_tlt, omm::Enum_value, Model_element> ;

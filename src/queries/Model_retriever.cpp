@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -11,6 +11,7 @@
 #include <omm/Association.h>
 #include <omm/Enumeration.h>
 #include <omm/Data_type.h>
+#include <omm/Composite_type.h>
 #include <omm/Package.h>
 #include <omm/Model_factory.h>
 #include <common/Object_model_info.h>
@@ -96,79 +97,6 @@ void Model_retriever::retrieve_init( const std::string& p_root_pk_id, const std:
 
 }
 
-void Model_retriever::retrieve_standard_types ( )  const{
-    
-    std::shared_ptr<omm::Package> pk = common_obj_->standard_domain();
-    
-    std::string pk_name = pk->name();
-
-    
-
-    unsigned int pk_id = util::String::stoui(common_obj_->standard_domain()->id());
-    
- 
-    auto f_types = db_->execSqlAsyncFuture ("SELECT am_p_elem.*, am_primitive_type.* , am_csf_struct.* FROM am_p_elem FULL OUTER JOIN am_primitive_type ON am_p_elem.id = am_primitive_type.primitive LEFT JOIN am_csf_struct ON am_p_elem.id = am_csf_struct.l_elem WHERE am_p_elem.package = $1 ORDER BY am_p_elem.id", pk_id);
-
-    try {
-        auto result_types = f_types.get();
-
-        if ( result_types.size() >0 ) {
-
-            for ( auto row : result_types ) {
-                const std::string elem_type = row["elem_type"].as<std::string>();
-                const std::string type_name = row["name"].as<std::string>();
-                const omm::Lc_status lc = qry::Util::convert_status (row["lc"].as<std::string>());
-                const std::string desc = (row["description"].isNull()) ? "" : row["description"].as<std::string>() ;
-                std::shared_ptr<omm::Data_type> new_type = nullptr;
-                std::shared_ptr<omm::Classifier> new_classifier = nullptr;
-
-                if ( elem_type == "type" ) {
-                    new_type = omm::Model_factory::instance().make_data_type ( type_name, pk , lc, desc);
-                    new_classifier = std::static_pointer_cast<omm::Classifier> ( new_type );
-
-                } else {
-                    const std::string msg ( "elem type not found: " + elem_type );
-                    exception::Sql_error e ( msg );
-                    throw e;
-                }
-
-                unsigned int type_id = row["id"].as<unsigned int>();
-                new_classifier->persistent_attributes( std::to_string(type_id), "am_p_elem" ) ;
-
-                common_obj_->insert_classifier ( new_classifier );
-                
-                auto field = row["native"];
-                if (! field.isNull()) { //primitive type
-                    std::string native_name = row["native"].as<std::string>();
-                    common_obj_->map_native_primitive_type ( type_name, native_name );
-
-                } else { // other standard type
-                    auto field = row["l_name"];
-                    if (!field.isNull() ) {
-                        auto && new_logical_type = omm::Model_factory::instance().make_logical_type (new_type, row["l_name"].as<std::string>());
-                        
-                    } else {
-                        std::string msg ( "standard type " + type_name + " in domain " + pk->name() + " not associated to a relational object " );
-                        exception::Sql_error e ( msg );
-                        throw e;
-                    }
-                }
-            
-            }
-        } else {
-            std::string msg ( "standard types not found in domain: " + pk->name() );
-            exception::Sql_error e ( msg );
-            throw e;
-        }
-    }
-
-    catch ( const exception::Db_exception &e ) {
-        std::cerr << "error: " << e.base().what() << std::endl;
-        throw e;
-    }
-
-
-}
 
 void Model_retriever::retrieve_user_domains() const {
     
@@ -229,8 +157,8 @@ void Model_retriever::retrieve_classifiers ( const std::shared_ptr<omm::Package>
     
     
          
-    auto f = db_->execSqlAsyncFuture("SELECT am_p_elem.*,  am_csf_struct.* FROM am_p_elem INNER JOIN am_csf_struct ON am_p_elem.id = am_csf_struct.l_elem WHERE am_p_elem.package=$1 ORDER BY am_p_elem.id", util::String::stoui(p_pk->id()));
-    
+    auto f = db_->execSqlAsyncFuture("SELECT am_p_elem.*, am_primitive_type.* , am_csf_struct.* FROM am_p_elem FULL OUTER JOIN am_primitive_type ON am_p_elem.id = am_primitive_type.primitive LEFT JOIN am_csf_struct ON am_p_elem.id = am_csf_struct.l_elem WHERE am_p_elem.package=$1 ORDER BY am_p_elem.id", util::String::stoui(p_pk->id()));
+
     try {
         auto result = f.get();
 
@@ -248,11 +176,23 @@ void Model_retriever::retrieve_classifiers ( const std::shared_ptr<omm::Package>
                     auto && new_logical_enum = omm::Model_factory::instance().make_logical_enum (new_enum, row["l_name"].as<std::string>());
                 }
                 else if (elem_type == "type") {
-                    auto && new_type = omm::Model_factory::instance().make_data_type(row["name"].as<std::string>(), 
+                    auto && new_type = omm::Model_factory::instance().make_composite_type(row["name"].as<std::string>(), 
                     p_pk, lc, desc);
                     new_classifier = std::static_pointer_cast<omm::Classifier>(new_type);
                     auto && new_logical_type = omm::Model_factory::instance().make_logical_type (new_type, row["l_name"].as<std::string>());
                     // properties retrieved later
+                } 
+                else if (elem_type == "primitive") {
+                     auto field = row["native"];
+                    if (! field.isNull()) { //primitive type
+                        std::string native_name = row["native"].as<std::string>();
+                        auto native_type = Util::get_native_type(native_name);
+                        new_classifier = omm::Model_factory::instance().make_primitive_type ( row["name"].as<std::string>(), p_pk , native_type, lc, desc);
+                    } else {
+                        std::string msg ( "primitive type " + row["name"].as<std::string>() + " in domain " + p_pk->name() + " not associated to a database native type " );
+                        exception::Sql_error e ( msg );
+                        throw e;
+                    }
                 }
                 else if (elem_type == "class") {
                     auto && new_class = omm::Model_factory::instance().make_class ( row["name"].as<std::string>(), p_pk, row["is_abstract"].as<bool>(), lc, desc );

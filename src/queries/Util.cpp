@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -11,7 +11,9 @@
 #include <sstream>
 #include <exception/Exceptions.h>
 #include <util/String.h>
+#include <util/Native_type.h>
 #include <omm/Property.h>
+#include <omm/Primitive_type.h>
 #include <common/Singleton.h>
 #include <common/Object_model_info.h>
 
@@ -133,26 +135,32 @@ std::string Util::erase_url_prefix (const std::string& p_url) {
 }
 
 
-Native_type Util::get_native_type (const std::string& p_native_name) {
-    return Internal::instance().native_type(p_native_name);
+util::Native_type Util::get_native_type (const std::string& p_native_name) {
+    static std::unordered_map<std::string,util::Native_type> map = {{ "integer", util::Native_type::integer}, {"bigint", util::Native_type::bigint}, {"smallint", util::Native_type::smallint}, {"boolean", util::Native_type::boolean}, {"numeric", util::Native_type::numeric}, {"real", util::Native_type::real}, { "double precision", util::Native_type::double_precision}, {"character varying", util::Native_type::character_varying}, {"text", util::Native_type::text}, {"date", util::Native_type::date}, {"time", util::Native_type::time}, { "timestamp", util::Native_type::timestamp}, { "time with time zone", util::Native_type::time_with_time_zone}, { "timestamp with time zone", util::Native_type::timestamp_with_time_zone}};
+
+    auto iter = map.find(p_native_name);
+    if (iter == map.end()){
+        throw exception::Not_found ("native type " + p_native_name + " not found" );
+
+    } else {
+        return iter->second;
+    }
+
 }
 
-bool Util::has_native_type_name (const std::string& p_native_name) {
-    return Internal::instance().has_native_type(p_native_name);
-}
 
-std::string Util::get_native_name (const Native_type p_native_type) {
-    static std::unordered_map<Native_type,std::string> map = {{ Native_type::_integer, "integer"}, {Native_type::_bigint, "bigint"}, {Native_type::_smallint, "smallint"}, {Native_type::_boolean, "boolean"}, {Native_type::_numeric, "numeric"}, {Native_type::_real, "real"}, { Native_type::_double_precision, "double precision"}, {Native_type::_character_varying,"character varying"}, {Native_type::_text, "text"}, {Native_type::_date, "date"}, {Native_type::_time, "time"}, { Native_type::_timestamp, "timestamp"}, { Native_type::_time_with_time_zone, "time with time zone"}, { Native_type::_timestamp_with_time_zone, "timestamp with time zone" }};
+std::string Util::get_native_name (const util::Native_type p_native_type) {
+    static std::unordered_map<util::Native_type,std::string> map = {{ util::Native_type::integer, "integer"}, {util::Native_type::bigint, "bigint"}, {util::Native_type::smallint, "smallint"}, {util::Native_type::boolean, "boolean"}, {util::Native_type::numeric, "numeric"}, {util::Native_type::real, "real"}, { util::Native_type::double_precision, "double precision"}, {util::Native_type::character_varying,"character varying"}, {util::Native_type::text, "text"}, {util::Native_type::date, "date"}, {util::Native_type::time, "time"}, { util::Native_type::timestamp, "timestamp"}, { util::Native_type::time_with_time_zone, "time with time zone"}, { util::Native_type::timestamp_with_time_zone, "timestamp with time zone" }};
 
     return map.at(p_native_type);
 }
 
 
-std::string Util::json_to_native(const Native_type p_type, const Json::Value& p_data, bool p_double_quote) {
+std::string Util::json_to_native(const util::Native_type p_type, const Json::Value& p_data, bool p_double_quote) {
 
     switch (static_cast<int>(p_type)) {
-        case Native_type::_character_varying:
-        case Native_type::_text: {
+        case util::Native_type::character_varying:
+        case util::Native_type::text: {
             if (p_double_quote) {
                 return "'"+ util::String::double_quote(p_data.asString()) + "'";
             }
@@ -161,15 +169,15 @@ std::string Util::json_to_native(const Native_type p_type, const Json::Value& p_
 
             }
             break; }
-        case Native_type::_date:
-        case Native_type::_time:
-        case Native_type::_timestamp:
-        case Native_type::_time_with_time_zone:
-        case Native_type::_timestamp_with_time_zone: {
+        case util::Native_type::date:
+        case util::Native_type::time:
+        case util::Native_type::timestamp:
+        case util::Native_type::time_with_time_zone:
+        case util::Native_type::timestamp_with_time_zone: {
             util::String::check_date_time (p_data.asString());
             return get_native_name(p_type) + " '" + p_data.asString()  + "'";
             break; }
-        case Native_type::_boolean: {
+        case util::Native_type::boolean: {
             if (p_data.isBool())  {
                 return (p_data.asBool())? "true" : "false";
             }
@@ -177,17 +185,17 @@ std::string Util::json_to_native(const Native_type p_type, const Json::Value& p_
                throw exception::Data_error ("boolean value " + p_data.asString() + " contains forbidden characters" );
             }
             break; }
-        case Native_type::_integer:
-        case Native_type::_bigint:
-        case Native_type::_smallint:
-        case Native_type::_real:
-        case Native_type::_double_precision: {
+        case util::Native_type::integer:
+        case util::Native_type::bigint:
+        case util::Native_type::smallint:
+        case util::Native_type::real:
+        case util::Native_type::double_precision: {
             util::String::check_number (p_data.asString());
             std::stringstream tmp;
             tmp << p_data;
             return tmp.str();
             break; }
-        case Native_type::_numeric: {
+        case util::Native_type::numeric: {
             util::String::check_number (p_data.asString());
              return " '" + p_data.asString()  + "'::" + get_native_name(p_type) ;
             break;
@@ -200,11 +208,11 @@ std::string Util::json_to_native(const Native_type p_type, const Json::Value& p_
 
 }
 
-std::string Util::string_to_native ( const Native_type p_type, const std::string& p_data , bool p_double_quote) {
+std::string Util::native_data_to_string ( const util::Native_type p_type, const std::string& p_data , bool p_double_quote) {
 
     switch ( static_cast<int> ( p_type ) ) {
-    case Native_type::_character_varying:
-    case Native_type::_text: {
+    case util::Native_type::character_varying:
+    case util::Native_type::text: {
         if (p_double_quote) {
             return "'"+ util::String::double_quote ( p_data ) + "'";
         }
@@ -213,15 +221,15 @@ std::string Util::string_to_native ( const Native_type p_type, const std::string
         }
         break;
     }
-    case Native_type::_date:
-    case Native_type::_time:
-    case Native_type::_timestamp:
-    case Native_type::_time_with_time_zone:
-    case Native_type::_timestamp_with_time_zone: {
+    case util::Native_type::date:
+    case util::Native_type::time:
+    case util::Native_type::timestamp:
+    case util::Native_type::time_with_time_zone:
+    case util::Native_type::timestamp_with_time_zone: {
         util::String::check_date_time (p_data);
         return get_native_name ( p_type ) + " '" + p_data  + "'";
         break; }
-    case Native_type::_boolean: {
+    case util::Native_type::boolean: {
       const std::string bool_val = util::String::standardize(p_data);
       if (bool_val == "true" || bool_val == "false") {
         return bool_val;
@@ -231,17 +239,17 @@ std::string Util::string_to_native ( const Native_type p_type, const std::string
       }
       break;
     }
-    case Native_type::_integer:
-    case Native_type::_bigint:
-    case Native_type::_smallint:
-    case Native_type::_real:
-    case Native_type::_double_precision: {
+    case util::Native_type::integer:
+    case util::Native_type::bigint:
+    case util::Native_type::smallint:
+    case util::Native_type::real:
+    case util::Native_type::double_precision: {
         util::String::check_number (p_data);
         std::stringstream tmp;
         tmp << p_data;
         return tmp.str();
         break; }
-    case Native_type::_numeric: {
+    case util::Native_type::numeric: {
         util::String::check_number (p_data);
             return " '" + p_data  + "'::" + get_native_name(p_type) ;
         break;
@@ -254,27 +262,27 @@ std::string Util::string_to_native ( const Native_type p_type, const std::string
 
 }
 
-Json::Value Util::native_to_json(const Native_type p_type, const qry::Db_field& p_data) {
+Json::Value Util::native_to_json(const util::Native_type p_type, const qry::Db_field& p_data) {
     
     switch ( static_cast<int> ( p_type ) ) {
-    case Native_type::_integer:
-    case Native_type::_smallint:
+    case util::Native_type::integer:
+    case util::Native_type::smallint:
         return  ( p_data.as<int>() );
         break;
-    case Native_type::_bigint:
+    case util::Native_type::bigint:
         return  ( p_data.as<Json::Value::Int64>() );
         break;
-    case Native_type::_real:
+    case util::Native_type::real:
         return  ( p_data.as<float>() );
         break;
 
-    case Native_type::_double_precision:
+    case util::Native_type::double_precision:
         return  ( p_data.as<double>() );
         break;
-    case Native_type::_boolean:
+    case util::Native_type::boolean:
         return ( p_data.as<bool>() );
         break;
-    case Native_type::_numeric:
+    case util::Native_type::numeric:
         return ( p_data.as<std::string>() );
         break;
     default:
@@ -287,47 +295,15 @@ int Util::property_native_type(const std::shared_ptr<const omm::Property>& p_pro
 
     int result = -1;
     if (p_prop->has_referencing_type() ) {
-        result = static_cast<int>(Native_type::_bigint);
-    } else {
-        const auto & map = common::Singleton<common::Object_model_info>::instance().object()->primitive_native_types_map();
-        auto && search = map.find(p_prop->type()->name());
-        if (search != map.end()) {
-            result =  static_cast<int>(search->second);
-        }
+        result = static_cast<int>(util::Native_type::bigint);
+
+    } else if (p_prop->has_primitive_type () ) {
+        auto prim_type = std::dynamic_pointer_cast<const omm::Primitive_type>(p_prop->type());
+        result = static_cast<int>(prim_type->native_type());
+
     }
 
     return result;
-}
-
-
-Util::Internal::Internal()
-{
-
-
-    native_name_type_map_ = {{"integer", Native_type::_integer}, {"bigint", Native_type::_bigint}, {"smallint", Native_type::_smallint}, {"boolean", Native_type::_boolean}, {"numeric", Native_type::_numeric}, {"real", Native_type::_real}, {"double precision", Native_type::_double_precision}, {"character varying", Native_type::_character_varying}, {"text", Native_type::_text}, {"date", Native_type::_date}, {"time", Native_type::_time}, {"timestamp", Native_type::_timestamp}, {"time with time zone", Native_type::_time_with_time_zone}, {"timestamp with time zone" , Native_type::_timestamp_with_time_zone}};
-}
-
-Util::Internal::~Internal()
-{
-}
-
-
-
-
-Native_type Util::Internal::native_type (const std::string& p_type_name) const
-{
-    return native_name_type_map_.at(p_type_name);
-}
-
-bool Util::Internal::has_native_type (const std::string& p_type_name) const
-{
- return (native_name_type_map_.find(p_type_name) != native_name_type_map_.end());
-}
-
-Util::Internal& Util::Internal::instance()
-{
-    static Internal inst = Internal ();
-    return inst;
 }
 
 

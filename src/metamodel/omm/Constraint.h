@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -26,7 +26,8 @@ namespace omm {
 		virtual std::shared_ptr<Namespace> own_namespace() const override;
 		virtual const std::string& expression () const { return expression_; }
 		virtual void expression (const std::string& p_expression) { expression_ = p_expression; }
-		virtual std::unordered_set<std::shared_ptr<Packageable_element>>&  constrained_elements () { return elements_; } ;
+		virtual const std::shared_ptr<Classifier>& classifier () const;
+		virtual void classifier (const std::shared_ptr<Classifier>& p_csf);
         virtual std::shared_ptr<Package> package() const override ;
         virtual void insert_in_package (Package& p_pk, const std::shared_ptr<Packageable_element>& p_elem) override;
         virtual void erase_from_package (Package& p_pk, const std::shared_ptr<Packageable_element>& p_elem) override;
@@ -36,12 +37,11 @@ namespace omm {
 
 		virtual void accept (Visitor& p_visitor) const override;
    
-        virtual void own_namespace(const std::shared_ptr<Namespace>& p_namespace) override { namespace_ = p_namespace ;}
+        virtual void own_namespace(const std::shared_ptr<Namespace>& p_namespace) override;
 
 	private:
-		std::shared_ptr<Namespace> namespace_;
+		std::shared_ptr<Classifier> classifier_;
 		std::string expression_ ;
-		std::unordered_set<std::shared_ptr<Packageable_element>> elements_;
 
 	} ;
 }

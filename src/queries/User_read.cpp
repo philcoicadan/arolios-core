@@ -1,13 +1,13 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
 #include <qry/User_read.h>
 #include <exception/Exceptions.h>
 #include <util/String.h>
-#include <qry/Native_type.h>
+#include <util/Native_type.h>
 #include <qry/Util.h>
 
 
@@ -48,7 +48,7 @@ void User_read::execute () {
             
             if (usage_ ==  qry::Util::Read_mode::read_for_update ) {
                 auto && field3 = row["upd_count"];
-                qry::Native_type native_type = qry::Native_type::_integer;
+                util::Native_type native_type = util::Native_type::integer;
                 return_json_["upd_count"] = qry::Util::native_to_json ( native_type, field3 ) ; ;
             }
             return_code_ = qry::Return_code::OK;

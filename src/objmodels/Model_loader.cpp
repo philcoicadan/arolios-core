@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -236,7 +236,7 @@ void Model_loader::insert_domain_in_app_model ( const std::shared_ptr<omm::Packa
         // insert the classifiers, their properties in the object model list
         insert_classifiers_in_app_model<omm::Enumeration> (p_dom->enumerations());
         
-        insert_classifiers_in_app_model<omm::Data_type> (p_dom->data_types());
+        insert_classifiers_in_app_model<omm::Composite_type> (p_dom->composite_types());
         
         insert_classifiers_in_app_model<omm::Class> (p_dom->classes());
         
@@ -284,7 +284,7 @@ void Model_loader::update_domain_in_app_model ( const std::shared_ptr<omm::Packa
         // insert the new classifiers and the new properties in the object model list
         insert_classifiers_in_app_model<omm::Enumeration> (p_dom->enumerations());
         
-        insert_classifiers_in_app_model<omm::Data_type> (p_dom->data_types());
+        insert_classifiers_in_app_model<omm::Composite_type> (p_dom->composite_types());
         
         insert_classifiers_in_app_model<omm::Class> (p_dom->classes());
         

@@ -181,6 +181,24 @@ namespace arolios
       this->type_ = s;
     }
 
+    const Domain_tlt::primitive_sequence& Domain_tlt::
+    primitive () const
+    {
+      return this->primitive_;
+    }
+
+    Domain_tlt::primitive_sequence& Domain_tlt::
+    primitive ()
+    {
+      return this->primitive_;
+    }
+
+    void Domain_tlt::
+    primitive (const primitive_sequence& s)
+    {
+      this->primitive_ = s;
+    }
+
     const Domain_tlt::class_sequence& Domain_tlt::
     class_ () const
     {
@@ -238,6 +256,10 @@ namespace arolios
     {
       this->property_ = s;
     }
+
+
+    // Primitive_tlt
+    // 
 
 
     // Association_tlt
@@ -525,6 +547,7 @@ namespace arolios
                                      translation),
       enumeration_ (this),
       type_ (this),
+      primitive_ (this),
       class__ (this),
       association_ (this)
     {
@@ -537,6 +560,7 @@ namespace arolios
     : ::arolios::model::Element_tlt (x, f, c),
       enumeration_ (x.enumeration_, f, this),
       type_ (x.type_, f, this),
+      primitive_ (x.primitive_, f, this),
       class__ (x.class__, f, this),
       association_ (x.association_, f, this)
     {
@@ -549,6 +573,7 @@ namespace arolios
     : ::arolios::model::Element_tlt (e, f | ::xml_schema::flags::base, c),
       enumeration_ (this),
       type_ (this),
+      primitive_ (this),
       class__ (this),
       association_ (this)
     {
@@ -593,6 +618,17 @@ namespace arolios
           continue;
         }
 
+        // primitive
+        //
+        if (n.name () == "primitive" && n.namespace_ ().empty ())
+        {
+          ::std::unique_ptr< primitive_type > r (
+            primitive_traits::create (i, f, this));
+
+          this->primitive_.push_back (::std::move (r));
+          continue;
+        }
+
         // class
         //
         if (n.name () == "class" && n.namespace_ ().empty ())
@@ -634,6 +670,7 @@ namespace arolios
         static_cast< ::arolios::model::Element_tlt& > (*this) = x;
         this->enumeration_ = x.enumeration_;
         this->type_ = x.type_;
+        this->primitive_ = x.primitive_;
         this->class__ = x.class__;
         this->association_ = x.association_;
       }
@@ -729,6 +766,45 @@ namespace arolios
 
     Type_tlt::
     ~Type_tlt ()
+    {
+    }
+
+    // Primitive_tlt
+    //
+
+    Primitive_tlt::
+    Primitive_tlt (const name_type& name,
+                   const translation_type& translation)
+    : ::arolios::model::Element_tlt (name,
+                                     translation)
+    {
+    }
+
+    Primitive_tlt::
+    Primitive_tlt (const Primitive_tlt& x,
+                   ::xml_schema::flags f,
+                   ::xml_schema::container* c)
+    : ::arolios::model::Element_tlt (x, f, c)
+    {
+    }
+
+    Primitive_tlt::
+    Primitive_tlt (const ::xercesc::DOMElement& e,
+                   ::xml_schema::flags f,
+                   ::xml_schema::container* c)
+    : ::arolios::model::Element_tlt (e, f, c)
+    {
+    }
+
+    Primitive_tlt* Primitive_tlt::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class Primitive_tlt (*this, f, c);
+    }
+
+    Primitive_tlt::
+    ~Primitive_tlt ()
     {
     }
 

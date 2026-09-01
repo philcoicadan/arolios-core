@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -11,6 +11,7 @@
 #include <omm/Class.h>
 #include <omm/Data_type.h>
 #include <omm/Enumeration.h>
+#include <omm/Primitive_type.h>
 #include <omm/Logical_field.h>
 #include <omm/Visitor.h>
 #include <memory>
@@ -141,6 +142,10 @@ bool Property::has_composite_type() const {
 
 bool Property::has_enum_type() const {
     return std::dynamic_pointer_cast<const omm::Enumeration> ( type_ ).operator bool();
+}
+
+bool Property::has_primitive_type() const {
+    return std::dynamic_pointer_cast<const omm::Primitive_type> ( type_ ).operator bool();
 }
 
 bool Property::has_referencing_type () const {

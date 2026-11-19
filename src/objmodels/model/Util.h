@@ -1,26 +1,21 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
 #pragma once
+#include "omm/Classifier.h"
+#include "omm/Property.h"
 #include <string>
 #include <memory>
 #include <unordered_map>
+#include <model/Classifier_search.h>
+#include <exception/Exceptions.h>
 
 namespace arolios {
 
 
-
-namespace omm {
-    class Classifier;
-    class Class;
-    class Package;
-    class Property;
-    class Logical_field;
-    class Association;
-}
 
 namespace model {
     class Util {
@@ -33,7 +28,22 @@ namespace model {
 
     static std::string make_fts_fragment_from_field( const std::shared_ptr<const omm::Logical_field>& p_field, const std::string& p_path);
 
-    static bool check_inheritance (const std::shared_ptr<omm::Class>& p_derived, const std::shared_ptr<omm::Class>& p_base) ;
+    static bool check_inheritance (const std::shared_ptr<omm::Classifier>& p_derived, const std::shared_ptr<omm::Classifier>& p_base) ;
+
+    template <typename T> static std::shared_ptr<T> resolve_base ( const std::string& p_base_name, const std::shared_ptr<omm::Package>& p_pk, const std::shared_ptr<omm::Classifier>& p_stored ) {
+        if (p_base_name.empty()) return nullptr;
+        Classifier_search search ( p_base_name, p_pk );
+        auto stored_base = search.execute<T>();
+        if ( p_stored && stored_base ) {
+            if ( Util::check_inheritance ( p_stored, std::dynamic_pointer_cast<omm::Classifier>(stored_base) ) ) {
+                std::string error_msg = "cyclic inheritance with " + stored_base->name() + " and " + p_stored->name();
+                throw exception::Model_error (error_msg);
+            }
+        }
+        return stored_base;
+    }
+
+    static void store_identifier ( const std::string& p_name, const std::shared_ptr<omm::Classifier>& p_csf, const std::unordered_map<std::string,std::shared_ptr<omm::Property>>& p_ident_map );
 
     static std::shared_ptr<omm::Property> find_property_in_inheritance ( const std::string& p_name, const std::shared_ptr<omm::Classifier>& p_csf ) ;
 

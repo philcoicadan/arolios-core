@@ -44,9 +44,9 @@ public:
     
     void update_translation (const std::shared_ptr<omm::Persistent_object>& p_elt, const std::string& p_lang_id, const std::string& p_translation) const;
     
-    std::shared_ptr<omm::Persistent_object> store_class ( const std::string& name, const std::string& elem_type, const unsigned int pk_id, const unsigned int p_base_id, const bool p_is_abstract, const std::string& p_desc ) const;
-    std::shared_ptr<omm::Persistent_object> store_class ( const std::string& name, const std::string& elem_type, const unsigned int pk_id, const bool p_is_abstract, const std::string& p_desc) const;
     std::shared_ptr<omm::Persistent_object> store_classifier ( const std::string& name, const std::string& elem_type, const unsigned int pk_id, const std::string& p_desc ) const;
+    std::shared_ptr<omm::Persistent_object> store_classifier ( const std::string& name, const std::string& elem_type, const unsigned int pk_id, const bool p_is_abstract, const std::string& p_desc) const;
+    std::shared_ptr<omm::Persistent_object> store_classifier ( const std::string& name, const std::string& elem_type, const unsigned int pk_id, const unsigned int p_base_id, const bool p_is_abstract, const std::string& p_desc ) const;
     std::shared_ptr<omm::Persistent_object> store_primitive ( const std::string& name, const unsigned int pk_id, const std::string& p_desc, const std::string& p_native_name ) const;
     std::shared_ptr<omm::Persistent_object> store_enumeration_value ( const std::string& p_token, const unsigned int enum_id ) const;
     std::shared_ptr<omm::Persistent_object> store_property ( const std::string& p_name, const unsigned int classifier_id, const unsigned int type_id,

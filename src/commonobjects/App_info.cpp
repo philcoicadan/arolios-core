@@ -4,6 +4,8 @@
  * License: LGPL-3.0-or-later
  *
  */
+#include "omm/Selection_type.h"
+#include "omm/Specific_type.h"
 #include <common/App_info.h>
 #include <common/Object_model_info.h>
 #include <common/Singleton.h>
@@ -67,27 +69,35 @@ template void App_info::insert<omm::Class> (const std::shared_ptr<omm::Class>& p
 template void App_info::insert<omm::Composite_type> (const std::shared_ptr<omm::Composite_type>& p_elt) ;
 template void App_info::insert<omm::Enumeration> (const std::shared_ptr<omm::Enumeration>& p_elt) ;
 template void App_info::insert<omm::Primitive_type> (const std::shared_ptr<omm::Primitive_type>& p_elt) ;
+template void App_info::insert<omm::Selection_type> (const std::shared_ptr<omm::Selection_type>& p_elt) ;
+template void App_info::insert<omm::Specific_type> (const std::shared_ptr<omm::Specific_type>& p_elt) ;
 template void App_info::insert<omm::Association> (const std::shared_ptr<omm::Association>& p_elt) ;
 template void App_info::insert<omm::Property> (const std::shared_ptr<omm::Property>& p_elt) ;
 template void App_info::insert<omm::Enum_value> (const std::shared_ptr<omm::Enum_value>& p_elt) ;
+template void App_info::insert<omm::Constraint> (const std::shared_ptr<omm::Constraint>& p_elt) ;
 
 template void App_info::rename<omm::Class> (const std::shared_ptr<omm::Class>& p_elt, const std::string& p_new_name) ;
 template void App_info::rename<omm::Composite_type> (const std::shared_ptr<omm::Composite_type>& p_elt, const std::string& p_new_name) ;
 template void App_info::rename<omm::Enumeration> (const std::shared_ptr<omm::Enumeration>& p_elt, const std::string& p_new_name) ;
 template void App_info::rename<omm::Primitive_type> (const std::shared_ptr<omm::Primitive_type>& p_elt, const std::string& p_new_name) ;
+template void App_info::rename<omm::Selection_type> (const std::shared_ptr<omm::Selection_type>& p_elt, const std::string& p_new_name) ;
+template void App_info::rename<omm::Specific_type> (const std::shared_ptr<omm::Specific_type>& p_elt, const std::string& p_new_name) ;
 template void App_info::rename<omm::Association> (const std::shared_ptr<omm::Association>& p_elt, const std::string& p_new_name) ;
 template void App_info::rename<omm::Property> (const std::shared_ptr<omm::Property>& p_elt, const std::string& p_new_name) ;
 template void App_info::rename<omm::Enum_value> (const std::shared_ptr<omm::Enum_value>& p_elt, const std::string& p_new_name) ;
+template void App_info::rename<omm::Constraint> (const std::shared_ptr<omm::Constraint>& p_elt, const std::string& p_new_name) ;
 
 
 template void App_info::eliminate<omm::Class> (const std::shared_ptr<omm::Class>& p_elt) ;
 template void App_info::eliminate<omm::Composite_type> (const std::shared_ptr<omm::Composite_type>& p_elt) ;
 template void App_info::eliminate<omm::Enumeration> (const std::shared_ptr<omm::Enumeration>& p_elt) ;
 template void App_info::eliminate<omm::Primitive_type> (const std::shared_ptr<omm::Primitive_type>& p_elt) ;
+template void App_info::eliminate<omm::Selection_type> (const std::shared_ptr<omm::Selection_type>& p_elt) ;
+template void App_info::eliminate<omm::Specific_type> (const std::shared_ptr<omm::Specific_type>& p_elt) ;
 template void App_info::eliminate<omm::Association> (const std::shared_ptr<omm::Association>& p_elt) ;
 template void App_info::eliminate<omm::Property> (const std::shared_ptr<omm::Property>& p_elt) ;
 template void App_info::eliminate<omm::Enum_value> (const std::shared_ptr<omm::Enum_value>& p_elt) ;
-
+template void App_info::eliminate<omm::Constraint> (const std::shared_ptr<omm::Constraint>& p_elt) ;
 
 template <> void App_info::insert (const std::shared_ptr<omm::Package>& p_pk)  {
     
@@ -183,6 +193,8 @@ template std::shared_ptr<omm::Association> App_info::find_domain_element_by_name
 
 template std::shared_ptr<omm::Enumeration> App_info::find_domain_element_by_name<omm::Enumeration> (const std::string& p_pk_name, const std::string& p_elem_name, const bool p_only_active) const ;
 template std::shared_ptr<omm::Primitive_type> App_info::find_domain_element_by_name<omm::Primitive_type> (const std::string& p_pk_name, const std::string& p_elem_name, const bool p_only_active) const ;
+template std::shared_ptr<omm::Selection_type> App_info::find_domain_element_by_name<omm::Selection_type> (const std::string& p_pk_name, const std::string& p_elem_name, const bool p_only_active) const ;
+template std::shared_ptr<omm::Specific_type> App_info::find_domain_element_by_name<omm::Specific_type> (const std::string& p_pk_name, const std::string& p_elem_name, const bool p_only_active) const ;
 
 template std::shared_ptr<omm::Composite_type> App_info::find_domain_element_by_name<omm::Composite_type> (const std::string& p_pk_name, const std::string& p_elem_name, const bool p_only_active) const ;
 
@@ -205,6 +217,8 @@ template std::shared_ptr<omm::Association> App_info::find_domain_element_by_full
 
 template std::shared_ptr<omm::Enumeration> App_info::find_domain_element_by_full_name<omm::Enumeration> (const std::string& p_elem_name, const bool p_only_active) const ;
 template std::shared_ptr<omm::Primitive_type> App_info::find_domain_element_by_full_name<omm::Primitive_type> (const std::string& p_elem_name, const bool p_only_active) const ;
+template std::shared_ptr<omm::Selection_type> App_info::find_domain_element_by_full_name<omm::Selection_type> (const std::string& p_elem_name, const bool p_only_active) const ;
+template std::shared_ptr<omm::Specific_type> App_info::find_domain_element_by_full_name<omm::Specific_type> (const std::string& p_elem_name, const bool p_only_active) const ;
 
 template std::shared_ptr<omm::Composite_type> App_info::find_domain_element_by_full_name<omm::Composite_type> (const std::string& p_elem_name, const bool p_only_active) const ;
 

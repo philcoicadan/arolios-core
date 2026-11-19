@@ -67,7 +67,7 @@ void Class_instance_read::build_property_json ( const std::string& p_name, const
         for ( const auto & nested_prop : p_prop->nested_properties() ) {
             build_property_json ( nested_prop->name(), nested_prop, p_csf, p_row, p_config, nested_json , p_recursive+1, column_path ,p_table_alias );
         }
-    } else if ( p_prop->has_referencing_type() ) {
+    } else if ( p_prop->has_instance_type() ) {
         if ( p_prop->has_sub_field() || p_prop->max_occurs() != 1) {
             // no column but necessary for navigation in the associations
             p_root_json [p_name]= Json::Value(Json::objectValue);

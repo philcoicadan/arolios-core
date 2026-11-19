@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -9,6 +9,7 @@
 #include "Classifier.h"
 #include "Package.h"
 #include <memory>
+#include <vector>
 
 namespace arolios {
 
@@ -26,11 +27,13 @@ namespace omm {
 	class Association : public virtual Relationship, public virtual Classifier {
 	public:
 
-		Association () {member_end_[0]= nullptr; member_end_[1]= nullptr;};
+		Association (const bool p_is_abstract = false) : Classifier(p_is_abstract) {member_end_[0]= nullptr; member_end_[1]= nullptr;};
 
 		virtual ~Association () {};
+        virtual bool has_id () const  override;
 		virtual std::shared_ptr<const std::vector<std::shared_ptr<Element>>> related_elements() const override;
 		virtual std::shared_ptr<const std::vector<std::shared_ptr<Property>>> member_ends() const;
+		virtual std::shared_ptr<Association> first_base_association () const;
 		virtual void member_end ( const std::shared_ptr<Property>&  p_member_end);
 		virtual void accept (Visitor& p_visitor) const override;
         virtual std::shared_ptr<Logical_struct> logical_struct() const override;
@@ -38,8 +41,8 @@ namespace omm {
         virtual std::shared_ptr<Table> table() const override ;
         virtual std::shared_ptr<Table> managing_table() const override ;
         
-        virtual std::shared_ptr<const Class> managing_table_class () const;
-        virtual void managing_table_class ( const std::shared_ptr<const Class>& p_class) ;
+        virtual std::shared_ptr<const Classifier> managing_table_class () const;
+        virtual void managing_table_class ( const std::shared_ptr<const Classifier>& p_class) ;
         
         virtual std::shared_ptr<Column> managing_table_column () const;
 
@@ -77,10 +80,11 @@ namespace omm {
 
 	private:
         virtual std::string build_select_template () ;
+        std::vector<std::shared_ptr<Property>> effective_member_ends () const;
 
 		std::shared_ptr<Property> member_end_[2];
         std::shared_ptr<Table> table_;
-        std::shared_ptr<const Class> managing_table_class_;
+        std::shared_ptr<const Classifier> managing_table_class_;
         std::string select_tpt_;
 
 	};

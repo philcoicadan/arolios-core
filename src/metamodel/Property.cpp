@@ -7,11 +7,12 @@
 #include <omm/Property.h>
 #include <omm/Column.h>
 #include <omm/Attribute.h>
-#include <omm/Classifier.h>
 #include <omm/Class.h>
-#include <omm/Data_type.h>
+#include <omm/Association.h>
+#include <omm/Composite_type.h>
 #include <omm/Enumeration.h>
 #include <omm/Primitive_type.h>
+#include <omm/Specific_type.h>
 #include <omm/Logical_field.h>
 #include <omm/Visitor.h>
 #include <memory>
@@ -136,20 +137,29 @@ void Property::type(const std::shared_ptr<const Classifier>& p_type) {
         
 }
 
+
 bool Property::has_composite_type() const {
-    return ( (std::dynamic_pointer_cast<const omm::Data_type> ( type_ )) && type_->has_properties());
+    return  (std::dynamic_pointer_cast<const omm::Composite_type> ( type_ ).operator bool() ||
+      Specific_type::reference_is_a<omm::Composite_type>(type_) ); 
 }
 
 bool Property::has_enum_type() const {
-    return std::dynamic_pointer_cast<const omm::Enumeration> ( type_ ).operator bool();
+    return (std::dynamic_pointer_cast<const omm::Enumeration> ( type_ ).operator bool() ||
+     Specific_type::reference_is_a<omm::Enumeration>(type_) );
 }
 
 bool Property::has_primitive_type() const {
-    return std::dynamic_pointer_cast<const omm::Primitive_type> ( type_ ).operator bool();
+    return ( std::dynamic_pointer_cast<const omm::Primitive_type> ( type_ ).operator bool() ||
+     Specific_type::reference_is_a<omm::Primitive_type>(type_) );
 }
 
-bool Property::has_referencing_type () const {
-    return std::dynamic_pointer_cast<const omm::Class> ( type_ ).operator bool();
+bool Property::has_instance_type () const {
+    
+    if (type_) {
+        return type_->has_id();
+    } else {
+        return false;
+    }
 }
 
 
@@ -177,9 +187,9 @@ void Property::own_namespace( const std::shared_ptr<Namespace>& p_parent) {
     }
 }
 
-bool Property::is_class_property () const {
+bool Property::is_end_property () const {
 
-    return (std::dynamic_pointer_cast<omm::Class> (classifier_)) ? true: false ;
+    return (classifier_ == assoc_ )? true: false ;
 
 }
 

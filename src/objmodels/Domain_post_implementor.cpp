@@ -149,7 +149,7 @@ void Domain_post_implementor::process_required_properties (const Model_element<D
               // get the referencing column
               auto members = assoc_ptr->member_ends();
               std::shared_ptr<omm::Column> ref_column = nullptr;
-              for (int k = 0; k < 2; ++k) {
+              for (std::size_t k = 0; k < members->size(); ++k) {
                 ref_column = (*members)[k]->column();
                 if (ref_column)
                   break;
@@ -324,10 +324,10 @@ void Domain_post_implementor::fill_column_constraints_for_many_to_many_associati
     if (assoc) {
         
         auto members = assoc->member_ends();
-        if ((*members)[0]->has_many_targets() && (*members)[1]->has_many_targets() ) {
+        if (members->size() == 2 && (*members)[0]->has_many_targets() && (*members)[1]->has_many_targets() ) {
 
-            for ( int k=0; k<2; ++k ) {
-                if  ((*members)[k]->is_class_property() ) {
+            for ( std::size_t k=0; k<members->size(); ++k ) {
+                if  ((*members)[k]->is_end_property() ) {
 
                     auto && column = ( *members ) [k]->column();
                     for ( auto & ctt : column->constraints() ) {

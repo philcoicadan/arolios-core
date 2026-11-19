@@ -192,7 +192,7 @@ using namespace arolios::appcfg;
           
             auto && prop_view = add_property_view ( prop, name , ! ( prop->classifier() == classifier_));
              p_prop_views.push_back(prop_view);
-             if (prop->has_referencing_type()) {
+             if (prop->has_instance_type()) {
                 auto && linked_props= prop->type()->all_id_properties();
                 for (auto [ lname, lprop ] : linked_props) {
                     // in the result json, <name>.properties.<lname> => for linked props, id_name = lname

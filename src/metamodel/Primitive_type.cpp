@@ -38,29 +38,10 @@ void Primitive_type::rename_in_package (Package& p_pk, const std::shared_ptr<Pac
 
 }
 
-void Primitive_type::insert_element (const std::shared_ptr<Named_element>& p_elem) {
-	// Nothing to do - primitive types have no elements
-}
-
-void Primitive_type::erase_element (const std::shared_ptr<Named_element>& p_elem) {
-	// Nothing to do - primitive types have no elements
-}
-
-bool Primitive_type::has_elements (bool p_active_only) const {
-    return false;
-}
-
-std::shared_ptr<Named_element> Primitive_type::find_element ( const std::string& p_name) const {
-    return nullptr;
-}
 
 const std::string& Primitive_type::meta_type() const {
     static std::string mt = "primitive";
     return mt;
-}
-
-void Primitive_type::rename_element (const std::shared_ptr<omm::Packageable_element>& p_elem, const std::string& p_new_name) {
-	// Nothing to do - primitive types have no elements
 }
 
 void Primitive_type::native_type (const util::Native_type p_type) {

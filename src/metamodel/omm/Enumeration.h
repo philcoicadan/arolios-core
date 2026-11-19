@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -45,7 +45,7 @@ namespace omm {
         
         virtual void recursive_lc_status(const omm::Lc_status p_status) override;
 
-        virtual std::shared_ptr<Named_element> find_element ( const std::string& p_name) const override ;
+        virtual std::shared_ptr<Named_element> find_element ( const std::string& p_name) const  override;
 
         virtual const std::string& meta_type() const override;
 

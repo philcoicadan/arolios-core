@@ -61,7 +61,7 @@ template <> void Classifier_instances_list<omm::Class>::build_json_from_row ( Js
         const auto field = p_row[ field_key];
         if ( ! field.isNull() ) {
             util::Native_type native_type;
-            if ( value->has_referencing_type() ) {
+            if ( value->has_instance_type() ) {
                 jrow[jkey] = Json::Value ( Json::objectValue );
                 Json::Value& ref_jrow = jrow[jkey];
                 const std::string csf_id_field_key  = field_key + "_csf_id";

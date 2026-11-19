@@ -4,13 +4,19 @@
  * License: LGPL-3.0-or-later
  *
  */
-#include "util/Native_type.h"
+#include <omm/Constraint.h>
+#include <omm/Constraint_attributes.h>
+#include <omm/Selection_attributes.h>
+#include <omm/Selection_type.h>
+#include <util/Native_type.h>
 #include <omm/Model_factory.h>
 #include <omm/Column.h>
-#include <omm/Class_attributes.h>
+#include <omm/Classifier_attributes.h>
 #include <omm/Property_attributes.h>
 #include <omm/Primitive_attributes.h>
 #include <omm/Primitive_type.h>
+#include <omm/Specific_type.h>
+#include <omm/Collection_attributes.h>
 #include <iostream>
 
 
@@ -48,7 +54,7 @@ template <>  std::shared_ptr<omm::Package> Model_factory::make<omm::Package>(con
 
 template <>  std::shared_ptr<omm::Class> Model_factory::make<omm::Class>(const std::shared_ptr<omm::Persistent_object>& p_pers_elem, const std::string& p_name, const std::shared_ptr<omm::Packageable_element>& p_parent, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status, const std::string& p_desc ) {
     
-    const omm::Class_attributes& attrs =dynamic_cast<const omm::Class_attributes&> (p_attrs);
+    const omm::Classifier_attributes& attrs =dynamic_cast<const omm::Classifier_attributes&> (p_attrs);
     auto parent = std::dynamic_pointer_cast<omm::Package>(p_parent);
 
     auto result = make_class (p_name, parent, attrs.is_abstract_,  p_status, p_desc);
@@ -78,6 +84,26 @@ template <>  std::shared_ptr<omm::Primitive_type> Model_factory::make<omm::Primi
     return result;
 }
 
+template <>  std::shared_ptr<omm::Selection_type> Model_factory::make<omm::Selection_type>(const std::shared_ptr<omm::Persistent_object>& p_pers_elem, const std::string& p_name, const std::shared_ptr<omm::Packageable_element>& p_parent, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status, const std::string& p_desc ) {
+    
+    auto parent = std::dynamic_pointer_cast<omm::Package>(p_parent);
+    const omm::Selection_attributes& attrs =dynamic_cast<const omm::Selection_attributes&> (p_attrs);
+
+    auto result = make_selection_type (p_name, parent,  p_status, p_desc);
+    result->persistent_attributes (p_pers_elem->id(), p_pers_elem->id_scope());
+    return result;
+}
+
+template <>  std::shared_ptr<omm::Specific_type> Model_factory::make<omm::Specific_type>(const std::shared_ptr<omm::Persistent_object>& p_pers_elem, const std::string& p_name, const std::shared_ptr<omm::Packageable_element>& p_parent, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status, const std::string& p_desc ) {
+    
+    auto parent = std::dynamic_pointer_cast<omm::Package>(p_parent);
+    //const omm::Specific_attributes& attrs =dynamic_cast<const omm::Specific_attributes&> (p_attrs);
+
+    //auto result = make_specific_type (p_name, parent,  p_status, p_desc);
+    //result->persistent_attributes (p_pers_elem->id(), p_pers_elem->id_scope());
+    //return result;
+    return nullptr;
+}
 
 template <>  std::shared_ptr<omm::Enumeration> Model_factory::make<omm::Enumeration>(const std::shared_ptr<omm::Persistent_object>& p_pers_elem, const std::string& p_name, const std::shared_ptr<omm::Packageable_element>& p_parent, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status, const std::string& p_desc ) {
     
@@ -90,9 +116,13 @@ template <>  std::shared_ptr<omm::Enumeration> Model_factory::make<omm::Enumerat
 
 template <>  std::shared_ptr<omm::Association> Model_factory::make<omm::Association>(const std::shared_ptr<omm::Persistent_object>& p_pers_elem, const std::string& p_name, const std::shared_ptr<omm::Packageable_element>& p_parent, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status, const std::string& p_desc ) {
     
+    const omm::Classifier_attributes& attrs =dynamic_cast<const omm::Classifier_attributes&> (p_attrs);
     auto parent = std::dynamic_pointer_cast<omm::Package>(p_parent);
     
-    auto result = make_association (p_name, parent, p_status, p_desc);
+    auto result = make_association (p_name, parent, attrs.is_abstract_, p_status, p_desc);
+    if (attrs.base_ != nullptr) {
+        std::shared_ptr<omm::Generalization> cur_general = omm::Model_factory::instance().make_generalization(attrs.base_, result);
+    }
     result->persistent_attributes (p_pers_elem->id(), p_pers_elem->id_scope());
     return result;
 }
@@ -109,14 +139,15 @@ template <>  std::shared_ptr<omm::Property> Model_factory::make<omm::Property>(c
     if (attrs.source_member_end_) {
         const auto target = std::dynamic_pointer_cast<omm::Class>(attrs.type_);
         const auto parent = std::dynamic_pointer_cast<omm::Association>(p_parent);
-        result = make_member_end ( p_name, parent, target, attrs.source_member_end_, attrs.min_, attrs.max_, attrs.is_scp_, (attrs.aggregation_ == omm::Aggregation_kind::composite) , /*attrs.part_of_id_,*/ p_status, p_desc);
-        
+        result = make_member_end ( p_name, parent, target, attrs.source_member_end_, attrs.min_, attrs.max_, attrs.is_scp_, (attrs.aggregation_ == omm::Aggregation_kind::composite) , attrs.is_navigable_, /*attrs.part_of_id_,*/ p_status, p_desc);
+       
     } else {
         const auto parent = std::dynamic_pointer_cast<omm::Classifier>(p_parent);
 
         result = make_property (p_name, parent, attrs.type_, attrs.min_, attrs.max_, std::string(), std::string(), /*attrs.part_of_id_,*/ p_status, p_desc);
     }
     
+    result->collection (attrs.collection_);
     result->persistent_attributes (p_pers_elem->id(), p_pers_elem->id_scope());
     return result;
 }
@@ -126,6 +157,16 @@ template <>  std::shared_ptr<omm::Enum_value> Model_factory::make<omm::Enum_valu
     auto parent = std::dynamic_pointer_cast<omm::Enumeration>(p_parent);
     
     auto result = make_enum_value (p_name, parent, p_status);
+    result->persistent_attributes (p_pers_elem->id(), p_pers_elem->id_scope());
+    return result;
+}
+
+template <>  std::shared_ptr<omm::Constraint> Model_factory::make<omm::Constraint>(const std::shared_ptr<omm::Persistent_object>& p_pers_elem, const std::string& p_name, const std::shared_ptr<omm::Packageable_element>& p_parent, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status, const std::string& p_desc ) {
+    
+    auto parent = std::dynamic_pointer_cast<omm::Classifier>(p_parent);
+    const omm::Constraint_attributes& attrs =dynamic_cast<const omm::Constraint_attributes&> (p_attrs);
+
+    auto result = make_constraint (p_name, parent, attrs.expression_, p_status,p_desc);
     result->persistent_attributes (p_pers_elem->id(), p_pers_elem->id_scope());
     return result;
 }
@@ -172,8 +213,8 @@ std::shared_ptr<omm::Enumeration> Model_factory::make_enumeration(const std::str
 	p_package->insert<omm::Enumeration>(result);
 	return result;
 }
-std::shared_ptr<omm::Association> Model_factory::make_association(const std::string& p_name,const std::shared_ptr<omm::Package>& p_package, const omm::Lc_status p_status, const std::string& p_desc ) {
-	std::shared_ptr<omm::Association> result = std::make_shared<omm::Association>();
+std::shared_ptr<omm::Association> Model_factory::make_association(const std::string& p_name,const std::shared_ptr<omm::Package>& p_package, const bool p_is_abstract, const omm::Lc_status p_status, const std::string& p_desc ) {
+	std::shared_ptr<omm::Association> result = std::make_shared<omm::Association>(p_is_abstract);
 	package_element_attributes ( result, p_name, p_package,p_status, p_desc);
 	p_package->insert<omm::Association>(result);
 	return result;
@@ -187,14 +228,14 @@ std::shared_ptr<omm::Property> Model_factory::make_property(const std::string& p
 }
 
 
-std::shared_ptr<omm::Property> Model_factory::make_member_end(const std::string& p_name,const std::shared_ptr<omm::Association>& p_assoc, const std::shared_ptr<const omm::Class>& p_target, const std::shared_ptr<omm::Class>& p_source,
-			const int p_min, const int p_max, const bool p_is_src_class_property, const bool p_is_composition, /*const bool p_part_of_id,*/ const omm::Lc_status p_status, const std::string& p_desc ) {
+std::shared_ptr<omm::Property> Model_factory::make_member_end(const std::string& p_name,const std::shared_ptr<omm::Association>& p_assoc, const std::shared_ptr<const omm::Classifier>& p_target, const std::shared_ptr<omm::Classifier>& p_source,
+			const int p_min, const int p_max, const bool p_is_src_class_property, const bool p_is_composition, const bool p_is_navigable, /*const bool p_part_of_id,*/ const omm::Lc_status p_status, const std::string& p_desc ) {
 
 
 	std::shared_ptr<omm::Property> result = std::make_shared<omm::Property>();
 	std::shared_ptr<omm::Classifier> l_classifier =  p_is_src_class_property ? std::static_pointer_cast<omm::Classifier>(p_source) : std::static_pointer_cast<omm::Classifier>(p_assoc);
 	property_attributes ( result, p_name, l_classifier, p_target, p_min, p_max, std::string(), std::string(), /* p_part_of_id,*/ p_status, p_desc);
-	//result->is_navigable (true);
+	result->is_navigable (p_is_navigable);
 	result->aggregation_kind ( p_is_composition ? omm::Aggregation_kind::composite : omm::Aggregation_kind::none );
 	result->association (p_assoc);
 	p_assoc->member_end(result);
@@ -210,6 +251,19 @@ std::shared_ptr<omm::Constraint> Model_factory::make_constraint( const std::stri
 	result->classifier(p_classifier);
 	p_classifier->insert_constraint(result);
 	return result;
+}
+
+std::shared_ptr<omm::Specific_type> Model_factory::make_specific_type( const std::string& p_name, const std::shared_ptr<omm::Package>& p_package, const std::shared_ptr<omm::Classifier>& p_referenced_type, const std::shared_ptr<omm::Collection_attributes>& p_collection, const omm::Lc_status p_status, const std::string& p_desc ) {
+	std::shared_ptr<omm::Specific_type> result = std::make_shared<omm::Specific_type>();
+	package_element_attributes ( result, p_name, p_package, p_status, p_desc );
+	result->referenced_classifier (p_referenced_type);
+	result->collection (p_collection);
+	p_package->insert<omm::Specific_type>(result);
+	return result;
+}
+
+std::shared_ptr<omm::Selection_type> Model_factory::make_selection_type( const std::string& p_name, const std::shared_ptr<omm::Package>& p_package , const omm::Lc_status p_status, const std::string& p_desc ) {
+	throw exception::Model_error("selection is not supported");
 }
 
 std::shared_ptr<omm::Generalization> Model_factory::make_generalization(const std::shared_ptr<omm::Classifier>& p_general, const std::shared_ptr<omm::Classifier>& p_specific) {
@@ -434,6 +488,8 @@ template void Model_factory::update<omm::Association> ( const std::shared_ptr<om
 template void Model_factory::update<omm::Composite_type> ( const std::shared_ptr<omm::Composite_type>& p_elem, const std::string& p_new_name,  const std::string& p_new_desc, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status ) ;
 
 template void Model_factory::update<omm::Primitive_type> ( const std::shared_ptr<omm::Primitive_type>& p_elem, const std::string& p_new_name,  const std::string& p_new_desc, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status ) ;
+template void Model_factory::update<omm::Selection_type> ( const std::shared_ptr<omm::Selection_type>& p_elem, const std::string& p_new_name,  const std::string& p_new_desc, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status ) ;
+template void Model_factory::update<omm::Specific_type> ( const std::shared_ptr<omm::Specific_type>& p_elem, const std::string& p_new_name,  const std::string& p_new_desc, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status ) ;
 
 template void Model_factory::update<omm::Enumeration> ( const std::shared_ptr<omm::Enumeration>& p_elem, const std::string& p_new_name,  const std::string& p_new_desc, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status ) ;
 
@@ -441,10 +497,12 @@ template void Model_factory::update<omm::Property> ( const std::shared_ptr<omm::
 
 template void Model_factory::update<omm::Enum_value> ( const std::shared_ptr<omm::Enum_value>& p_elem, const std::string& p_new_name,  const std::string& p_new_desc, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status ) ;
 
+template void Model_factory::update<omm::Constraint> ( const std::shared_ptr<omm::Constraint>& p_elem, const std::string& p_new_name,  const std::string& p_new_desc, const omm::Element_attributes& p_attrs, const omm::Lc_status p_status ) ;
+
 void Model_factory::specific_attributes_update ( const std::shared_ptr<omm::Class>& p_elem,  const omm::Element_attributes& p_attrs ) {
     
     
-    const omm::Class_attributes& attrs =dynamic_cast<const omm::Class_attributes&> (p_attrs);
+    const omm::Classifier_attributes& attrs =dynamic_cast<const omm::Classifier_attributes&> (p_attrs);
     
     if (attrs.is_abstract_ == true && !p_elem->is_abstract() ) {
         std::cerr << "Update of the class " + p_elem->name() + " : the class cannot become abstract " << std::endl;
@@ -456,9 +514,26 @@ void Model_factory::specific_attributes_update ( const std::shared_ptr<omm::Clas
 
 }
 
+void Model_factory::specific_attributes_update ( const std::shared_ptr<omm::Association>& p_elem,  const omm::Element_attributes& p_attrs ) {
+    
+    
+    const omm::Classifier_attributes& attrs =dynamic_cast<const omm::Classifier_attributes&> (p_attrs);
+    
+    if (attrs.is_abstract_ == true && !p_elem->is_abstract() ) {
+        std::cerr << "Update of the association " + p_elem->name() + " : the association cannot become abstract " << std::endl;
+        
+    } else {
+        p_elem->is_abstract(attrs.is_abstract_);
+    }
+
+
+}
+
 void Model_factory::specific_attributes_update ( const std::shared_ptr<omm::Property>& p_elem,  const omm::Element_attributes& p_attrs ) {
 
   const omm::Property_attributes& attrs =dynamic_cast<const omm::Property_attributes&> (p_attrs);
+
+     p_elem->collection (attrs.collection_);
 
      if ( attrs.source_member_end_ ) {
           if ( attrs.min_ != p_elem->min_occurs() ) {
@@ -489,11 +564,18 @@ void Model_factory::specific_attributes_update ( const std::shared_ptr<omm::Prop
                p_elem->aggregation_kind ( attrs.aggregation_ );
           }
 
+          if (attrs.is_navigable_ != p_elem->is_navigable()) {
+               p_elem->is_navigable(attrs.is_navigable_);
+          }
+
 
      } else {
           //simple property
           if ( attrs.min_ != p_elem->min_occurs() ) {
                p_elem->min_occurs ( attrs.min_ ) ;
+          }
+          if ( attrs.max_ != p_elem->max_occurs() ) {
+               p_elem->max_occurs ( attrs.max_ ) ;
           }
      }
 
@@ -507,6 +589,18 @@ void Model_factory::specific_attributes_update ( const std::shared_ptr<omm::Prim
     if (attrs.native_type_ != p_elem->native_type()) {
         std::cerr << "Update of the primitive type " + p_elem->name() + " : the native type cannot be modified. Delete the primitive and create again with another primitive type " << std::endl;
         
+    } 
+
+
+}
+
+void Model_factory::specific_attributes_update ( const std::shared_ptr<omm::Constraint>& p_elem,  const omm::Element_attributes& p_attrs ) {
+    
+    
+    const omm::Constraint_attributes& attrs =dynamic_cast<const omm::Constraint_attributes&> (p_attrs);
+    
+    if (attrs.expression_ != p_elem->expression()) {
+        p_elem->expression(attrs.expression_);
     } 
 
 

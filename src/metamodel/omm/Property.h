@@ -7,6 +7,7 @@
 #pragma once
 #include "Packageable_element.h"
 #include "Aggregation_kind.h"
+#include <memory>
 
 namespace arolios {
 
@@ -23,6 +24,7 @@ namespace omm {
     class Column;
     class Attribute;
     class Property_by_sub_field;
+    class Collection_attributes;
 	class Property : public virtual Packageable_element {
 	public:
 
@@ -39,6 +41,7 @@ namespace omm {
 		virtual long max_occurs () const { return max_; }
 		virtual const std::string& default_value () const { return default_; }
 		virtual const std::string& computed_value () const { return computed_; }
+		virtual const std::shared_ptr<Collection_attributes>& collection () const { return collection_; }
 
 		virtual void classifier(const std::shared_ptr<Classifier>& p_classifier)  { classifier_ = p_classifier;}
 		virtual void type(const std::shared_ptr<const Classifier>& p_type) ;
@@ -48,6 +51,10 @@ namespace omm {
 		virtual void max_occurs (long p_max)  { max_ = p_max; }
 		void default_value (const std::string& p_default)  {  default_ = p_default; }
 		void computed_value (const std::string& p_computed)  {  computed_ = p_computed; }
+		virtual void collection (const std::shared_ptr<Collection_attributes>& p_collection) { collection_ = p_collection; }
+		virtual void is_navigable (bool p_navigable) { is_navigable_ = p_navigable; }
+		virtual bool is_navigable () const { return is_navigable_; }
+
 		
 		virtual void logical_field (const std::shared_ptr<Logical_field>& p_field) { field_ = p_field; }
 
@@ -68,19 +75,20 @@ namespace omm {
         virtual void rename_in_package (Package& p_pk, const std::shared_ptr<Packageable_element>& p_elem, const std::string& p_new_name ) override;
 
         
+
         virtual bool has_composite_type() const ;
         
         virtual bool has_enum_type () const;   
 
         virtual bool has_primitive_type () const;
         
-        virtual bool has_referencing_type () const;
+        virtual bool has_instance_type () const;
         
         virtual bool has_sub_field () const ;
         
         virtual bool is_required () const ;
 
-		virtual bool is_class_property () const;
+		virtual bool is_end_property () const;
 		virtual bool has_many_targets () const;
          
         virtual const std::vector<std::shared_ptr<omm::Property>>& nested_properties () const ;
@@ -98,16 +106,19 @@ private:
 		std::shared_ptr<const Classifier> type_; // Data_type, Enumeration or Class
 		std::shared_ptr<Association> assoc_;
 		std::shared_ptr<Logical_field> field_;
-        std::shared_ptr<Property_by_sub_field> sub_field_;
-        std::vector<std::shared_ptr<omm::Property>> nested_properties_;
-        
-        
+		std::shared_ptr<Property_by_sub_field> sub_field_;
+		std::shared_ptr<Collection_attributes> collection_;
+		std::vector<std::shared_ptr<omm::Property>> nested_properties_;
+		
+		
 		Aggregation_kind aggregation_ ;
 
 		long min_;
 		long max_; // -1 means *
 		std::string default_;
 		std::string computed_;
+		bool is_navigable_ {true};
+
 
 
 

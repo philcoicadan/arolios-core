@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -23,6 +23,7 @@ namespace omm {
 		Class ( const Class& ) = default;
 		virtual ~Class () {};
 		virtual void accept (Visitor& p_visitor) const override;
+        virtual bool has_id () const  override;
         virtual std::shared_ptr<Logical_struct> logical_struct() const override;
         virtual std::shared_ptr<Table> table() const override;
         virtual std::shared_ptr<Table> managing_table() const override ;
@@ -40,7 +41,7 @@ namespace omm {
 
         virtual const std::string& meta_type() const override;
         
-        virtual std::shared_ptr<Named_element> find_element ( const std::string& p_name) const override ;
+        //virtual std::shared_ptr<Named_element> find_element ( const std::string& p_name) const override ;
 
 
 

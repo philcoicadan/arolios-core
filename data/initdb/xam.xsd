@@ -1,0 +1,281 @@
+<?xml version="1.0"?>
+<!--                                                           
+ 
+  Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
+  License: LGPL-3.0-or-later
+ 
+ -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://arolios.org/arolios/model"
+	xmlns:t="http://arolios.org/arolios/model"
+	elementFormDefault="unqualified">
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">
+		Schema to define the application model
+		</xsd:documentation>
+	</xsd:annotation>
+
+	<!--  global definitions -->
+	<xsd:element name="model" type="t:Model_t"/>
+
+	<xsd:complexType name="Model_t">
+		<xsd:sequence>
+			<xsd:element name="domain" type="t:Domain_t" minOccurs="1" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>	
+
+	<xsd:complexType name="Element_t">
+		<xsd:sequence>
+			<xsd:element name="description" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+		</xsd:sequence>
+		<xsd:attribute name="name" type="xsd:NCName" use="required"/> 
+		<xsd:attribute name="action" type="t:Action_t" default="create" />
+        <xsd:attribute name="rename" type="xsd:NCName"/> 
+	</xsd:complexType>
+	
+	<xsd:complexType name="Classifier_t">
+		<xsd:complexContent>
+			<xsd:extension base="t:Element_t"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:group name="Class_body_t">
+		<xsd:sequence>
+			<xsd:element name="base" type="xsd:NCName" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="property" type="t:Class_property_t" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:group>
+
+	<xsd:attributeGroup name="Class_body_attlist">
+		<xsd:attribute name="isAbstract" type="xsd:boolean" default="false"/>
+	</xsd:attributeGroup>
+
+	<xsd:group name="Constraints_t">
+		<xsd:sequence>
+			<xsd:element name="constraint" type="t:Constraint_t" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:group>
+
+	<xsd:complexType name="Domain_t">
+		<xsd:complexContent>
+			<xsd:extension base="t:Element_t">
+				<xsd:sequence>
+					<xsd:choice maxOccurs="unbounded">
+						<xsd:element name="enumeration" type="t:Enumeration_t" minOccurs="0" maxOccurs="unbounded"/>
+						<xsd:element name="type" type="t:Type_t" minOccurs="0" maxOccurs="unbounded"/>
+						<xsd:element name="class" type="t:Class_t" minOccurs="0" maxOccurs="unbounded"/>
+						<xsd:element name="association" type="t:Association_t" minOccurs="0" maxOccurs="unbounded"/>	
+						<xsd:element name="primitive" type="t:Primitive_t" minOccurs="0" maxOccurs="unbounded"/>	
+						<xsd:element name="specific" type="t:Specific_t" minOccurs="0" maxOccurs="unbounded"/>	
+						<xsd:element name="selection" type="t:Selection_t" minOccurs="0" maxOccurs="unbounded"/>	
+					</xsd:choice>
+				</xsd:sequence>
+			</xsd:extension>	
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+	<xsd:complexType name="Primitive_t">
+		<xsd:complexContent>
+			<xsd:extension base="t:Classifier_t">
+			<xsd:sequence>
+				<xsd:group ref="t:Constraints_t"/>
+			</xsd:sequence>
+			<xsd:attribute name="native" type="xsd:token" use="required"/> 
+			</xsd:extension>	
+		</xsd:complexContent>	
+	</xsd:complexType>
+
+	<xsd:complexType name="Specific_t">
+		<xsd:complexContent>
+			<xsd:extension base="t:Classifier_t">
+				<xsd:sequence>
+					<xsd:element name="collection" type="t:Collection_t" minOccurs="0" maxOccurs="1"/>
+					<xsd:group ref="t:Constraints_t"/>
+				</xsd:sequence>
+				<xsd:attribute name="type" type="xsd:NCName" use="required"/> 
+			</xsd:extension>	
+		</xsd:complexContent>	
+	</xsd:complexType>
+
+	<xsd:complexType name="Collection_t">
+		<xsd:sequence>
+			<xsd:element name="range" type="t:Range_t" minOccurs="1" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="kind" type="t:KindOfCollection_t" default="array"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="Type_t">
+		<xsd:complexContent>
+			<xsd:extension base="t:Classifier_t">
+				<xsd:sequence>
+					<xsd:element name="property" type="t:Type_property_t" minOccurs="1" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>	
+		</xsd:complexContent>	
+	</xsd:complexType>
+	
+	<xsd:complexType name="Class_t">
+		<xsd:complexContent>
+			<xsd:extension base="t:Classifier_t">
+				<xsd:sequence>
+					<xsd:group ref="t:Class_body_t"/>
+                    <xsd:element name="identifier" type="t:Class_identifier_t" minOccurs="0" maxOccurs="1"/>
+					<xsd:group ref="t:Constraints_t"/>
+				</xsd:sequence>
+                <xsd:attributeGroup ref="t:Class_body_attlist"/>
+			</xsd:extension>	
+		</xsd:complexContent>
+	</xsd:complexType>
+
+    <xsd:complexType name="Classifier_identifier_t">
+		<xsd:sequence>
+                <xsd:element name="property" type="xsd:NCName" minOccurs="0" maxOccurs="unbounded"/>		
+        </xsd:sequence>	
+	</xsd:complexType>
+    
+    <xsd:complexType name="Class_identifier_t">
+        <xsd:complexContent>
+            <xsd:extension base="t:Classifier_identifier_t">
+                <xsd:sequence>
+                    <xsd:element name="memberEnd" type="xsd:NCName" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>	
+            </xsd:extension>
+        </xsd:complexContent>
+	</xsd:complexType>
+	
+	
+	
+	<xsd:complexType name="Type_property_t">
+		<xsd:complexContent>
+			<xsd:extension base="t:Element_t">
+				<xsd:attribute name="type" type="xsd:NCName" use="required"/>	
+			</xsd:extension>	
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="Class_property_t">
+		<xsd:complexContent>
+			<xsd:extension base="t:Type_property_t">
+				<xsd:sequence>
+					<xsd:element name="collection" type="t:Collection_t" minOccurs="0" maxOccurs="1"/>
+				</xsd:sequence>
+				<xsd:attribute name="required" type="xsd:boolean" default="false"/>
+				<xsd:attribute name="isComposition" type="xsd:boolean" default="false"/>
+				<xsd:attribute name="memberEnd" type="xsd:boolean" default="false"/>
+				<xsd:attribute name="opposite" type="xsd:NCName"/>
+			</xsd:extension>	
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="Association_t">
+		<xsd:complexContent>
+			<xsd:extension base="t:Classifier_t">
+				<xsd:sequence>
+					<xsd:element name="memberEnd" type="t:Member_end_t" minOccurs="0" maxOccurs="2"/>
+                    <xsd:group ref="t:Class_body_t"/>
+                    <xsd:element name="identifier" type="t:Classifier_identifier_t" minOccurs="0" maxOccurs="1"/>
+                    <xsd:group ref="t:Constraints_t"/>
+				</xsd:sequence>
+                <xsd:attributeGroup ref="t:Class_body_attlist"/>
+			</xsd:extension>	
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+	<xsd:attributeGroup name="Member_end_body_attlist">
+		<xsd:attribute name="minOccurs" type="t:Min_occurrences_t" default="zero"/>
+		<xsd:attribute name="maxOccurs" type="t:Max_occurrences_t" default="many"/>
+		<xsd:attribute name="isComposition" type="xsd:boolean" default="false"/>
+		<xsd:attribute name="owned" type="xsd:boolean" default="false"/>
+		<xsd:attribute name="navigable" type="xsd:boolean" default="true"/>
+	</xsd:attributeGroup>
+
+	<xsd:complexType name="Member_end_t">
+		<xsd:complexContent>
+			<xsd:extension base="t:Element_t">
+				<xsd:attribute name="class" type="xsd:NCName" use="required"/>
+				<xsd:attributeGroup ref="t:Member_end_body_attlist"/>
+			</xsd:extension>	
+		</xsd:complexContent>
+	</xsd:complexType>
+
+
+	<xsd:complexType name="Enumeration_t">
+		<xsd:complexContent>
+			<xsd:extension base="t:Classifier_t">
+				<xsd:sequence>
+                    <xsd:element name="value" type="t:Value_t" minOccurs="1" maxOccurs="unbounded"/>
+				</xsd:sequence>			
+			</xsd:extension>	
+		</xsd:complexContent>
+	</xsd:complexType>
+    
+		
+	<xsd:complexType name="Value_t">
+		<xsd:sequence>
+			<xsd:element name="description" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+		</xsd:sequence>
+		<xsd:attribute name="name" type="xsd:token" use="required"/> 
+		<xsd:attribute name="action" type="t:Action_t" default="create" />
+        <xsd:attribute name="rename" type="xsd:token"/> 
+	</xsd:complexType>
+
+	<xsd:complexType name="Selection_t">
+		<xsd:complexContent>
+			<xsd:extension base="t:Classifier_t">
+				<xsd:sequence>
+					<xsd:element name="option" type="xsd:NCName" minOccurs="1" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="Constraint_t">
+		<xsd:complexContent>
+			<xsd:extension base="t:Element_t">
+				<xsd:attribute name="expression" type="xsd:string" use="required"/> 
+			</xsd:extension>	
+		</xsd:complexContent>	
+	</xsd:complexType>
+
+	<xsd:simpleType name="Action_t">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="create"/>
+			<xsd:enumeration value="update"/>
+			<xsd:enumeration value="delete"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:complexType name="Range_t">
+		<xsd:attribute name="min" type="xsd:nonNegativeInteger" use="required"/>
+		<xsd:attribute name="max" type="t:HighLimit_t" use="required"/>	
+	</xsd:complexType>
+    
+    <xsd:simpleType name="Min_occurrences_t">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="zero"/>
+			<xsd:enumeration value="one"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+    
+    <xsd:simpleType name="Max_occurrences_t">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="one"/>
+			<xsd:enumeration value="many"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="KindOfCollection_t">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="array"/>
+			<xsd:enumeration value="list"/>
+			<xsd:enumeration value="set"/>
+			<xsd:enumeration value="bag"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="HighLimit_t">
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="[1-9][0-9]*|many"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

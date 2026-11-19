@@ -61,7 +61,7 @@ void Base_instance_read::build_linked_property_json (const std::string& p_key, c
         const auto field = p_row[ field_key];
         if ( ! field.isNull() ) {
             util::Native_type native_type;
-            if ( p_prop->has_referencing_type() ) {
+            if ( p_prop->has_instance_type() ) {
                 jrow[jkey] = Json::Value ( Json::objectValue );
                 Json::Value& ref_jrow = jrow[jkey];
                 const std::string csf_id_field_key  = field_key + "_csf_id";

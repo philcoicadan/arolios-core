@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -36,7 +36,7 @@ Association_config::~Association_config () {}
 
             auto && prop_view = add_property_view ( prop, name, false);
             p_prop_views.push_back(prop_view);
-            if (prop->has_referencing_type()) {
+            if (prop->has_instance_type()) {
                 auto && linked_props= prop->type()->all_id_properties();
                 for (auto [ lname, lprop ] : linked_props) {
                     // in the result json, <name>.properties.<lname> => for linked props, id_name = lname
@@ -544,7 +544,7 @@ Association_config::~Association_config () {}
 
             auto && prop_view = add_property_view ( prop, name , false);
             p_prop_views.push_back(prop_view);
-            if (prop->has_referencing_type()) {
+            if (prop->has_instance_type()) {
                 auto && linked_props= prop->type()->all_id_properties();
                 for (auto [ lname, lprop ] : linked_props) {
                     

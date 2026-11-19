@@ -5,6 +5,9 @@
  *
  */
 #pragma once
+#include "model/xam.h"
+#include "omm/Selection_type.h"
+#include "omm/Specific_type.h"
 #include <model/Visitor.h>
 #include <string>
 #include <omm/Property.h>
@@ -36,9 +39,9 @@ public:
     virtual void visit (const Model_element_create<Enumeration_t, omm::Enumeration >& p_obj) override ;
     virtual void visit (const Model_element_delete<Enumeration_t, omm::Enumeration >& p_obj) override ;
     virtual void visit (const Model_element_update<Enumeration_t, omm::Enumeration >& p_obj) override ;
-    virtual void visit (const Model_element_create<Element_t, omm::Enum_value >& p_obj) override ;
-    virtual void visit (const Model_element_delete<Element_t, omm::Enum_value >& p_obj) override ;
-    virtual void visit (const Model_element_update<Element_t, omm::Enum_value >& p_obj) override ; 
+    virtual void visit (const Model_element_create<Value_t, omm::Enum_value >& p_obj) override ;
+    virtual void visit (const Model_element_delete<Value_t, omm::Enum_value >& p_obj) override ;
+    virtual void visit (const Model_element_update<Value_t, omm::Enum_value >& p_obj) override ; 
     virtual void visit (const Model_element_create<Type_t, omm::Composite_type >& p_obj) override;
     virtual void visit (const Model_element_delete<Type_t, omm::Composite_type >& p_obj) override;
     virtual void visit (const Model_element_update<Type_t, omm::Composite_type >& p_obj) override; 
@@ -63,8 +66,16 @@ public:
     virtual void visit (const Model_element_create<Domain_t, omm::Package >& p_obj) override;
     virtual void visit (const Model_element_delete<Domain_t, omm::Package >& p_obj) override ;
     virtual void visit (const Model_element_update<Domain_t, omm::Package >& p_obj) override;   
-
-
+    virtual void visit (const Model_element_create<Selection_t, omm::Selection_type >& p_obj) override;
+    virtual void visit (const Model_element_delete<Selection_t, omm::Selection_type >& p_obj) override ;
+    virtual void visit (const Model_element_update<Selection_t, omm::Selection_type >& p_obj) override;   
+    virtual void visit (const Model_element_create<Specific_t, omm::Specific_type >& p_obj) override;
+    virtual void visit (const Model_element_delete<Specific_t, omm::Specific_type >& p_obj) override ;
+    virtual void visit (const Model_element_update<Specific_t, omm::Specific_type >& p_obj) override;   
+    virtual void visit (const Model_element_create<Constraint_t, omm::Constraint >& p_obj)  override;
+    virtual void visit (const Model_element_delete<Constraint_t, omm::Constraint >& p_obj)  override;
+    virtual void visit (const Model_element_update<Constraint_t, omm::Constraint >& p_obj) override;
+  
     virtual void visit (const Root_loader& p_obj) override ;
 
 
@@ -102,6 +113,8 @@ private:
     void prepare_declaration_for_reference_column (std::string& p_stmt, const std::shared_ptr<const omm::Property>& p_prop, const std::string& p_column_name, const std::string& p_table_name, const bool is_root, const bool p_delete_cascade, const bool p_not_null, const bool p_unique, const std::shared_ptr<const omm::Classifier>& p_class) const ;
 
     void add_complementary_table (const std::shared_ptr<omm::Association>& p_assoc)  const ;
+
+    void create_member_end_column (const std::shared_ptr<omm::Association>& p_assoc, const std::shared_ptr<omm::Property>& p_prop)  const ;
     
   
     

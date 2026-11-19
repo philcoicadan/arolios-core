@@ -6,6 +6,8 @@
  */
 #include <model/Model_element.h>
 #include "Model_element.tpp"
+#include <model/Model_composite.h>
+#include "Model_composite.tpp"
 #include <omm/Enumeration.h>
 #include <omm/Enum_value.h>
 #include <omm/Package.h>
@@ -22,14 +24,16 @@ namespace arolios::model {
 
 
 
-template <> void Model_element<Element_t, omm::Enum_value>::fill_children() {
+template <> void Model_element<Value_t, omm::Enum_value>::fill_children() {
  
    // no child
 }
 
 
 
-template class Model_element<Element_t, omm::Enum_value> ;
+template class Model_element<Value_t, omm::Enum_value> ;
+template class Model_composite<Value_t, omm::Enum_value, Model_element>;
+
 
 }
 

@@ -18,6 +18,8 @@
 #include <common/Object_model_info.h>
 #include <util/String.h>
 #include <qry/Util.h>
+#include <model/Model_recorder.h>
+#include <iostream>
 
 
 
@@ -139,10 +141,71 @@ std::shared_ptr<omm::Property> Util::find_property_in_inheritance ( const std::s
     return result;
 }
 
-bool Util::check_inheritance (const std::shared_ptr<omm::Class>& p_derived, const std::shared_ptr<omm::Class>& p_base) {
+bool Util::check_inheritance (const std::shared_ptr<omm::Classifier>& p_derived, const std::shared_ptr<omm::Classifier>& p_base) {
 
     auto base_classes = p_derived->more_general_classifiers();
     return ( base_classes.find(p_base) != base_classes.end()) ;
+}
+
+void Util::store_identifier ( const std::string& p_name, const std::shared_ptr<omm::Classifier>& p_csf, const std::unordered_map<std::string,std::shared_ptr<omm::Property>>& p_ident_map ) {
+
+    if (p_csf == nullptr ) {
+        std::string warn_msg = p_name + " is not saved, identifier cannot be taken into account";
+        std::cout << "WARNING: " << warn_msg<< std::endl;
+        return;
+    }
+
+    if ( p_ident_map.size() > 0 ) {
+        // check one is not null
+        bool has_not_null = false;
+        for ( auto [name, prop] : p_ident_map ) {
+            if ( prop->min_occurs() > 0 ) {
+                has_not_null = true;
+                break;
+            }
+        }
+        if ( has_not_null ) {
+            Model_recorder mdl_rcd;
+            try {
+                mdl_rcd.update_identifier ( p_csf, p_ident_map );
+
+            } catch ( const exception::Db_exception &e ) {
+                mdl_rcd.rollback();
+                
+                throw e;
+            } catch ( const exception::Base_exception &e ) {
+                mdl_rcd.rollback();
+                
+                throw e;
+            } catch ( std::exception const &e ) {
+                mdl_rcd.rollback();
+                
+                throw e;
+            }
+        } else {
+            std::string error_msg = "The identifier of " + p_csf->name() + " cannot be saved because there is no required property ";
+            
+            throw exception::Failure ( error_msg );
+        }
+    } else {
+        Model_recorder mdl_rcd;
+        try {
+            mdl_rcd.reset_identifier(p_csf);
+        } catch (const exception::Db_exception &e) {
+            mdl_rcd.rollback();
+
+            throw e;
+        } catch (const exception::Base_exception &e) {
+            mdl_rcd.rollback();
+
+            throw e;
+        } catch (std::exception const &e) {
+            mdl_rcd.rollback();
+
+            throw e;
+        }
+    }
+    p_csf->identifier ( p_ident_map );
 }
 
 std::string Util::make_fts_fragment_from_field( const std::shared_ptr<const omm::Logical_field>& p_field, const std::string& p_path) {

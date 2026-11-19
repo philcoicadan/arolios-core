@@ -9,11 +9,13 @@
 #include <omm/Package.h>
 #include <omm/Association.h>
 #include <omm/Property.h>
+#include <omm/Classifier_attributes.h>
 #include <model/xam.h>
 #include <model/Model_composite.h>
 #include <exception/Exceptions.h>
 #include <model/Util.h>
 #include "Model_composite.tpp"
+#include <exception/Exceptions.h>
 
 
 
@@ -57,28 +59,27 @@ template <> void Model_element<Association_t, omm::Association >::fill_children(
     int count = xml_obj_.memberEnd().size();
 
     if ( action_ != Element_action::a_delete ) {
-        // create or update action , check the consistency of the members ( 2 members are required)
-        if ( count != 2 ) {
+        if ( count > 2 ) {
             throw exception::Model_error ( std::to_string(count) + "-ary association  is not authorized" );
-
         }
-       
-
-        const Member_end_t* members[2] = {&xml_obj_.memberEnd() [0], &xml_obj_.memberEnd() [1]};
-
 
         // if association implemented in the table of the target class of one of its member ends, the order of insertion is important: firstly the member_end whose the target class IS NOT the managing table class
 
         Model_composite<Member_end_t, omm::Property, Model_element> cont_me ( *this );
 
 
-        if ( this->stored()->table() ) {
+        if ( this->stored()->table() || count == 1 ) {
             // the order is indifferent
+            if ( count == 2 ) {
+                cont_me.insert_child ( * &xml_obj_.memberEnd() [0] );
+                cont_me.insert_child ( * &xml_obj_.memberEnd() [1] );
+            } else if ( count == 1 ) {
+                cont_me.insert_child ( * &xml_obj_.memberEnd() [0] );
+            }
 
-            cont_me.insert_child ( * members[0] );
-            cont_me.insert_child ( * members[1] );
+        } else if ( count != 0 ) {
 
-        } else {
+            const Member_end_t* members[2] = {&xml_obj_.memberEnd() [0], &xml_obj_.memberEnd() [1]};
 
             if ( members[0]->maxOccurs() == "many" && members[1]->maxOccurs() == "one" ) {
                 // one-to-many
@@ -133,6 +134,17 @@ template <> void Model_element<Association_t, omm::Association >::fill_children(
 
 
     }
+    
+    Model_composite<Constraint_t, omm::Constraint,  Model_element> cont_ctt (*this);
+    for (Class_t::constraint_const_iterator i (this->xml_obj_.constraint().begin ());
+			i != this->xml_obj_.constraint ().end () ;
+			++i)
+	{
+     		cont_ctt.insert_child(*i);
+
+	}
+
+
 }
 
 template <> void Model_element<Association_t, omm::Association >::execute () {
@@ -140,74 +152,83 @@ template <> void Model_element<Association_t, omm::Association >::execute () {
     int count = xml_obj_.memberEnd().size();
     bool ident_authorized = false;
 
+    //check base 
+    std::string base = (xml_obj_.base().present() ) ? xml_obj_.base().get() : "";
+    auto && pk = std::dynamic_pointer_cast<omm::Package>(parent_element_.stored_element());
+    auto stored_base = Util::resolve_base<omm::Association> ( base, pk, (this->stored_ ? std::dynamic_pointer_cast<omm::Classifier>(this->stored_) : nullptr) ) ;
+
     if ( action_ != Element_action::a_delete ) {
-        // create or update action , check the consistency of the members ( 2 members are required)
-        if ( count != 2 ) {
-            throw exception::Model_error ( std::to_string(count) + "-ary association  is not authorized" );
-
+        // consistency of the effective member ends (own + inherited): concretes require 2, abstract allow 1..2
+        int inherited = 0;
+        if ( stored_base ) {
+            inherited = stored_base->member_ends()->size();
+        }
+        const int total = count + inherited;
+        if ( total > 2 ) {
+            throw exception::Model_error ( std::to_string(total) + "-ary association  is not authorized" );
+        }
+        if ( ! xml_obj_.isAbstract() && total != 2 ) {
+            throw exception::Model_error ( std::to_string(total) + "-ary association  is not authorized" );
         }
 
+        if ( count == 2 ) {
+            const Member_end_t* members[2] = {&xml_obj_.memberEnd() [0], &xml_obj_.memberEnd() [1]};
 
-        const Member_end_t* members[2] = {&xml_obj_.memberEnd() [0], &xml_obj_.memberEnd() [1]};
-
-    // decode maxOccurs
-        int max_occurs_i[2] = {-1, -1};
-        std::string max_occurs_str;
-        for ( int k=0; k<2; ++k ) {
-            max_occurs_str= members[k]->maxOccurs();
-            if ( max_occurs_str != "many" ) {
-                max_occurs_i [k]= 1;
+            // decode maxOccurs
+            int max_occurs_i[2] = {-1, -1};
+            std::string max_occurs_str;
+            for ( int k=0; k<2; ++k ) {
+                max_occurs_str= members[k]->maxOccurs();
+                if ( max_occurs_str != "many" ) {
+                    max_occurs_i [k]= 1;
+                }
             }
-        }
 
-        // identifier authorized only for many-many association
-        ident_authorized = (max_occurs_i[0] == -1) && ((max_occurs_i[1] == -1));
+            // identifier authorized only for many-many association
+            ident_authorized = (max_occurs_i[0] == -1) && ((max_occurs_i[1] == -1));
 
-        // check if many-many association, no one is a composition
-        for ( int k=0; k<2 && max_occurs_i[0] == -1 && max_occurs_i[1] == -1 ; ++k ) {
-            if ( members[k]->isComposition() ) {
-                std::string error_msg = "Association" + xml_obj_.name()  + "is many-many and member: " + members[k]->name()+ " is a composition"  ;
+            // check if many-many association, no one is a composition
+            for ( int k=0; k<2 && max_occurs_i[0] == -1 && max_occurs_i[1] == -1 ; ++k ) {
+                if ( members[k]->isComposition() ) {
+                    std::string error_msg = "Association" + xml_obj_.name()  + "is many-many and member: " + members[k]->name()+ " is a composition"  ;
+                    throw exception::Model_error ( error_msg );
+                    break;
+                }
+            }
+
+            for ( int k=0; k<2; ++k ) {
+                //check that of one end is composite the other one is not.
+                if ( members[k]->isComposition() && members[1-k]->isComposition() ) {
+                    std::string error_msg = "Association" + xml_obj_.name()  + " only one member can be a composition" ;
+                    throw exception::Model_error ( error_msg );
+                    break;
+                }
+            }
+
+            std::string member_names[2] = { members[0]->name(),
+                                            members[1]->name()
+                                          };
+
+            for ( int k=0; k<2; ++k ) {
+                member_names [k] = util::String::standardize ( member_names [k] );
+            }
+
+            // check member names
+            if ( member_names[0] == member_names[1] ) {
+                std::string error_msg = "Association" + xml_obj_.name()  + ", member names are similar" ;
                 throw exception::Model_error ( error_msg );
-                break;
             }
-        }
 
-        for ( int k=0; k<2; ++k ) {
-            //check that of one end is composite the other one is not.
-            if ( members[k]->isComposition() && members[1-k]->isComposition() ) {
-                std::string error_msg = "Association" + xml_obj_.name()  + " only one member can be a composition" ;
+            // if both minOccurs >0 , creation of a common object is not possible.
+            const std::string min_str0 = members[0]->minOccurs();
+            const int min0 = ( min_str0 == "zero" ) ? 0: 1;
+            const std::string min_str1 = members[1]->minOccurs();
+            const int min1 = ( min_str1 == "zero" ) ? 0: 1;
+            if ( min0 >0  && min1 >0 ) {
+                std::string error_msg = "Association" + xml_obj_.name()  + ", both members have at least one occurrence, creation of both objects is not possible simultaneaously";
                 throw exception::Model_error ( error_msg );
-                break;
             }
-        }
-
-   
-
-        std::string member_names[2] = { members[0]->name(),
-                                        members[1]->name()
-                                      };
-
-        for ( int k=0; k<2; ++k ) {
-            member_names [k] = util::String::standardize ( member_names [k] );
-        }
-
-        // check member names
-        if ( member_names[0] == member_names[1] ) {
-            std::string error_msg = "Association" + xml_obj_.name()  + ", member names are similar" ;
-            throw exception::Model_error ( error_msg );
-        }
-
-      
-
-        // if both minOccurs >0 , creation of a common object is not possible.
-        const std::string min_str0 = members[0]->minOccurs();
-        const int min0 = ( min_str0 == "zero" ) ? 0: 1;
-        const std::string min_str1 = members[1]->minOccurs();
-        const int min1 = ( min_str1 == "zero" ) ? 0: 1;
-        if ( min0 >0  && min1 >0 ) {
-            std::string error_msg = "Association" + xml_obj_.name()  + ", both members have at least one occurrence, creation of both objects is not possible simultaneaously";
-            throw exception::Model_error ( error_msg );
-        }
+        } // else count == 1 : the identifier is not authorized for a single declared member end
 
       } else {
 
@@ -217,9 +238,11 @@ template <> void Model_element<Association_t, omm::Association >::execute () {
 
       }
 
-    omm::Element_attributes attrs;
+    omm::Classifier_attributes c_attrs;
+    c_attrs.is_abstract_ = xml_obj_.isAbstract();
+    c_attrs.base_ = std::dynamic_pointer_cast<omm::Classifier>(stored_base);
     
-    this->internal_execute(attrs);
+    this->internal_execute(c_attrs);
     
 	this->execute_children();
     
@@ -233,76 +256,14 @@ template <> void Model_element<Association_t, omm::Association >::execute () {
             ident_map;
         auto pers_assoc = this->stored_;
 
-        if (pers_assoc == nullptr) {
-          std::string warn_msg =
-              "Association " + xml_obj_.name() +
-              " is not saved, identifier cannot be taken into account";
-          std::cout << "WARNING: " << warn_msg << std::endl;
+        for (Classifier_identifier_t::property_const_iterator i(
+                 ident.property().begin());
+             i != ident.property().end(); ++i) {
 
-        } else {
-
-          for (Classifier_identifier_t::property_const_iterator i(
-                   ident.property().begin());
-               i != ident.property().end(); ++i) {
-
-            Util::add_identifier(*i, pers_assoc, ident_map);
-          }
-
-          if (ident_map.size() > 0) {
-            // check one is not null
-            bool has_not_null = false;
-            for (auto [name, prop] : ident_map) {
-              if (prop->min_occurs() > 0) {
-                has_not_null = true;
-                break;
-              }
-            }
-            if (has_not_null) {
-              Model_recorder mdl_rcd;
-              try {
-                mdl_rcd.update_identifier(pers_assoc, ident_map);
-
-              } catch (const exception::Db_exception &e) {
-                mdl_rcd.rollback();
-
-                throw e;
-              } catch (const exception::Base_exception &e) {
-                mdl_rcd.rollback();
-
-                throw e;
-              } catch (std::exception const &e) {
-                mdl_rcd.rollback();
-
-                throw e;
-              }
-
-            } else {
-              std::string error_msg =
-                  "The identifier of the association " + pers_assoc->name() +
-                  " cannot be saved because there is no required property ";
-
-              throw exception::Failure(error_msg);
-            }
-          } else {
-            Model_recorder mdl_rcd;
-            try {
-              mdl_rcd.reset_identifier(pers_assoc);
-            } catch (const exception::Db_exception &e) {
-              mdl_rcd.rollback();
-
-              throw e;
-            } catch (const exception::Base_exception &e) {
-              mdl_rcd.rollback();
-
-              throw e;
-            } catch (std::exception const &e) {
-              mdl_rcd.rollback();
-
-              throw e;
-            }
-          }
-          pers_assoc->identifier(ident_map);
+          Util::add_identifier(*i, pers_assoc, ident_map);
         }
+
+        Util::store_identifier ( "Association " + xml_obj_.name(), pers_assoc, ident_map );
       } else {
         std::string warn_msg = "Association " + xml_obj_.name() +
                                " is not many-many, identifier ignored";
@@ -313,7 +274,7 @@ template <> void Model_element<Association_t, omm::Association >::execute () {
 
 template class Model_element<Association_t, omm::Association > ;
 
-template class Model_composite<Member_end_t, omm::Property, Model_element>;
+template class Model_composite<Association_t, omm::Association, Model_element>;
 
 
 }

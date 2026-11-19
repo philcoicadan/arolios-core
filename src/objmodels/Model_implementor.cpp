@@ -4,7 +4,9 @@
  * License: LGPL-3.0-or-later
  *
  */
+#include "model/xam.h"
 #include "omm/Primitive_type.h"
+#include "omm/Selection_type.h"
 #include <omm/Composite_type.h>
 #include <omm/Enumeration.h>
 #include <omm/Class.h>
@@ -12,6 +14,7 @@
 #include <omm/Column.h>
 #include <omm/Column_constraint.h>
 #include <omm/Property.h>
+#include <omm/Specific_type.h>
 #include <omm/Logical_schema.h>
 #include <omm/Table.h>
 #include <omm/Generalization.h>
@@ -307,77 +310,114 @@ void Model_implementor::visit ( const Model_element_create<Association_t, omm::A
 
     std::shared_ptr<qry::Db_transaction> transPtr = mdl_rcd_.transaction();
 
+    const std::shared_ptr<omm::Association> stored = p_store.stored();
+    const std::shared_ptr<omm::Association> base = stored->first_base_association();
 
-    const Member_end_t* members[2] = {&p_store.xml_object().memberEnd() [0], &p_store.xml_object().memberEnd() [1]};
+    // own declared member ends
+    const auto& xml_ends = p_store.xml_object().memberEnd();
+
+    // inherited member ends (from the base association, if any)
+    std::vector<std::shared_ptr<omm::Property>> inherited;
+    if ( base ) {
+        for ( auto && me : *base->member_ends() ) {
+            inherited.push_back ( me );
+        }
+    }
+    const std::size_t effective_count = xml_ends.size() + inherited.size();
+
+    // an abstract association without a full pair of member ends has no physical mapping
+    // (a concrete association with less than 2 effective member ends is rejected earlier)
+    if ( stored->is_abstract() && effective_count < 2 ) {
+        return;
+    }
+
+    // when the base association already owns a physical mapping, the derived association shares it
+    if ( base ) {
+        if ( base->managing_table_class() ) {
+            stored->managing_table_class ( base->managing_table_class() );
+            return;
+        }
+        if ( base->table() ) {
+            stored->table ( base->table() );
+            return;
+        }
+    }
+
+    // otherwise the mapping is decided from the effective member ends
+    struct End_desc {
+        bool many;
+        bool required;
+        std::shared_ptr<const omm::Class> target;
+    };
+    std::vector<End_desc> ends;
+    for ( std::size_t k = 0; k < xml_ends.size(); ++k ) {
+        const Member_end_t& me = xml_ends[k];
+        Classifier_search search ( me.class_(), stored->package() );
+        auto target = search.execute<omm::Class>();
+        ends.push_back ( End_desc { me.maxOccurs() == "many", me.minOccurs() == "one", target } );
+    }
+    for ( auto && me : inherited ) {
+        auto target = std::dynamic_pointer_cast<const omm::Class>( me->type() );
+        ends.push_back ( End_desc { me->max_occurs() > 1, me->min_occurs() > 0, target } );
+    }
+
+    if ( ends.size() != 2 ) {
+        std::string error_msg = "Association " + stored->name() + " does not have 2 effective member ends";
+        throw exception::Model_error ( error_msg );
+    }
 
     try {
 
         bool no_impl = true;
 
-        if ( members[0]->maxOccurs() == "many" && members[1]->maxOccurs() == "one" ) {
+        if ( ends[0].many && ! ends[1].many ) {
             // one-to-many
             // assoc implemented in the target of the member[0]
-            Classifier_search  search ( members[0]->class_(), p_store.stored()->package() );
-            auto table_class =  search.execute<omm::Class> ();
-            p_store.stored()->managing_table_class ( table_class );
+            stored->managing_table_class ( ends[0].target );
 
-        } else if ( members[0]->maxOccurs() == "one" && members[1]->maxOccurs() == "many" ) {
+        } else if ( ! ends[0].many && ends[1].many ) {
             // many-to-one
             // assoc implemented in the target of the member[1]
-            Classifier_search  search ( members[1]->class_(), p_store.stored()->package() );
-            auto table_class = search.execute<omm::Class> ();
-            p_store.stored()->managing_table_class ( table_class );
+            stored->managing_table_class ( ends[1].target );
 
-        } else if ( members[0]->maxOccurs() == "one" && members[1]->maxOccurs() == "one" ) {
+        } else if ( ! ends[0].many && ! ends[1].many ) {
             // one-to-one
-            if ( members[1]->minOccurs() == "one" && members[0]->minOccurs() == "zero" ) {
-                // case #1: 1,1 <-> 0,1
-                //assoc implemented in the target of the member[0]
-                Classifier_search  search ( members[0]->class_(), p_store.stored()->package() );
-                auto table_class = search.execute<omm::Class> ();
-                p_store.stored()->managing_table_class ( table_class );
+            if ( ends[1].required && ! ends[0].required ) {
+                // case #1: 1,1 <-> 0,1, assoc implemented in the target of the member[0]
+                stored->managing_table_class ( ends[0].target );
 
-            } else if ( members[0]->minOccurs() == "one" && members[1]->minOccurs() == "zero" ) {
-                //case #2: 0,1 <-> 1,1
-                //assoc implemented in the target of the member[1]
-                Classifier_search  search ( members[1]->class_(), p_store.stored()->package());
-                auto table_class = search.execute<omm::Class> ();
-                p_store.stored()->managing_table_class ( table_class );
+            } else if ( ends[0].required && ! ends[1].required ) {
+                // case #2: 0,1 <-> 1,1, assoc implemented in the target of the member[1]
+                stored->managing_table_class ( ends[1].target );
 
-            } else if ( members[0]->minOccurs() == "zero" && members[1]->minOccurs() == "zero" ) {
-                // case # 3: 0,1 <-> 0,1 => previous case without the constraint "required"
-                //assoc implemented in the target of the member[1]
-                Classifier_search  search ( members[1]->class_(), p_store.stored()->package() );
-                auto table_class = search.execute<omm::Class> ();
-                p_store.stored()->managing_table_class ( table_class );
+            } else if ( ! ends[0].required && ! ends[1].required ) {
+                // case #3: 0,1 <-> 0,1, assoc implemented in the target of the member[1]
+                stored->managing_table_class ( ends[1].target );
 
-            } else if ( members[0]->minOccurs() == "one" && members[1]->minOccurs() == "one" ) {
-                // case #4: 1,1 <-> 1,1 this case should not be happened. It cannot be implemented because the referential integrity. Decision to implement the case #2
-                Classifier_search  search ( members[1]->class_(), p_store.stored()->package() );
-                auto table_class = search.execute<omm::Class> ();
-                p_store.stored()->managing_table_class ( table_class );
+            } else {
+                // case #4: 1,1 <-> 1,1, cannot be implemented. Decision to implement the case #2
+                stored->managing_table_class ( ends[1].target );
             }
         } else {
             // many-to-many
             // => add a complementary table to keep the relationship bw the classes
 
-
-            std::string table_full_name = Util::make_logical_struct_full_name ( p_store.stored() );
+            std::string table_full_name = Util::make_logical_struct_full_name ( stored );
 
             std::string stmt = "CREATE TABLE " + table_full_name + + " ( id bigserial PRIMARY KEY, ai_uuid uuid UNIQUE, upd_count integer DEFAULT 1, trashed_date timestamp with time zone DEFAULT 'epoch', csf_id integer REFERENCES am_p_elem ON DELETE RESTRICT NOT NULL )" ;
 
             
             auto r = transPtr->execSqlSync ( stmt );
 
-            const std::string table_name = Util::make_logical_struct_name ( p_store.stored() );
-            auto && table = omm::Model_factory::instance().make_table ( p_store.stored(), table_name );
+            const std::string table_name = Util::make_logical_struct_name ( stored );
+            auto && table = omm::Model_factory::instance().make_table ( stored, table_name );
 
-            execute_insert_for_classifier ( p_store.stored() );
+            execute_insert_for_classifier ( stored );
             no_impl = false;
         }
 
         if ( no_impl ) {
-            execute_insert_for_classifier_with_no_logical ( p_store.stored() );
+            execute_insert_for_classifier_with_no_logical ( stored );
         }
 
         
@@ -399,20 +439,22 @@ void Model_implementor::visit(const Model_element_delete<Association_t,omm::Asso
     
         
     const auto stored = p_store.stored();
-    if (stored->logical_struct()) {
+    if ( ! stored->has_generalizations() && stored->logical_struct() ) {
+        // only a root association owns its logical structure (table)
         delete_classifier (stored, "TABLE");
     }
 } 
 
 
-void Model_implementor::visit (const Model_element_create<Element_t,omm::Enum_value >& p_store) {
+void Model_implementor::visit (const Model_element_create<Value_t,omm::Enum_value >& p_store) {
     
     std::shared_ptr<qry::Db_transaction> transPtr = mdl_rcd_.transaction();
 
 	const std::string enum_name = p_store.stored()->enumeration()->logical_struct()->full_name();
     
     try {
-        std::string stmt = "ALTER TYPE " + enum_name + " ADD VALUE '" + p_store.stored()->name() + "'" ;
+        const std::string value = "'" + util::String::double_quote ( p_store.stored()->name() ) + "'";
+        std::string stmt = "ALTER TYPE " + enum_name + " ADD VALUE IF NOT EXISTS " + value ;
         
 
         auto r = transPtr->execSqlSync ( stmt );
@@ -426,7 +468,7 @@ void Model_implementor::visit (const Model_element_create<Element_t,omm::Enum_va
 
 }
 
-void Model_implementor::visit (const Model_element_update<Element_t,omm::Enum_value >& p_store) {
+void Model_implementor::visit (const Model_element_update<Value_t,omm::Enum_value >& p_store) {
     
     std::shared_ptr<qry::Db_transaction> transPtr = mdl_rcd_.transaction();
 
@@ -434,7 +476,9 @@ void Model_implementor::visit (const Model_element_update<Element_t,omm::Enum_va
 
     if ( !p_store.new_name().empty() ) {
         try {
-            std::string stmt = "ALTER TYPE " + enum_name + " RENAME VALUE '" + p_store.stored()->name() + "' TO '" +  p_store.new_name() + "'";
+            const std::string old_value = "'" + util::String::double_quote ( p_store.stored()->name() ) + "'";
+            const std::string new_value = "'" + util::String::double_quote ( p_store.new_name() ) + "'";
+            std::string stmt = "ALTER TYPE " + enum_name + " RENAME VALUE " + old_value + " TO " + new_value;
             
 
             auto r = transPtr->execSqlSync ( stmt );
@@ -447,7 +491,7 @@ void Model_implementor::visit (const Model_element_update<Element_t,omm::Enum_va
     }
 }
 
-void Model_implementor::visit (const Model_element_delete<Element_t,omm::Enum_value >& p_store) {
+void Model_implementor::visit (const Model_element_delete<Value_t,omm::Enum_value >& p_store) {
     
  // nothing to do
 
@@ -522,6 +566,10 @@ void Model_implementor::visit (const Model_element_delete<Type_property_t,omm::P
 
 void Model_implementor::visit (const Model_element_create<Class_property_t,omm::Property >& p_store) {
     
+    if (std::dynamic_pointer_cast<const omm::Specific_type>(p_store.stored()->type())) {
+        throw exception::Model_error("property " + p_store.stored()->name() + " : specific type is not supported by the SQL implementation");
+    }
+
     std::shared_ptr<qry::Db_transaction> transPtr = mdl_rcd_.transaction();
     std::shared_ptr<const omm::Classifier> impl_csf = p_store.stored()->classifier();
     auto table = impl_csf->table();
@@ -633,82 +681,65 @@ void Model_implementor::visit (const Model_element_delete<Class_property_t,omm::
     }
 }
 
-void Model_implementor::visit ( const Model_element_create<Member_end_t,omm::Property >& p_store ) {
+void Model_implementor::create_member_end_column ( const std::shared_ptr<omm::Association>& p_assoc, const std::shared_ptr<omm::Property>& p_prop ) const {
+
+    auto managing = p_assoc->managing_table();
+    if ( ! managing ) {
+        // no physical mapping: abstract association with less than 2 effective member ends
+        return;
+    }
 
     std::shared_ptr<qry::Db_transaction> transPtr = mdl_rcd_.transaction();
-    const auto & assoc = p_store.stored()->association();
-    const std::string table_name = assoc->managing_table()->full_name();
+    const std::string table_name = managing->full_name();
 
     std::string stmt = "ALTER TABLE " + table_name + " ADD COLUMN " ;
     try {
-        if ( assoc->table() ) {
-            const std::string column_name = Util::make_logical_field_name ( p_store.stored() );
+        if ( p_assoc->table() ) {
+            const std::string column_name = Util::make_logical_field_name ( p_prop );
             // assoc is root, cascade delete if referenced obj deleted, not null, many-many => not unique
-            prepare_declaration_for_reference_column ( stmt, p_store.stored(), column_name, table_name, true, true, true, false, assoc );
+            prepare_declaration_for_reference_column ( stmt, p_prop, column_name, table_name, true, true, true, false, p_assoc );
 
             // add csf_id for the reference
             stmt += " ADD COLUMN " + column_name + "_csf_id integer";
-            
-            
+
             auto r = transPtr->execSqlSync ( stmt );
 
             util::Native_type ref_type = util::Native_type::bigint;
-            auto column = omm::Model_factory::instance().make_column ( p_store.stored(), column_name, assoc->table(), static_cast<int> ( ref_type ) );
+            auto column = omm::Model_factory::instance().make_column ( p_prop, column_name, p_assoc->table(), static_cast<int> ( ref_type ) );
 
             auto && cctt =  omm::Model_factory::instance().make_column_constraint ( column, omm::Column_constraint::Type::unique );
 
-            execute_insert_for_property ( p_store.stored(), assoc ) ;
-            
-            
+            execute_insert_for_property ( p_prop, p_assoc ) ;
+
         } else {
             // association implemented in the table of one of its member ends
-            auto impl_class = assoc->managing_table_class();
+            auto impl_class = p_assoc->managing_table_class();
 
-            std::shared_ptr<omm::Property> opposite = assoc->opposite_member_end (p_store.stored());
+            std::shared_ptr<omm::Property> opposite = p_assoc->opposite_member_end ( p_prop );
 
-            if ( p_store.stored()->type()->id() == impl_class->id() && opposite) {
-                // target of the member end is the implementing class and the opposite already processed, the member end is not implemented in a column
-                // the opposite member end processed at first, that means it is implemented in a column
-                
+            if ( p_prop->type()->id() == impl_class->id() && opposite) {
+                // target of the member end is the implementing class: the member end is implemented by a query
+                auto && qry_field = omm::Model_factory::instance().make_property_by_sub_field ( p_prop, opposite );
 
-                // the member end is implemented by a query
-                auto && qry_field = omm::Model_factory::instance().make_property_by_sub_field ( p_store.stored(), opposite );
-
-                execute_insert_for_property_by_sub_field ( p_store.stored() );
+                execute_insert_for_property_by_sub_field ( p_prop );
 
             } else {
-                // opposite member not yet processed but already checked
-                const Model_element<Association_t,omm::Association>& assoc_elt = dynamic_cast<const Model_element<Association_t,omm::Association>&>(p_store.parent());
-                const Member_end_t* members[2] = {&assoc_elt.xml_object().memberEnd() [0], &assoc_elt.xml_object().memberEnd() [1]};
-
-                int pos = 0;
-                for ( ; pos <2 ; ++pos ) {
-                    if ( p_store.standard_name() == util::String::standardize(members[pos]->name())   ) {
-                        // member end found , take the opposite
-                        pos = 1 - pos;
-                        break;
-                    }
-                }
-                if ( pos > 1 ) {
-                    throw exception::Model_error ( "Opposite member end of " + p_store.standard_name() + " not found" );
-                }
-
                 bool is_root = !impl_class->has_generalizations();
-                const std::string column_name = Util::make_column_name_for_association ( p_store.stored(), impl_class, assoc );
+                const std::string column_name = Util::make_column_name_for_association ( p_prop, impl_class, p_assoc );
 
                 // the reference is  a column, column type is bigint
                 util::Native_type ref_type = util::Native_type::bigint;
-                auto && column = omm::Model_factory::instance().make_column ( p_store.stored(), column_name, assoc->managing_table(), static_cast<int> ( ref_type ) );
+                auto && column = omm::Model_factory::instance().make_column ( p_prop, column_name, p_assoc->managing_table(), static_cast<int> ( ref_type ) );
 
-                prepare_declaration_for_reference_column ( stmt, p_store.stored(), column_name, table_name,  is_root,  members[pos]->isComposition(), ( p_store.stored()->min_occurs() >0 ), ( members[pos]->maxOccurs() == "one" ), impl_class );
+                const bool opposite_composition = opposite ? ( opposite->aggregation_kind() == omm::Aggregation_kind::composite ) : false;
+                const bool opposite_one = opposite ? ( opposite->max_occurs() == 1 ) : false;
+                prepare_declaration_for_reference_column ( stmt, p_prop, column_name, table_name, is_root, opposite_composition, ( p_prop->min_occurs() > 0 ), opposite_one, impl_class );
 
-                execute_insert_for_property ( p_store.stored(), impl_class );
-
-
+                execute_insert_for_property ( p_prop, impl_class );
 
                 stmt += " ADD COLUMN "+ column_name + "_trashed_date timestamp with time zone DEFAULT 'epoch' , ADD COLUMN " + column_name + "_csf_id integer";
-                        
-                        auto r = transPtr->execSqlSync ( stmt );
+
+                auto r = transPtr->execSqlSync ( stmt );
 
             }
 
@@ -716,11 +747,26 @@ void Model_implementor::visit ( const Model_element_create<Member_end_t,omm::Pro
 
 
     } catch ( const exception::Db_exception &e ) {
-         
+
         throw e;
     }
 
 
+}
+
+void Model_implementor::visit ( const Model_element_create<Member_end_t,omm::Property >& p_store ) {
+
+    const auto & assoc = p_store.stored()->association();
+
+    // own member end
+    create_member_end_column ( assoc, p_store.stored() );
+
+    // materialize the inherited member ends which are not yet mapped to a column
+    for ( auto && me : *assoc->member_ends() ) {
+        if ( me && me->association().get() != assoc.get() && ! me->column() ) {
+            create_member_end_column ( assoc, me );
+        }
+    }
 }
 
 void Model_implementor::visit ( const Model_element_update<Member_end_t,omm::Property >& p_store ) {
@@ -943,7 +989,7 @@ void Model_implementor::add_complementary_table (const std::shared_ptr<omm::Asso
     std::shared_ptr<const std::vector<std::shared_ptr<omm::Property>>> members_vec = p_assoc->member_ends();
 
     std::string column_names[2];
-    for (int k=0; k<2; ++k ) {
+    for (std::size_t k=0; k<members_vec->size() && k<2; ++k ) {
         // no inheritance column name is direct
         column_names [k] = Util::make_logical_field_name ( (*members_vec)[k]  );
         // assoc is root, cascade delete if referenced obj deleted, not null, many-many => not unique
@@ -964,7 +1010,7 @@ void Model_implementor::add_complementary_table (const std::shared_ptr<omm::Asso
     execute_insert_for_classifier ( p_assoc );
     
     std::shared_ptr<omm::Column> columns[2] ;
-    for ( int k=0; k<2; ++k ) {
+    for ( std::size_t k=0; k<members_vec->size() && k<2; ++k ) {
 
       
             //  column type is bigint
@@ -976,7 +1022,7 @@ void Model_implementor::add_complementary_table (const std::shared_ptr<omm::Asso
 
     }
     
-    for ( int k=0; k<2; ++k ) {
+    for ( std::size_t k=0; k<members_vec->size() && k<2; ++k ) {
 
         
 
@@ -1012,5 +1058,67 @@ void Model_implementor::execute_delete_column_constraint (const std::shared_ptr<
         std::string error_msg = "Error in erasing column constraint " + p_column->name();
         throw exception::Sql_error ( error_msg );
     }
+
+}
+
+
+void Model_implementor::visit (const Model_element_create<Selection_t,omm::Selection_type >& p_store) {
+ 
+// NYI
+
+}   
+
+void Model_implementor::visit(const Model_element_update<Selection_t,omm::Selection_type >& p_store) {
+     
+// NYI
+
+}
+
+
+void Model_implementor::visit(const Model_element_delete<Selection_t,omm::Selection_type >& p_store) {
+    
+// NYI
+
+
+}
+
+
+void Model_implementor::visit (const Model_element_create<Specific_t,omm::Specific_type >& p_store) {
+ 
+// NYI
+
+}   
+
+void Model_implementor::visit(const Model_element_update<Specific_t,omm::Specific_type>& p_store) {
+     
+// NYI
+
+}
+
+
+void Model_implementor::visit(const Model_element_delete<Specific_t,omm::Specific_type >& p_store) {
+    
+// NYI
+
+
+}
+
+void Model_implementor::visit (const Model_element_create<Constraint_t,omm::Constraint >& p_store) {
+ 
+// NYI
+
+}   
+
+void Model_implementor::visit(const Model_element_update<Constraint_t,omm::Constraint>& p_store) {
+     
+// NYI
+
+}
+
+
+void Model_implementor::visit(const Model_element_delete<Constraint_t,omm::Constraint >& p_store) {
+    
+// NYI
+
 
 }

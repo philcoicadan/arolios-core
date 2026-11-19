@@ -232,8 +232,11 @@ namespace arolios
   {
     class Model_t;
     class Element_t;
+    class Classifier_t;
     class Domain_t;
     class Primitive_t;
+    class Specific_t;
+    class Collection_t;
     class Type_t;
     class Class_t;
     class Classifier_identifier_t;
@@ -243,9 +246,15 @@ namespace arolios
     class Association_t;
     class Member_end_t;
     class Enumeration_t;
+    class Value_t;
+    class Selection_t;
+    class Constraint_t;
     class Action_t;
+    class Range_t;
     class Min_occurrences_t;
     class Max_occurrences_t;
+    class KindOfCollection_t;
+    class HighLimit_t;
   }
 }
 
@@ -440,6 +449,29 @@ namespace arolios
       rename_optional rename_;
     };
 
+    class Classifier_t: public ::arolios::model::Element_t
+    {
+      public:
+      // Constructors.
+      //
+      Classifier_t (const name_type&);
+
+      Classifier_t (const ::xercesc::DOMElement& e,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+      Classifier_t (const Classifier_t& x,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+      virtual Classifier_t*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      virtual 
+      ~Classifier_t ();
+    };
+
     class Domain_t: public ::arolios::model::Element_t
     {
       public:
@@ -528,6 +560,40 @@ namespace arolios
       void
       primitive (const primitive_sequence& s);
 
+      // specific
+      //
+      typedef ::arolios::model::Specific_t specific_type;
+      typedef ::xsd::cxx::tree::sequence< specific_type > specific_sequence;
+      typedef specific_sequence::iterator specific_iterator;
+      typedef specific_sequence::const_iterator specific_const_iterator;
+      typedef ::xsd::cxx::tree::traits< specific_type, char > specific_traits;
+
+      const specific_sequence&
+      specific () const;
+
+      specific_sequence&
+      specific ();
+
+      void
+      specific (const specific_sequence& s);
+
+      // selection
+      //
+      typedef ::arolios::model::Selection_t selection_type;
+      typedef ::xsd::cxx::tree::sequence< selection_type > selection_sequence;
+      typedef selection_sequence::iterator selection_iterator;
+      typedef selection_sequence::const_iterator selection_const_iterator;
+      typedef ::xsd::cxx::tree::traits< selection_type, char > selection_traits;
+
+      const selection_sequence&
+      selection () const;
+
+      selection_sequence&
+      selection ();
+
+      void
+      selection (const selection_sequence& s);
+
       // Constructors.
       //
       Domain_t (const name_type&);
@@ -563,14 +629,33 @@ namespace arolios
       class_sequence class__;
       association_sequence association_;
       primitive_sequence primitive_;
+      specific_sequence specific_;
+      selection_sequence selection_;
     };
 
-    class Primitive_t: public ::arolios::model::Element_t
+    class Primitive_t: public ::arolios::model::Classifier_t
     {
       public:
+      // constraint
+      //
+      typedef ::arolios::model::Constraint_t constraint_type;
+      typedef ::xsd::cxx::tree::sequence< constraint_type > constraint_sequence;
+      typedef constraint_sequence::iterator constraint_iterator;
+      typedef constraint_sequence::const_iterator constraint_const_iterator;
+      typedef ::xsd::cxx::tree::traits< constraint_type, char > constraint_traits;
+
+      const constraint_sequence&
+      constraint () const;
+
+      constraint_sequence&
+      constraint ();
+
+      void
+      constraint (const constraint_sequence& s);
+
       // native
       //
-      typedef ::xml_schema::string native_type;
+      typedef ::xml_schema::token native_type;
       typedef ::xsd::cxx::tree::traits< native_type, char > native_traits;
 
       const native_type&
@@ -616,10 +701,180 @@ namespace arolios
              ::xml_schema::flags);
 
       protected:
+      constraint_sequence constraint_;
       ::xsd::cxx::tree::one< native_type > native_;
     };
 
-    class Type_t: public ::arolios::model::Element_t
+    class Specific_t: public ::arolios::model::Classifier_t
+    {
+      public:
+      // collection
+      //
+      typedef ::arolios::model::Collection_t collection_type;
+      typedef ::xsd::cxx::tree::optional< collection_type > collection_optional;
+      typedef ::xsd::cxx::tree::traits< collection_type, char > collection_traits;
+
+      const collection_optional&
+      collection () const;
+
+      collection_optional&
+      collection ();
+
+      void
+      collection (const collection_type& x);
+
+      void
+      collection (const collection_optional& x);
+
+      void
+      collection (::std::unique_ptr< collection_type > p);
+
+      // constraint
+      //
+      typedef ::arolios::model::Constraint_t constraint_type;
+      typedef ::xsd::cxx::tree::sequence< constraint_type > constraint_sequence;
+      typedef constraint_sequence::iterator constraint_iterator;
+      typedef constraint_sequence::const_iterator constraint_const_iterator;
+      typedef ::xsd::cxx::tree::traits< constraint_type, char > constraint_traits;
+
+      const constraint_sequence&
+      constraint () const;
+
+      constraint_sequence&
+      constraint ();
+
+      void
+      constraint (const constraint_sequence& s);
+
+      // type
+      //
+      typedef ::xml_schema::ncname type_type;
+      typedef ::xsd::cxx::tree::traits< type_type, char > type_traits;
+
+      const type_type&
+      type () const;
+
+      type_type&
+      type ();
+
+      void
+      type (const type_type& x);
+
+      void
+      type (::std::unique_ptr< type_type > p);
+
+      // Constructors.
+      //
+      Specific_t (const name_type&,
+                  const type_type&);
+
+      Specific_t (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+      Specific_t (const Specific_t& x,
+                  ::xml_schema::flags f = 0,
+                  ::xml_schema::container* c = 0);
+
+      virtual Specific_t*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      Specific_t&
+      operator= (const Specific_t& x);
+
+      virtual 
+      ~Specific_t ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      collection_optional collection_;
+      constraint_sequence constraint_;
+      ::xsd::cxx::tree::one< type_type > type_;
+    };
+
+    class Collection_t: public ::xml_schema::type
+    {
+      public:
+      // range
+      //
+      typedef ::arolios::model::Range_t range_type;
+      typedef ::xsd::cxx::tree::sequence< range_type > range_sequence;
+      typedef range_sequence::iterator range_iterator;
+      typedef range_sequence::const_iterator range_const_iterator;
+      typedef ::xsd::cxx::tree::traits< range_type, char > range_traits;
+
+      const range_sequence&
+      range () const;
+
+      range_sequence&
+      range ();
+
+      void
+      range (const range_sequence& s);
+
+      // kind
+      //
+      typedef ::arolios::model::KindOfCollection_t kind_type;
+      typedef ::xsd::cxx::tree::traits< kind_type, char > kind_traits;
+
+      const kind_type&
+      kind () const;
+
+      kind_type&
+      kind ();
+
+      void
+      kind (const kind_type& x);
+
+      void
+      kind (::std::unique_ptr< kind_type > p);
+
+      static const kind_type&
+      kind_default_value ();
+
+      // Constructors.
+      //
+      Collection_t ();
+
+      Collection_t (const ::xercesc::DOMElement& e,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+      Collection_t (const Collection_t& x,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+      virtual Collection_t*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      Collection_t&
+      operator= (const Collection_t& x);
+
+      virtual 
+      ~Collection_t ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      range_sequence range_;
+      ::xsd::cxx::tree::one< kind_type > kind_;
+      static const kind_type kind_default_value_;
+    };
+
+    class Type_t: public ::arolios::model::Classifier_t
     {
       public:
       // property
@@ -672,7 +927,7 @@ namespace arolios
       property_sequence property_;
     };
 
-    class Class_t: public ::arolios::model::Element_t
+    class Class_t: public ::arolios::model::Classifier_t
     {
       public:
       // base
@@ -734,6 +989,23 @@ namespace arolios
       void
       identifier (::std::unique_ptr< identifier_type > p);
 
+      // constraint
+      //
+      typedef ::arolios::model::Constraint_t constraint_type;
+      typedef ::xsd::cxx::tree::sequence< constraint_type > constraint_sequence;
+      typedef constraint_sequence::iterator constraint_iterator;
+      typedef constraint_sequence::const_iterator constraint_const_iterator;
+      typedef ::xsd::cxx::tree::traits< constraint_type, char > constraint_traits;
+
+      const constraint_sequence&
+      constraint () const;
+
+      constraint_sequence&
+      constraint ();
+
+      void
+      constraint (const constraint_sequence& s);
+
       // isAbstract
       //
       typedef ::xml_schema::boolean isAbstract_type;
@@ -784,6 +1056,7 @@ namespace arolios
       base_optional base_;
       property_sequence property_;
       identifier_optional identifier_;
+      constraint_sequence constraint_;
       ::xsd::cxx::tree::one< isAbstract_type > isAbstract_;
     };
 
@@ -950,6 +1223,27 @@ namespace arolios
     class Class_property_t: public ::arolios::model::Type_property_t
     {
       public:
+      // collection
+      //
+      typedef ::arolios::model::Collection_t collection_type;
+      typedef ::xsd::cxx::tree::optional< collection_type > collection_optional;
+      typedef ::xsd::cxx::tree::traits< collection_type, char > collection_traits;
+
+      const collection_optional&
+      collection () const;
+
+      collection_optional&
+      collection ();
+
+      void
+      collection (const collection_type& x);
+
+      void
+      collection (const collection_optional& x);
+
+      void
+      collection (::std::unique_ptr< collection_type > p);
+
       // required
       //
       typedef ::xml_schema::boolean required_type;
@@ -966,6 +1260,61 @@ namespace arolios
 
       static required_type
       required_default_value ();
+
+      // isComposition
+      //
+      typedef ::xml_schema::boolean isComposition_type;
+      typedef ::xsd::cxx::tree::traits< isComposition_type, char > isComposition_traits;
+
+      const isComposition_type&
+      isComposition () const;
+
+      isComposition_type&
+      isComposition ();
+
+      void
+      isComposition (const isComposition_type& x);
+
+      static isComposition_type
+      isComposition_default_value ();
+
+      // memberEnd
+      //
+      typedef ::xml_schema::boolean memberEnd_type;
+      typedef ::xsd::cxx::tree::traits< memberEnd_type, char > memberEnd_traits;
+
+      const memberEnd_type&
+      memberEnd () const;
+
+      memberEnd_type&
+      memberEnd ();
+
+      void
+      memberEnd (const memberEnd_type& x);
+
+      static memberEnd_type
+      memberEnd_default_value ();
+
+      // opposite
+      //
+      typedef ::xml_schema::ncname opposite_type;
+      typedef ::xsd::cxx::tree::optional< opposite_type > opposite_optional;
+      typedef ::xsd::cxx::tree::traits< opposite_type, char > opposite_traits;
+
+      const opposite_optional&
+      opposite () const;
+
+      opposite_optional&
+      opposite ();
+
+      void
+      opposite (const opposite_type& x);
+
+      void
+      opposite (const opposite_optional& x);
+
+      void
+      opposite (::std::unique_ptr< opposite_type > p);
 
       // Constructors.
       //
@@ -998,10 +1347,14 @@ namespace arolios
              ::xml_schema::flags);
 
       protected:
+      collection_optional collection_;
       ::xsd::cxx::tree::one< required_type > required_;
+      ::xsd::cxx::tree::one< isComposition_type > isComposition_;
+      ::xsd::cxx::tree::one< memberEnd_type > memberEnd_;
+      opposite_optional opposite_;
     };
 
-    class Association_t: public ::arolios::model::Element_t
+    class Association_t: public ::arolios::model::Classifier_t
     {
       public:
       // memberEnd
@@ -1020,6 +1373,27 @@ namespace arolios
 
       void
       memberEnd (const memberEnd_sequence& s);
+
+      // base
+      //
+      typedef ::xml_schema::ncname base_type;
+      typedef ::xsd::cxx::tree::optional< base_type > base_optional;
+      typedef ::xsd::cxx::tree::traits< base_type, char > base_traits;
+
+      const base_optional&
+      base () const;
+
+      base_optional&
+      base ();
+
+      void
+      base (const base_type& x);
+
+      void
+      base (const base_optional& x);
+
+      void
+      base (::std::unique_ptr< base_type > p);
 
       // property
       //
@@ -1059,6 +1433,40 @@ namespace arolios
       void
       identifier (::std::unique_ptr< identifier_type > p);
 
+      // constraint
+      //
+      typedef ::arolios::model::Constraint_t constraint_type;
+      typedef ::xsd::cxx::tree::sequence< constraint_type > constraint_sequence;
+      typedef constraint_sequence::iterator constraint_iterator;
+      typedef constraint_sequence::const_iterator constraint_const_iterator;
+      typedef ::xsd::cxx::tree::traits< constraint_type, char > constraint_traits;
+
+      const constraint_sequence&
+      constraint () const;
+
+      constraint_sequence&
+      constraint ();
+
+      void
+      constraint (const constraint_sequence& s);
+
+      // isAbstract
+      //
+      typedef ::xml_schema::boolean isAbstract_type;
+      typedef ::xsd::cxx::tree::traits< isAbstract_type, char > isAbstract_traits;
+
+      const isAbstract_type&
+      isAbstract () const;
+
+      isAbstract_type&
+      isAbstract ();
+
+      void
+      isAbstract (const isAbstract_type& x);
+
+      static isAbstract_type
+      isAbstract_default_value ();
+
       // Constructors.
       //
       Association_t (const name_type&);
@@ -1090,8 +1498,11 @@ namespace arolios
 
       protected:
       memberEnd_sequence memberEnd_;
+      base_optional base_;
       property_sequence property_;
       identifier_optional identifier_;
+      constraint_sequence constraint_;
+      ::xsd::cxx::tree::one< isAbstract_type > isAbstract_;
     };
 
     class Member_end_t: public ::arolios::model::Element_t
@@ -1171,6 +1582,40 @@ namespace arolios
       static isComposition_type
       isComposition_default_value ();
 
+      // owned
+      //
+      typedef ::xml_schema::boolean owned_type;
+      typedef ::xsd::cxx::tree::traits< owned_type, char > owned_traits;
+
+      const owned_type&
+      owned () const;
+
+      owned_type&
+      owned ();
+
+      void
+      owned (const owned_type& x);
+
+      static owned_type
+      owned_default_value ();
+
+      // navigable
+      //
+      typedef ::xml_schema::boolean navigable_type;
+      typedef ::xsd::cxx::tree::traits< navigable_type, char > navigable_traits;
+
+      const navigable_type&
+      navigable () const;
+
+      navigable_type&
+      navigable ();
+
+      void
+      navigable (const navigable_type& x);
+
+      static navigable_type
+      navigable_default_value ();
+
       // Constructors.
       //
       Member_end_t (const name_type&,
@@ -1208,14 +1653,16 @@ namespace arolios
       ::xsd::cxx::tree::one< maxOccurs_type > maxOccurs_;
       static const maxOccurs_type maxOccurs_default_value_;
       ::xsd::cxx::tree::one< isComposition_type > isComposition_;
+      ::xsd::cxx::tree::one< owned_type > owned_;
+      ::xsd::cxx::tree::one< navigable_type > navigable_;
     };
 
-    class Enumeration_t: public ::arolios::model::Element_t
+    class Enumeration_t: public ::arolios::model::Classifier_t
     {
       public:
       // value
       //
-      typedef ::arolios::model::Element_t value_type;
+      typedef ::arolios::model::Value_t value_type;
       typedef ::xsd::cxx::tree::sequence< value_type > value_sequence;
       typedef value_sequence::iterator value_iterator;
       typedef value_sequence::const_iterator value_const_iterator;
@@ -1263,7 +1710,233 @@ namespace arolios
       value_sequence value_;
     };
 
-    class Action_t: public ::xml_schema::string
+    class Value_t: public ::xml_schema::type
+    {
+      public:
+      // description
+      //
+      typedef ::xml_schema::string description_type;
+      typedef ::xsd::cxx::tree::optional< description_type > description_optional;
+      typedef ::xsd::cxx::tree::traits< description_type, char > description_traits;
+
+      const description_optional&
+      description () const;
+
+      description_optional&
+      description ();
+
+      void
+      description (const description_type& x);
+
+      void
+      description (const description_optional& x);
+
+      void
+      description (::std::unique_ptr< description_type > p);
+
+      // name
+      //
+      typedef ::xml_schema::token name_type;
+      typedef ::xsd::cxx::tree::traits< name_type, char > name_traits;
+
+      const name_type&
+      name () const;
+
+      name_type&
+      name ();
+
+      void
+      name (const name_type& x);
+
+      void
+      name (::std::unique_ptr< name_type > p);
+
+      // action
+      //
+      typedef ::arolios::model::Action_t action_type;
+      typedef ::xsd::cxx::tree::traits< action_type, char > action_traits;
+
+      const action_type&
+      action () const;
+
+      action_type&
+      action ();
+
+      void
+      action (const action_type& x);
+
+      void
+      action (::std::unique_ptr< action_type > p);
+
+      static const action_type&
+      action_default_value ();
+
+      // rename
+      //
+      typedef ::xml_schema::token rename_type;
+      typedef ::xsd::cxx::tree::optional< rename_type > rename_optional;
+      typedef ::xsd::cxx::tree::traits< rename_type, char > rename_traits;
+
+      const rename_optional&
+      rename () const;
+
+      rename_optional&
+      rename ();
+
+      void
+      rename (const rename_type& x);
+
+      void
+      rename (const rename_optional& x);
+
+      void
+      rename (::std::unique_ptr< rename_type > p);
+
+      // Constructors.
+      //
+      Value_t (const name_type&);
+
+      Value_t (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+      Value_t (const Value_t& x,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+      virtual Value_t*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      Value_t&
+      operator= (const Value_t& x);
+
+      virtual 
+      ~Value_t ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      description_optional description_;
+      ::xsd::cxx::tree::one< name_type > name_;
+      ::xsd::cxx::tree::one< action_type > action_;
+      static const action_type action_default_value_;
+      rename_optional rename_;
+    };
+
+    class Selection_t: public ::arolios::model::Classifier_t
+    {
+      public:
+      // option
+      //
+      typedef ::xml_schema::ncname option_type;
+      typedef ::xsd::cxx::tree::sequence< option_type > option_sequence;
+      typedef option_sequence::iterator option_iterator;
+      typedef option_sequence::const_iterator option_const_iterator;
+      typedef ::xsd::cxx::tree::traits< option_type, char > option_traits;
+
+      const option_sequence&
+      option () const;
+
+      option_sequence&
+      option ();
+
+      void
+      option (const option_sequence& s);
+
+      // Constructors.
+      //
+      Selection_t (const name_type&);
+
+      Selection_t (const ::xercesc::DOMElement& e,
+                   ::xml_schema::flags f = 0,
+                   ::xml_schema::container* c = 0);
+
+      Selection_t (const Selection_t& x,
+                   ::xml_schema::flags f = 0,
+                   ::xml_schema::container* c = 0);
+
+      virtual Selection_t*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      Selection_t&
+      operator= (const Selection_t& x);
+
+      virtual 
+      ~Selection_t ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      option_sequence option_;
+    };
+
+    class Constraint_t: public ::arolios::model::Element_t
+    {
+      public:
+      // expression
+      //
+      typedef ::xml_schema::string expression_type;
+      typedef ::xsd::cxx::tree::traits< expression_type, char > expression_traits;
+
+      const expression_type&
+      expression () const;
+
+      expression_type&
+      expression ();
+
+      void
+      expression (const expression_type& x);
+
+      void
+      expression (::std::unique_ptr< expression_type > p);
+
+      // Constructors.
+      //
+      Constraint_t (const name_type&,
+                    const expression_type&);
+
+      Constraint_t (const ::xercesc::DOMElement& e,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+      Constraint_t (const Constraint_t& x,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+      virtual Constraint_t*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      Constraint_t&
+      operator= (const Constraint_t& x);
+
+      virtual 
+      ~Constraint_t ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      ::xsd::cxx::tree::one< expression_type > expression_;
+    };
+
+    class Action_t: public ::xml_schema::token
     {
       public:
       enum value
@@ -1279,7 +1952,7 @@ namespace arolios
 
       Action_t (const ::std::string& v);
 
-      Action_t (const ::xml_schema::string& v);
+      Action_t (const ::xml_schema::token& v);
 
       Action_t (const ::xercesc::DOMElement& e,
                 ::xml_schema::flags f = 0,
@@ -1320,7 +1993,76 @@ namespace arolios
       static const value _xsd_Action_t_indexes_[3];
     };
 
-    class Min_occurrences_t: public ::xml_schema::string
+    class Range_t: public ::xml_schema::type
+    {
+      public:
+      // min
+      //
+      typedef ::xml_schema::non_negative_integer min_type;
+      typedef ::xsd::cxx::tree::traits< min_type, char > min_traits;
+
+      const min_type&
+      min () const;
+
+      min_type&
+      min ();
+
+      void
+      min (const min_type& x);
+
+      // max
+      //
+      typedef ::arolios::model::HighLimit_t max_type;
+      typedef ::xsd::cxx::tree::traits< max_type, char > max_traits;
+
+      const max_type&
+      max () const;
+
+      max_type&
+      max ();
+
+      void
+      max (const max_type& x);
+
+      void
+      max (::std::unique_ptr< max_type > p);
+
+      // Constructors.
+      //
+      Range_t (const min_type&,
+               const max_type&);
+
+      Range_t (const ::xercesc::DOMElement& e,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+      Range_t (const Range_t& x,
+               ::xml_schema::flags f = 0,
+               ::xml_schema::container* c = 0);
+
+      virtual Range_t*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      Range_t&
+      operator= (const Range_t& x);
+
+      virtual 
+      ~Range_t ();
+
+      // Implementation.
+      //
+      protected:
+      void
+      parse (::xsd::cxx::xml::dom::parser< char >&,
+             ::xml_schema::flags);
+
+      protected:
+      ::xsd::cxx::tree::one< min_type > min_;
+      ::xsd::cxx::tree::one< max_type > max_;
+    };
+
+    class Min_occurrences_t: public ::xml_schema::token
     {
       public:
       enum value
@@ -1335,7 +2077,7 @@ namespace arolios
 
       Min_occurrences_t (const ::std::string& v);
 
-      Min_occurrences_t (const ::xml_schema::string& v);
+      Min_occurrences_t (const ::xml_schema::token& v);
 
       Min_occurrences_t (const ::xercesc::DOMElement& e,
                          ::xml_schema::flags f = 0,
@@ -1376,7 +2118,7 @@ namespace arolios
       static const value _xsd_Min_occurrences_t_indexes_[2];
     };
 
-    class Max_occurrences_t: public ::xml_schema::string
+    class Max_occurrences_t: public ::xml_schema::token
     {
       public:
       enum value
@@ -1391,7 +2133,7 @@ namespace arolios
 
       Max_occurrences_t (const ::std::string& v);
 
-      Max_occurrences_t (const ::xml_schema::string& v);
+      Max_occurrences_t (const ::xml_schema::token& v);
 
       Max_occurrences_t (const ::xercesc::DOMElement& e,
                          ::xml_schema::flags f = 0,
@@ -1430,6 +2172,102 @@ namespace arolios
       public:
       static const char* const _xsd_Max_occurrences_t_literals_[2];
       static const value _xsd_Max_occurrences_t_indexes_[2];
+    };
+
+    class KindOfCollection_t: public ::xml_schema::token
+    {
+      public:
+      enum value
+      {
+        array,
+        list,
+        set,
+        bag
+      };
+
+      KindOfCollection_t (value v);
+
+      KindOfCollection_t (const char* v);
+
+      KindOfCollection_t (const ::std::string& v);
+
+      KindOfCollection_t (const ::xml_schema::token& v);
+
+      KindOfCollection_t (const ::xercesc::DOMElement& e,
+                          ::xml_schema::flags f = 0,
+                          ::xml_schema::container* c = 0);
+
+      KindOfCollection_t (const ::xercesc::DOMAttr& a,
+                          ::xml_schema::flags f = 0,
+                          ::xml_schema::container* c = 0);
+
+      KindOfCollection_t (const ::std::string& s,
+                          const ::xercesc::DOMElement* e,
+                          ::xml_schema::flags f = 0,
+                          ::xml_schema::container* c = 0);
+
+      KindOfCollection_t (const KindOfCollection_t& x,
+                          ::xml_schema::flags f = 0,
+                          ::xml_schema::container* c = 0);
+
+      virtual KindOfCollection_t*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      KindOfCollection_t&
+      operator= (value v);
+
+      virtual
+      operator value () const
+      {
+        return _xsd_KindOfCollection_t_convert ();
+      }
+
+      protected:
+      value
+      _xsd_KindOfCollection_t_convert () const;
+
+      public:
+      static const char* const _xsd_KindOfCollection_t_literals_[4];
+      static const value _xsd_KindOfCollection_t_indexes_[4];
+    };
+
+    class HighLimit_t: public ::xml_schema::token
+    {
+      public:
+      // Constructors.
+      //
+      HighLimit_t ();
+
+      HighLimit_t (const char*);
+
+      HighLimit_t (const ::std::string&);
+
+      HighLimit_t (const ::xml_schema::token&);
+
+      HighLimit_t (const ::xercesc::DOMElement& e,
+                   ::xml_schema::flags f = 0,
+                   ::xml_schema::container* c = 0);
+
+      HighLimit_t (const ::xercesc::DOMAttr& a,
+                   ::xml_schema::flags f = 0,
+                   ::xml_schema::container* c = 0);
+
+      HighLimit_t (const ::std::string& s,
+                   const ::xercesc::DOMElement* e,
+                   ::xml_schema::flags f = 0,
+                   ::xml_schema::container* c = 0);
+
+      HighLimit_t (const HighLimit_t& x,
+                   ::xml_schema::flags f = 0,
+                   ::xml_schema::container* c = 0);
+
+      virtual HighLimit_t*
+      _clone (::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0) const;
+
+      virtual 
+      ~HighLimit_t ();
     };
   }
 }

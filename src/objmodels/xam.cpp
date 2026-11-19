@@ -184,6 +184,10 @@ namespace arolios
     }
 
 
+    // Classifier_t
+    // 
+
+
     // Domain_t
     // 
 
@@ -277,9 +281,63 @@ namespace arolios
       this->primitive_ = s;
     }
 
+    const Domain_t::specific_sequence& Domain_t::
+    specific () const
+    {
+      return this->specific_;
+    }
+
+    Domain_t::specific_sequence& Domain_t::
+    specific ()
+    {
+      return this->specific_;
+    }
+
+    void Domain_t::
+    specific (const specific_sequence& s)
+    {
+      this->specific_ = s;
+    }
+
+    const Domain_t::selection_sequence& Domain_t::
+    selection () const
+    {
+      return this->selection_;
+    }
+
+    Domain_t::selection_sequence& Domain_t::
+    selection ()
+    {
+      return this->selection_;
+    }
+
+    void Domain_t::
+    selection (const selection_sequence& s)
+    {
+      this->selection_ = s;
+    }
+
 
     // Primitive_t
     // 
+
+    const Primitive_t::constraint_sequence& Primitive_t::
+    constraint () const
+    {
+      return this->constraint_;
+    }
+
+    Primitive_t::constraint_sequence& Primitive_t::
+    constraint ()
+    {
+      return this->constraint_;
+    }
+
+    void Primitive_t::
+    constraint (const constraint_sequence& s)
+    {
+      this->constraint_ = s;
+    }
 
     const Primitive_t::native_type& Primitive_t::
     native () const
@@ -303,6 +361,134 @@ namespace arolios
     native (::std::unique_ptr< native_type > x)
     {
       this->native_.set (std::move (x));
+    }
+
+
+    // Specific_t
+    // 
+
+    const Specific_t::collection_optional& Specific_t::
+    collection () const
+    {
+      return this->collection_;
+    }
+
+    Specific_t::collection_optional& Specific_t::
+    collection ()
+    {
+      return this->collection_;
+    }
+
+    void Specific_t::
+    collection (const collection_type& x)
+    {
+      this->collection_.set (x);
+    }
+
+    void Specific_t::
+    collection (const collection_optional& x)
+    {
+      this->collection_ = x;
+    }
+
+    void Specific_t::
+    collection (::std::unique_ptr< collection_type > x)
+    {
+      this->collection_.set (std::move (x));
+    }
+
+    const Specific_t::constraint_sequence& Specific_t::
+    constraint () const
+    {
+      return this->constraint_;
+    }
+
+    Specific_t::constraint_sequence& Specific_t::
+    constraint ()
+    {
+      return this->constraint_;
+    }
+
+    void Specific_t::
+    constraint (const constraint_sequence& s)
+    {
+      this->constraint_ = s;
+    }
+
+    const Specific_t::type_type& Specific_t::
+    type () const
+    {
+      return this->type_.get ();
+    }
+
+    Specific_t::type_type& Specific_t::
+    type ()
+    {
+      return this->type_.get ();
+    }
+
+    void Specific_t::
+    type (const type_type& x)
+    {
+      this->type_.set (x);
+    }
+
+    void Specific_t::
+    type (::std::unique_ptr< type_type > x)
+    {
+      this->type_.set (std::move (x));
+    }
+
+
+    // Collection_t
+    // 
+
+    const Collection_t::range_sequence& Collection_t::
+    range () const
+    {
+      return this->range_;
+    }
+
+    Collection_t::range_sequence& Collection_t::
+    range ()
+    {
+      return this->range_;
+    }
+
+    void Collection_t::
+    range (const range_sequence& s)
+    {
+      this->range_ = s;
+    }
+
+    const Collection_t::kind_type& Collection_t::
+    kind () const
+    {
+      return this->kind_.get ();
+    }
+
+    Collection_t::kind_type& Collection_t::
+    kind ()
+    {
+      return this->kind_.get ();
+    }
+
+    void Collection_t::
+    kind (const kind_type& x)
+    {
+      this->kind_.set (x);
+    }
+
+    void Collection_t::
+    kind (::std::unique_ptr< kind_type > x)
+    {
+      this->kind_.set (std::move (x));
+    }
+
+    const Collection_t::kind_type& Collection_t::
+    kind_default_value ()
+    {
+      return kind_default_value_;
     }
 
 
@@ -409,6 +595,24 @@ namespace arolios
       this->identifier_.set (std::move (x));
     }
 
+    const Class_t::constraint_sequence& Class_t::
+    constraint () const
+    {
+      return this->constraint_;
+    }
+
+    Class_t::constraint_sequence& Class_t::
+    constraint ()
+    {
+      return this->constraint_;
+    }
+
+    void Class_t::
+    constraint (const constraint_sequence& s)
+    {
+      this->constraint_ = s;
+    }
+
     const Class_t::isAbstract_type& Class_t::
     isAbstract () const
     {
@@ -509,6 +713,36 @@ namespace arolios
     // Class_property_t
     // 
 
+    const Class_property_t::collection_optional& Class_property_t::
+    collection () const
+    {
+      return this->collection_;
+    }
+
+    Class_property_t::collection_optional& Class_property_t::
+    collection ()
+    {
+      return this->collection_;
+    }
+
+    void Class_property_t::
+    collection (const collection_type& x)
+    {
+      this->collection_.set (x);
+    }
+
+    void Class_property_t::
+    collection (const collection_optional& x)
+    {
+      this->collection_ = x;
+    }
+
+    void Class_property_t::
+    collection (::std::unique_ptr< collection_type > x)
+    {
+      this->collection_.set (std::move (x));
+    }
+
     const Class_property_t::required_type& Class_property_t::
     required () const
     {
@@ -533,6 +767,84 @@ namespace arolios
       return required_type (false);
     }
 
+    const Class_property_t::isComposition_type& Class_property_t::
+    isComposition () const
+    {
+      return this->isComposition_.get ();
+    }
+
+    Class_property_t::isComposition_type& Class_property_t::
+    isComposition ()
+    {
+      return this->isComposition_.get ();
+    }
+
+    void Class_property_t::
+    isComposition (const isComposition_type& x)
+    {
+      this->isComposition_.set (x);
+    }
+
+    Class_property_t::isComposition_type Class_property_t::
+    isComposition_default_value ()
+    {
+      return isComposition_type (false);
+    }
+
+    const Class_property_t::memberEnd_type& Class_property_t::
+    memberEnd () const
+    {
+      return this->memberEnd_.get ();
+    }
+
+    Class_property_t::memberEnd_type& Class_property_t::
+    memberEnd ()
+    {
+      return this->memberEnd_.get ();
+    }
+
+    void Class_property_t::
+    memberEnd (const memberEnd_type& x)
+    {
+      this->memberEnd_.set (x);
+    }
+
+    Class_property_t::memberEnd_type Class_property_t::
+    memberEnd_default_value ()
+    {
+      return memberEnd_type (false);
+    }
+
+    const Class_property_t::opposite_optional& Class_property_t::
+    opposite () const
+    {
+      return this->opposite_;
+    }
+
+    Class_property_t::opposite_optional& Class_property_t::
+    opposite ()
+    {
+      return this->opposite_;
+    }
+
+    void Class_property_t::
+    opposite (const opposite_type& x)
+    {
+      this->opposite_.set (x);
+    }
+
+    void Class_property_t::
+    opposite (const opposite_optional& x)
+    {
+      this->opposite_ = x;
+    }
+
+    void Class_property_t::
+    opposite (::std::unique_ptr< opposite_type > x)
+    {
+      this->opposite_.set (std::move (x));
+    }
+
 
     // Association_t
     // 
@@ -553,6 +865,36 @@ namespace arolios
     memberEnd (const memberEnd_sequence& s)
     {
       this->memberEnd_ = s;
+    }
+
+    const Association_t::base_optional& Association_t::
+    base () const
+    {
+      return this->base_;
+    }
+
+    Association_t::base_optional& Association_t::
+    base ()
+    {
+      return this->base_;
+    }
+
+    void Association_t::
+    base (const base_type& x)
+    {
+      this->base_.set (x);
+    }
+
+    void Association_t::
+    base (const base_optional& x)
+    {
+      this->base_ = x;
+    }
+
+    void Association_t::
+    base (::std::unique_ptr< base_type > x)
+    {
+      this->base_.set (std::move (x));
     }
 
     const Association_t::property_sequence& Association_t::
@@ -601,6 +943,48 @@ namespace arolios
     identifier (::std::unique_ptr< identifier_type > x)
     {
       this->identifier_.set (std::move (x));
+    }
+
+    const Association_t::constraint_sequence& Association_t::
+    constraint () const
+    {
+      return this->constraint_;
+    }
+
+    Association_t::constraint_sequence& Association_t::
+    constraint ()
+    {
+      return this->constraint_;
+    }
+
+    void Association_t::
+    constraint (const constraint_sequence& s)
+    {
+      this->constraint_ = s;
+    }
+
+    const Association_t::isAbstract_type& Association_t::
+    isAbstract () const
+    {
+      return this->isAbstract_.get ();
+    }
+
+    Association_t::isAbstract_type& Association_t::
+    isAbstract ()
+    {
+      return this->isAbstract_.get ();
+    }
+
+    void Association_t::
+    isAbstract (const isAbstract_type& x)
+    {
+      this->isAbstract_.set (x);
+    }
+
+    Association_t::isAbstract_type Association_t::
+    isAbstract_default_value ()
+    {
+      return isAbstract_type (false);
     }
 
 
@@ -715,6 +1099,54 @@ namespace arolios
       return isComposition_type (false);
     }
 
+    const Member_end_t::owned_type& Member_end_t::
+    owned () const
+    {
+      return this->owned_.get ();
+    }
+
+    Member_end_t::owned_type& Member_end_t::
+    owned ()
+    {
+      return this->owned_.get ();
+    }
+
+    void Member_end_t::
+    owned (const owned_type& x)
+    {
+      this->owned_.set (x);
+    }
+
+    Member_end_t::owned_type Member_end_t::
+    owned_default_value ()
+    {
+      return owned_type (false);
+    }
+
+    const Member_end_t::navigable_type& Member_end_t::
+    navigable () const
+    {
+      return this->navigable_.get ();
+    }
+
+    Member_end_t::navigable_type& Member_end_t::
+    navigable ()
+    {
+      return this->navigable_.get ();
+    }
+
+    void Member_end_t::
+    navigable (const navigable_type& x)
+    {
+      this->navigable_.set (x);
+    }
+
+    Member_end_t::navigable_type Member_end_t::
+    navigable_default_value ()
+    {
+      return navigable_type (true);
+    }
+
 
     // Enumeration_t
     // 
@@ -738,30 +1170,198 @@ namespace arolios
     }
 
 
+    // Value_t
+    // 
+
+    const Value_t::description_optional& Value_t::
+    description () const
+    {
+      return this->description_;
+    }
+
+    Value_t::description_optional& Value_t::
+    description ()
+    {
+      return this->description_;
+    }
+
+    void Value_t::
+    description (const description_type& x)
+    {
+      this->description_.set (x);
+    }
+
+    void Value_t::
+    description (const description_optional& x)
+    {
+      this->description_ = x;
+    }
+
+    void Value_t::
+    description (::std::unique_ptr< description_type > x)
+    {
+      this->description_.set (std::move (x));
+    }
+
+    const Value_t::name_type& Value_t::
+    name () const
+    {
+      return this->name_.get ();
+    }
+
+    Value_t::name_type& Value_t::
+    name ()
+    {
+      return this->name_.get ();
+    }
+
+    void Value_t::
+    name (const name_type& x)
+    {
+      this->name_.set (x);
+    }
+
+    void Value_t::
+    name (::std::unique_ptr< name_type > x)
+    {
+      this->name_.set (std::move (x));
+    }
+
+    const Value_t::action_type& Value_t::
+    action () const
+    {
+      return this->action_.get ();
+    }
+
+    Value_t::action_type& Value_t::
+    action ()
+    {
+      return this->action_.get ();
+    }
+
+    void Value_t::
+    action (const action_type& x)
+    {
+      this->action_.set (x);
+    }
+
+    void Value_t::
+    action (::std::unique_ptr< action_type > x)
+    {
+      this->action_.set (std::move (x));
+    }
+
+    const Value_t::action_type& Value_t::
+    action_default_value ()
+    {
+      return action_default_value_;
+    }
+
+    const Value_t::rename_optional& Value_t::
+    rename () const
+    {
+      return this->rename_;
+    }
+
+    Value_t::rename_optional& Value_t::
+    rename ()
+    {
+      return this->rename_;
+    }
+
+    void Value_t::
+    rename (const rename_type& x)
+    {
+      this->rename_.set (x);
+    }
+
+    void Value_t::
+    rename (const rename_optional& x)
+    {
+      this->rename_ = x;
+    }
+
+    void Value_t::
+    rename (::std::unique_ptr< rename_type > x)
+    {
+      this->rename_.set (std::move (x));
+    }
+
+
+    // Selection_t
+    // 
+
+    const Selection_t::option_sequence& Selection_t::
+    option () const
+    {
+      return this->option_;
+    }
+
+    Selection_t::option_sequence& Selection_t::
+    option ()
+    {
+      return this->option_;
+    }
+
+    void Selection_t::
+    option (const option_sequence& s)
+    {
+      this->option_ = s;
+    }
+
+
+    // Constraint_t
+    // 
+
+    const Constraint_t::expression_type& Constraint_t::
+    expression () const
+    {
+      return this->expression_.get ();
+    }
+
+    Constraint_t::expression_type& Constraint_t::
+    expression ()
+    {
+      return this->expression_.get ();
+    }
+
+    void Constraint_t::
+    expression (const expression_type& x)
+    {
+      this->expression_.set (x);
+    }
+
+    void Constraint_t::
+    expression (::std::unique_ptr< expression_type > x)
+    {
+      this->expression_.set (std::move (x));
+    }
+
+
     // Action_t
     // 
 
     Action_t::
     Action_t (value v)
-    : ::xml_schema::string (_xsd_Action_t_literals_[v])
+    : ::xml_schema::token (_xsd_Action_t_literals_[v])
     {
     }
 
     Action_t::
     Action_t (const char* v)
-    : ::xml_schema::string (v)
+    : ::xml_schema::token (v)
     {
     }
 
     Action_t::
     Action_t (const ::std::string& v)
-    : ::xml_schema::string (v)
+    : ::xml_schema::token (v)
     {
     }
 
     Action_t::
-    Action_t (const ::xml_schema::string& v)
-    : ::xml_schema::string (v)
+    Action_t (const ::xml_schema::token& v)
+    : ::xml_schema::token (v)
     {
     }
 
@@ -769,17 +1369,63 @@ namespace arolios
     Action_t (const Action_t& v,
               ::xml_schema::flags f,
               ::xml_schema::container* c)
-    : ::xml_schema::string (v, f, c)
+    : ::xml_schema::token (v, f, c)
     {
     }
 
     Action_t& Action_t::
     operator= (value v)
     {
-      static_cast< ::xml_schema::string& > (*this) = 
-      ::xml_schema::string (_xsd_Action_t_literals_[v]);
+      static_cast< ::xml_schema::token& > (*this) = 
+      ::xml_schema::token (_xsd_Action_t_literals_[v]);
 
       return *this;
+    }
+
+
+    // Range_t
+    // 
+
+    const Range_t::min_type& Range_t::
+    min () const
+    {
+      return this->min_.get ();
+    }
+
+    Range_t::min_type& Range_t::
+    min ()
+    {
+      return this->min_.get ();
+    }
+
+    void Range_t::
+    min (const min_type& x)
+    {
+      this->min_.set (x);
+    }
+
+    const Range_t::max_type& Range_t::
+    max () const
+    {
+      return this->max_.get ();
+    }
+
+    Range_t::max_type& Range_t::
+    max ()
+    {
+      return this->max_.get ();
+    }
+
+    void Range_t::
+    max (const max_type& x)
+    {
+      this->max_.set (x);
+    }
+
+    void Range_t::
+    max (::std::unique_ptr< max_type > x)
+    {
+      this->max_.set (std::move (x));
     }
 
 
@@ -788,25 +1434,25 @@ namespace arolios
 
     Min_occurrences_t::
     Min_occurrences_t (value v)
-    : ::xml_schema::string (_xsd_Min_occurrences_t_literals_[v])
+    : ::xml_schema::token (_xsd_Min_occurrences_t_literals_[v])
     {
     }
 
     Min_occurrences_t::
     Min_occurrences_t (const char* v)
-    : ::xml_schema::string (v)
+    : ::xml_schema::token (v)
     {
     }
 
     Min_occurrences_t::
     Min_occurrences_t (const ::std::string& v)
-    : ::xml_schema::string (v)
+    : ::xml_schema::token (v)
     {
     }
 
     Min_occurrences_t::
-    Min_occurrences_t (const ::xml_schema::string& v)
-    : ::xml_schema::string (v)
+    Min_occurrences_t (const ::xml_schema::token& v)
+    : ::xml_schema::token (v)
     {
     }
 
@@ -814,15 +1460,15 @@ namespace arolios
     Min_occurrences_t (const Min_occurrences_t& v,
                        ::xml_schema::flags f,
                        ::xml_schema::container* c)
-    : ::xml_schema::string (v, f, c)
+    : ::xml_schema::token (v, f, c)
     {
     }
 
     Min_occurrences_t& Min_occurrences_t::
     operator= (value v)
     {
-      static_cast< ::xml_schema::string& > (*this) = 
-      ::xml_schema::string (_xsd_Min_occurrences_t_literals_[v]);
+      static_cast< ::xml_schema::token& > (*this) = 
+      ::xml_schema::token (_xsd_Min_occurrences_t_literals_[v]);
 
       return *this;
     }
@@ -833,25 +1479,25 @@ namespace arolios
 
     Max_occurrences_t::
     Max_occurrences_t (value v)
-    : ::xml_schema::string (_xsd_Max_occurrences_t_literals_[v])
+    : ::xml_schema::token (_xsd_Max_occurrences_t_literals_[v])
     {
     }
 
     Max_occurrences_t::
     Max_occurrences_t (const char* v)
-    : ::xml_schema::string (v)
+    : ::xml_schema::token (v)
     {
     }
 
     Max_occurrences_t::
     Max_occurrences_t (const ::std::string& v)
-    : ::xml_schema::string (v)
+    : ::xml_schema::token (v)
     {
     }
 
     Max_occurrences_t::
-    Max_occurrences_t (const ::xml_schema::string& v)
-    : ::xml_schema::string (v)
+    Max_occurrences_t (const ::xml_schema::token& v)
+    : ::xml_schema::token (v)
     {
     }
 
@@ -859,18 +1505,67 @@ namespace arolios
     Max_occurrences_t (const Max_occurrences_t& v,
                        ::xml_schema::flags f,
                        ::xml_schema::container* c)
-    : ::xml_schema::string (v, f, c)
+    : ::xml_schema::token (v, f, c)
     {
     }
 
     Max_occurrences_t& Max_occurrences_t::
     operator= (value v)
     {
-      static_cast< ::xml_schema::string& > (*this) = 
-      ::xml_schema::string (_xsd_Max_occurrences_t_literals_[v]);
+      static_cast< ::xml_schema::token& > (*this) = 
+      ::xml_schema::token (_xsd_Max_occurrences_t_literals_[v]);
 
       return *this;
     }
+
+
+    // KindOfCollection_t
+    // 
+
+    KindOfCollection_t::
+    KindOfCollection_t (value v)
+    : ::xml_schema::token (_xsd_KindOfCollection_t_literals_[v])
+    {
+    }
+
+    KindOfCollection_t::
+    KindOfCollection_t (const char* v)
+    : ::xml_schema::token (v)
+    {
+    }
+
+    KindOfCollection_t::
+    KindOfCollection_t (const ::std::string& v)
+    : ::xml_schema::token (v)
+    {
+    }
+
+    KindOfCollection_t::
+    KindOfCollection_t (const ::xml_schema::token& v)
+    : ::xml_schema::token (v)
+    {
+    }
+
+    KindOfCollection_t::
+    KindOfCollection_t (const KindOfCollection_t& v,
+                        ::xml_schema::flags f,
+                        ::xml_schema::container* c)
+    : ::xml_schema::token (v, f, c)
+    {
+    }
+
+    KindOfCollection_t& KindOfCollection_t::
+    operator= (value v)
+    {
+      static_cast< ::xml_schema::token& > (*this) = 
+      ::xml_schema::token (_xsd_KindOfCollection_t_literals_[v]);
+
+      return *this;
+    }
+
+
+    // HighLimit_t
+    // 
   }
 }
 
@@ -1099,6 +1794,43 @@ namespace arolios
     {
     }
 
+    // Classifier_t
+    //
+
+    Classifier_t::
+    Classifier_t (const name_type& name)
+    : ::arolios::model::Element_t (name)
+    {
+    }
+
+    Classifier_t::
+    Classifier_t (const Classifier_t& x,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
+    : ::arolios::model::Element_t (x, f, c)
+    {
+    }
+
+    Classifier_t::
+    Classifier_t (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
+    : ::arolios::model::Element_t (e, f, c)
+    {
+    }
+
+    Classifier_t* Classifier_t::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class Classifier_t (*this, f, c);
+    }
+
+    Classifier_t::
+    ~Classifier_t ()
+    {
+    }
+
     // Domain_t
     //
 
@@ -1109,7 +1841,9 @@ namespace arolios
       type_ (this),
       class__ (this),
       association_ (this),
-      primitive_ (this)
+      primitive_ (this),
+      specific_ (this),
+      selection_ (this)
     {
     }
 
@@ -1122,7 +1856,9 @@ namespace arolios
       type_ (x.type_, f, this),
       class__ (x.class__, f, this),
       association_ (x.association_, f, this),
-      primitive_ (x.primitive_, f, this)
+      primitive_ (x.primitive_, f, this),
+      specific_ (x.specific_, f, this),
+      selection_ (x.selection_, f, this)
     {
     }
 
@@ -1135,7 +1871,9 @@ namespace arolios
       type_ (this),
       class__ (this),
       association_ (this),
-      primitive_ (this)
+      primitive_ (this),
+      specific_ (this),
+      selection_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -1211,6 +1949,28 @@ namespace arolios
           continue;
         }
 
+        // specific
+        //
+        if (n.name () == "specific" && n.namespace_ ().empty ())
+        {
+          ::std::unique_ptr< specific_type > r (
+            specific_traits::create (i, f, this));
+
+          this->specific_.push_back (::std::move (r));
+          continue;
+        }
+
+        // selection
+        //
+        if (n.name () == "selection" && n.namespace_ ().empty ())
+        {
+          ::std::unique_ptr< selection_type > r (
+            selection_traits::create (i, f, this));
+
+          this->selection_.push_back (::std::move (r));
+          continue;
+        }
+
         break;
       }
     }
@@ -1233,6 +1993,8 @@ namespace arolios
         this->class__ = x.class__;
         this->association_ = x.association_;
         this->primitive_ = x.primitive_;
+        this->specific_ = x.specific_;
+        this->selection_ = x.selection_;
       }
 
       return *this;
@@ -1249,7 +2011,8 @@ namespace arolios
     Primitive_t::
     Primitive_t (const name_type& name,
                  const native_type& native)
-    : ::arolios::model::Element_t (name),
+    : ::arolios::model::Classifier_t (name),
+      constraint_ (this),
       native_ (native, this)
     {
     }
@@ -1258,7 +2021,8 @@ namespace arolios
     Primitive_t (const Primitive_t& x,
                  ::xml_schema::flags f,
                  ::xml_schema::container* c)
-    : ::arolios::model::Element_t (x, f, c),
+    : ::arolios::model::Classifier_t (x, f, c),
+      constraint_ (x.constraint_, f, this),
       native_ (x.native_, f, this)
     {
     }
@@ -1267,7 +2031,8 @@ namespace arolios
     Primitive_t (const ::xercesc::DOMElement& e,
                  ::xml_schema::flags f,
                  ::xml_schema::container* c)
-    : ::arolios::model::Element_t (e, f | ::xml_schema::flags::base, c),
+    : ::arolios::model::Classifier_t (e, f | ::xml_schema::flags::base, c),
+      constraint_ (this),
       native_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
@@ -1281,7 +2046,27 @@ namespace arolios
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
-      this->::arolios::model::Element_t::parse (p, f);
+      this->::arolios::model::Classifier_t::parse (p, f);
+
+      for (; p.more_content (); p.next_content (false))
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // constraint
+        //
+        if (n.name () == "constraint" && n.namespace_ ().empty ())
+        {
+          ::std::unique_ptr< constraint_type > r (
+            constraint_traits::create (i, f, this));
+
+          this->constraint_.push_back (::std::move (r));
+          continue;
+        }
+
+        break;
+      }
 
       p.reset_attributes ();
 
@@ -1318,7 +2103,8 @@ namespace arolios
     {
       if (this != &x)
       {
-        static_cast< ::arolios::model::Element_t& > (*this) = x;
+        static_cast< ::arolios::model::Classifier_t& > (*this) = x;
+        this->constraint_ = x.constraint_;
         this->native_ = x.native_;
       }
 
@@ -1330,12 +2116,248 @@ namespace arolios
     {
     }
 
+    // Specific_t
+    //
+
+    Specific_t::
+    Specific_t (const name_type& name,
+                const type_type& type)
+    : ::arolios::model::Classifier_t (name),
+      collection_ (this),
+      constraint_ (this),
+      type_ (type, this)
+    {
+    }
+
+    Specific_t::
+    Specific_t (const Specific_t& x,
+                ::xml_schema::flags f,
+                ::xml_schema::container* c)
+    : ::arolios::model::Classifier_t (x, f, c),
+      collection_ (x.collection_, f, this),
+      constraint_ (x.constraint_, f, this),
+      type_ (x.type_, f, this)
+    {
+    }
+
+    Specific_t::
+    Specific_t (const ::xercesc::DOMElement& e,
+                ::xml_schema::flags f,
+                ::xml_schema::container* c)
+    : ::arolios::model::Classifier_t (e, f | ::xml_schema::flags::base, c),
+      collection_ (this),
+      constraint_ (this),
+      type_ (this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void Specific_t::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      this->::arolios::model::Classifier_t::parse (p, f);
+
+      for (; p.more_content (); p.next_content (false))
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // collection
+        //
+        if (n.name () == "collection" && n.namespace_ ().empty ())
+        {
+          ::std::unique_ptr< collection_type > r (
+            collection_traits::create (i, f, this));
+
+          if (!this->collection_)
+          {
+            this->collection_.set (::std::move (r));
+            continue;
+          }
+        }
+
+        // constraint
+        //
+        if (n.name () == "constraint" && n.namespace_ ().empty ())
+        {
+          ::std::unique_ptr< constraint_type > r (
+            constraint_traits::create (i, f, this));
+
+          this->constraint_.push_back (::std::move (r));
+          continue;
+        }
+
+        break;
+      }
+
+      p.reset_attributes ();
+
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "type" && n.namespace_ ().empty ())
+        {
+          this->type_.set (type_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!type_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "type",
+          "");
+      }
+    }
+
+    Specific_t* Specific_t::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class Specific_t (*this, f, c);
+    }
+
+    Specific_t& Specific_t::
+    operator= (const Specific_t& x)
+    {
+      if (this != &x)
+      {
+        static_cast< ::arolios::model::Classifier_t& > (*this) = x;
+        this->collection_ = x.collection_;
+        this->constraint_ = x.constraint_;
+        this->type_ = x.type_;
+      }
+
+      return *this;
+    }
+
+    Specific_t::
+    ~Specific_t ()
+    {
+    }
+
+    // Collection_t
+    //
+
+    const Collection_t::kind_type Collection_t::kind_default_value_ (
+      "array");
+
+    Collection_t::
+    Collection_t ()
+    : ::xml_schema::type (),
+      range_ (this),
+      kind_ (kind_default_value (), this)
+    {
+    }
+
+    Collection_t::
+    Collection_t (const Collection_t& x,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      range_ (x.range_, f, this),
+      kind_ (x.kind_, f, this)
+    {
+    }
+
+    Collection_t::
+    Collection_t (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      range_ (this),
+      kind_ (this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void Collection_t::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      for (; p.more_content (); p.next_content (false))
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // range
+        //
+        if (n.name () == "range" && n.namespace_ ().empty ())
+        {
+          ::std::unique_ptr< range_type > r (
+            range_traits::create (i, f, this));
+
+          this->range_.push_back (::std::move (r));
+          continue;
+        }
+
+        break;
+      }
+
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "kind" && n.namespace_ ().empty ())
+        {
+          this->kind_.set (kind_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!kind_.present ())
+      {
+        this->kind_.set (kind_default_value ());
+      }
+    }
+
+    Collection_t* Collection_t::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class Collection_t (*this, f, c);
+    }
+
+    Collection_t& Collection_t::
+    operator= (const Collection_t& x)
+    {
+      if (this != &x)
+      {
+        static_cast< ::xml_schema::type& > (*this) = x;
+        this->range_ = x.range_;
+        this->kind_ = x.kind_;
+      }
+
+      return *this;
+    }
+
+    Collection_t::
+    ~Collection_t ()
+    {
+    }
+
     // Type_t
     //
 
     Type_t::
     Type_t (const name_type& name)
-    : ::arolios::model::Element_t (name),
+    : ::arolios::model::Classifier_t (name),
       property_ (this)
     {
     }
@@ -1344,7 +2366,7 @@ namespace arolios
     Type_t (const Type_t& x,
             ::xml_schema::flags f,
             ::xml_schema::container* c)
-    : ::arolios::model::Element_t (x, f, c),
+    : ::arolios::model::Classifier_t (x, f, c),
       property_ (x.property_, f, this)
     {
     }
@@ -1353,7 +2375,7 @@ namespace arolios
     Type_t (const ::xercesc::DOMElement& e,
             ::xml_schema::flags f,
             ::xml_schema::container* c)
-    : ::arolios::model::Element_t (e, f | ::xml_schema::flags::base, c),
+    : ::arolios::model::Classifier_t (e, f | ::xml_schema::flags::base, c),
       property_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
@@ -1367,7 +2389,7 @@ namespace arolios
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
-      this->::arolios::model::Element_t::parse (p, f);
+      this->::arolios::model::Classifier_t::parse (p, f);
 
       for (; p.more_content (); p.next_content (false))
       {
@@ -1402,7 +2424,7 @@ namespace arolios
     {
       if (this != &x)
       {
-        static_cast< ::arolios::model::Element_t& > (*this) = x;
+        static_cast< ::arolios::model::Classifier_t& > (*this) = x;
         this->property_ = x.property_;
       }
 
@@ -1419,10 +2441,11 @@ namespace arolios
 
     Class_t::
     Class_t (const name_type& name)
-    : ::arolios::model::Element_t (name),
+    : ::arolios::model::Classifier_t (name),
       base_ (this),
       property_ (this),
       identifier_ (this),
+      constraint_ (this),
       isAbstract_ (isAbstract_default_value (), this)
     {
     }
@@ -1431,10 +2454,11 @@ namespace arolios
     Class_t (const Class_t& x,
              ::xml_schema::flags f,
              ::xml_schema::container* c)
-    : ::arolios::model::Element_t (x, f, c),
+    : ::arolios::model::Classifier_t (x, f, c),
       base_ (x.base_, f, this),
       property_ (x.property_, f, this),
       identifier_ (x.identifier_, f, this),
+      constraint_ (x.constraint_, f, this),
       isAbstract_ (x.isAbstract_, f, this)
     {
     }
@@ -1443,10 +2467,11 @@ namespace arolios
     Class_t (const ::xercesc::DOMElement& e,
              ::xml_schema::flags f,
              ::xml_schema::container* c)
-    : ::arolios::model::Element_t (e, f | ::xml_schema::flags::base, c),
+    : ::arolios::model::Classifier_t (e, f | ::xml_schema::flags::base, c),
       base_ (this),
       property_ (this),
       identifier_ (this),
+      constraint_ (this),
       isAbstract_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
@@ -1460,7 +2485,7 @@ namespace arolios
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
-      this->::arolios::model::Element_t::parse (p, f);
+      this->::arolios::model::Classifier_t::parse (p, f);
 
       for (; p.more_content (); p.next_content (false))
       {
@@ -1507,6 +2532,17 @@ namespace arolios
           }
         }
 
+        // constraint
+        //
+        if (n.name () == "constraint" && n.namespace_ ().empty ())
+        {
+          ::std::unique_ptr< constraint_type > r (
+            constraint_traits::create (i, f, this));
+
+          this->constraint_.push_back (::std::move (r));
+          continue;
+        }
+
         break;
       }
 
@@ -1543,10 +2579,11 @@ namespace arolios
     {
       if (this != &x)
       {
-        static_cast< ::arolios::model::Element_t& > (*this) = x;
+        static_cast< ::arolios::model::Classifier_t& > (*this) = x;
         this->base_ = x.base_;
         this->property_ = x.property_;
         this->identifier_ = x.identifier_;
+        this->constraint_ = x.constraint_;
         this->isAbstract_ = x.isAbstract_;
       }
 
@@ -1819,7 +2856,11 @@ namespace arolios
                       const type_type& type)
     : ::arolios::model::Type_property_t (name,
                                          type),
-      required_ (required_default_value (), this)
+      collection_ (this),
+      required_ (required_default_value (), this),
+      isComposition_ (isComposition_default_value (), this),
+      memberEnd_ (memberEnd_default_value (), this),
+      opposite_ (this)
     {
     }
 
@@ -1828,7 +2869,11 @@ namespace arolios
                       ::xml_schema::flags f,
                       ::xml_schema::container* c)
     : ::arolios::model::Type_property_t (x, f, c),
-      required_ (x.required_, f, this)
+      collection_ (x.collection_, f, this),
+      required_ (x.required_, f, this),
+      isComposition_ (x.isComposition_, f, this),
+      memberEnd_ (x.memberEnd_, f, this),
+      opposite_ (x.opposite_, f, this)
     {
     }
 
@@ -1837,7 +2882,11 @@ namespace arolios
                       ::xml_schema::flags f,
                       ::xml_schema::container* c)
     : ::arolios::model::Type_property_t (e, f | ::xml_schema::flags::base, c),
-      required_ (this)
+      collection_ (this),
+      required_ (this),
+      isComposition_ (this),
+      memberEnd_ (this),
+      opposite_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -1852,6 +2901,29 @@ namespace arolios
     {
       this->::arolios::model::Type_property_t::parse (p, f);
 
+      for (; p.more_content (); p.next_content (false))
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // collection
+        //
+        if (n.name () == "collection" && n.namespace_ ().empty ())
+        {
+          ::std::unique_ptr< collection_type > r (
+            collection_traits::create (i, f, this));
+
+          if (!this->collection_)
+          {
+            this->collection_.set (::std::move (r));
+            continue;
+          }
+        }
+
+        break;
+      }
+
       p.reset_attributes ();
 
       while (p.more_attributes ())
@@ -1865,11 +2937,39 @@ namespace arolios
           this->required_.set (required_traits::create (i, f, this));
           continue;
         }
+
+        if (n.name () == "isComposition" && n.namespace_ ().empty ())
+        {
+          this->isComposition_.set (isComposition_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "memberEnd" && n.namespace_ ().empty ())
+        {
+          this->memberEnd_.set (memberEnd_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "opposite" && n.namespace_ ().empty ())
+        {
+          this->opposite_.set (opposite_traits::create (i, f, this));
+          continue;
+        }
       }
 
       if (!required_.present ())
       {
         this->required_.set (required_default_value ());
+      }
+
+      if (!isComposition_.present ())
+      {
+        this->isComposition_.set (isComposition_default_value ());
+      }
+
+      if (!memberEnd_.present ())
+      {
+        this->memberEnd_.set (memberEnd_default_value ());
       }
     }
 
@@ -1886,7 +2986,11 @@ namespace arolios
       if (this != &x)
       {
         static_cast< ::arolios::model::Type_property_t& > (*this) = x;
+        this->collection_ = x.collection_;
         this->required_ = x.required_;
+        this->isComposition_ = x.isComposition_;
+        this->memberEnd_ = x.memberEnd_;
+        this->opposite_ = x.opposite_;
       }
 
       return *this;
@@ -1902,10 +3006,13 @@ namespace arolios
 
     Association_t::
     Association_t (const name_type& name)
-    : ::arolios::model::Element_t (name),
+    : ::arolios::model::Classifier_t (name),
       memberEnd_ (this),
+      base_ (this),
       property_ (this),
-      identifier_ (this)
+      identifier_ (this),
+      constraint_ (this),
+      isAbstract_ (isAbstract_default_value (), this)
     {
     }
 
@@ -1913,10 +3020,13 @@ namespace arolios
     Association_t (const Association_t& x,
                    ::xml_schema::flags f,
                    ::xml_schema::container* c)
-    : ::arolios::model::Element_t (x, f, c),
+    : ::arolios::model::Classifier_t (x, f, c),
       memberEnd_ (x.memberEnd_, f, this),
+      base_ (x.base_, f, this),
       property_ (x.property_, f, this),
-      identifier_ (x.identifier_, f, this)
+      identifier_ (x.identifier_, f, this),
+      constraint_ (x.constraint_, f, this),
+      isAbstract_ (x.isAbstract_, f, this)
     {
     }
 
@@ -1924,10 +3034,13 @@ namespace arolios
     Association_t (const ::xercesc::DOMElement& e,
                    ::xml_schema::flags f,
                    ::xml_schema::container* c)
-    : ::arolios::model::Element_t (e, f | ::xml_schema::flags::base, c),
+    : ::arolios::model::Classifier_t (e, f | ::xml_schema::flags::base, c),
       memberEnd_ (this),
+      base_ (this),
       property_ (this),
-      identifier_ (this)
+      identifier_ (this),
+      constraint_ (this),
+      isAbstract_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -1940,7 +3053,7 @@ namespace arolios
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
-      this->::arolios::model::Element_t::parse (p, f);
+      this->::arolios::model::Classifier_t::parse (p, f);
 
       for (; p.more_content (); p.next_content (false))
       {
@@ -1957,6 +3070,20 @@ namespace arolios
 
           this->memberEnd_.push_back (::std::move (r));
           continue;
+        }
+
+        // base
+        //
+        if (n.name () == "base" && n.namespace_ ().empty ())
+        {
+          ::std::unique_ptr< base_type > r (
+            base_traits::create (i, f, this));
+
+          if (!this->base_)
+          {
+            this->base_.set (::std::move (r));
+            continue;
+          }
         }
 
         // property
@@ -1984,7 +3111,38 @@ namespace arolios
           }
         }
 
+        // constraint
+        //
+        if (n.name () == "constraint" && n.namespace_ ().empty ())
+        {
+          ::std::unique_ptr< constraint_type > r (
+            constraint_traits::create (i, f, this));
+
+          this->constraint_.push_back (::std::move (r));
+          continue;
+        }
+
         break;
+      }
+
+      p.reset_attributes ();
+
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "isAbstract" && n.namespace_ ().empty ())
+        {
+          this->isAbstract_.set (isAbstract_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!isAbstract_.present ())
+      {
+        this->isAbstract_.set (isAbstract_default_value ());
       }
     }
 
@@ -2000,10 +3158,13 @@ namespace arolios
     {
       if (this != &x)
       {
-        static_cast< ::arolios::model::Element_t& > (*this) = x;
+        static_cast< ::arolios::model::Classifier_t& > (*this) = x;
         this->memberEnd_ = x.memberEnd_;
+        this->base_ = x.base_;
         this->property_ = x.property_;
         this->identifier_ = x.identifier_;
+        this->constraint_ = x.constraint_;
+        this->isAbstract_ = x.isAbstract_;
       }
 
       return *this;
@@ -2030,7 +3191,9 @@ namespace arolios
       class__ (class_, this),
       minOccurs_ (minOccurs_default_value (), this),
       maxOccurs_ (maxOccurs_default_value (), this),
-      isComposition_ (isComposition_default_value (), this)
+      isComposition_ (isComposition_default_value (), this),
+      owned_ (owned_default_value (), this),
+      navigable_ (navigable_default_value (), this)
     {
     }
 
@@ -2042,7 +3205,9 @@ namespace arolios
       class__ (x.class__, f, this),
       minOccurs_ (x.minOccurs_, f, this),
       maxOccurs_ (x.maxOccurs_, f, this),
-      isComposition_ (x.isComposition_, f, this)
+      isComposition_ (x.isComposition_, f, this),
+      owned_ (x.owned_, f, this),
+      navigable_ (x.navigable_, f, this)
     {
     }
 
@@ -2054,7 +3219,9 @@ namespace arolios
       class__ (this),
       minOccurs_ (this),
       maxOccurs_ (this),
-      isComposition_ (this)
+      isComposition_ (this),
+      owned_ (this),
+      navigable_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
       {
@@ -2100,6 +3267,18 @@ namespace arolios
           this->isComposition_.set (isComposition_traits::create (i, f, this));
           continue;
         }
+
+        if (n.name () == "owned" && n.namespace_ ().empty ())
+        {
+          this->owned_.set (owned_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "navigable" && n.namespace_ ().empty ())
+        {
+          this->navigable_.set (navigable_traits::create (i, f, this));
+          continue;
+        }
       }
 
       if (!class__.present ())
@@ -2123,6 +3302,16 @@ namespace arolios
       {
         this->isComposition_.set (isComposition_default_value ());
       }
+
+      if (!owned_.present ())
+      {
+        this->owned_.set (owned_default_value ());
+      }
+
+      if (!navigable_.present ())
+      {
+        this->navigable_.set (navigable_default_value ());
+      }
     }
 
     Member_end_t* Member_end_t::
@@ -2142,6 +3331,8 @@ namespace arolios
         this->minOccurs_ = x.minOccurs_;
         this->maxOccurs_ = x.maxOccurs_;
         this->isComposition_ = x.isComposition_;
+        this->owned_ = x.owned_;
+        this->navigable_ = x.navigable_;
       }
 
       return *this;
@@ -2157,7 +3348,7 @@ namespace arolios
 
     Enumeration_t::
     Enumeration_t (const name_type& name)
-    : ::arolios::model::Element_t (name),
+    : ::arolios::model::Classifier_t (name),
       value_ (this)
     {
     }
@@ -2166,7 +3357,7 @@ namespace arolios
     Enumeration_t (const Enumeration_t& x,
                    ::xml_schema::flags f,
                    ::xml_schema::container* c)
-    : ::arolios::model::Element_t (x, f, c),
+    : ::arolios::model::Classifier_t (x, f, c),
       value_ (x.value_, f, this)
     {
     }
@@ -2175,7 +3366,7 @@ namespace arolios
     Enumeration_t (const ::xercesc::DOMElement& e,
                    ::xml_schema::flags f,
                    ::xml_schema::container* c)
-    : ::arolios::model::Element_t (e, f | ::xml_schema::flags::base, c),
+    : ::arolios::model::Classifier_t (e, f | ::xml_schema::flags::base, c),
       value_ (this)
     {
       if ((f & ::xml_schema::flags::base) == 0)
@@ -2189,7 +3380,7 @@ namespace arolios
     parse (::xsd::cxx::xml::dom::parser< char >& p,
            ::xml_schema::flags f)
     {
-      this->::arolios::model::Element_t::parse (p, f);
+      this->::arolios::model::Classifier_t::parse (p, f);
 
       for (; p.more_content (); p.next_content (false))
       {
@@ -2224,7 +3415,7 @@ namespace arolios
     {
       if (this != &x)
       {
-        static_cast< ::arolios::model::Element_t& > (*this) = x;
+        static_cast< ::arolios::model::Classifier_t& > (*this) = x;
         this->value_ = x.value_;
       }
 
@@ -2236,6 +3427,314 @@ namespace arolios
     {
     }
 
+    // Value_t
+    //
+
+    const Value_t::action_type Value_t::action_default_value_ (
+      "create");
+
+    Value_t::
+    Value_t (const name_type& name)
+    : ::xml_schema::type (),
+      description_ (this),
+      name_ (name, this),
+      action_ (action_default_value (), this),
+      rename_ (this)
+    {
+    }
+
+    Value_t::
+    Value_t (const Value_t& x,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      description_ (x.description_, f, this),
+      name_ (x.name_, f, this),
+      action_ (x.action_, f, this),
+      rename_ (x.rename_, f, this)
+    {
+    }
+
+    Value_t::
+    Value_t (const ::xercesc::DOMElement& e,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      description_ (this),
+      name_ (this),
+      action_ (this),
+      rename_ (this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void Value_t::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      for (; p.more_content (); p.next_content (false))
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // description
+        //
+        if (n.name () == "description" && n.namespace_ ().empty ())
+        {
+          ::std::unique_ptr< description_type > r (
+            description_traits::create (i, f, this));
+
+          if (!this->description_)
+          {
+            this->description_.set (::std::move (r));
+            continue;
+          }
+        }
+
+        break;
+      }
+
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "name" && n.namespace_ ().empty ())
+        {
+          this->name_.set (name_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "action" && n.namespace_ ().empty ())
+        {
+          this->action_.set (action_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "rename" && n.namespace_ ().empty ())
+        {
+          this->rename_.set (rename_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!name_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "name",
+          "");
+      }
+
+      if (!action_.present ())
+      {
+        this->action_.set (action_default_value ());
+      }
+    }
+
+    Value_t* Value_t::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class Value_t (*this, f, c);
+    }
+
+    Value_t& Value_t::
+    operator= (const Value_t& x)
+    {
+      if (this != &x)
+      {
+        static_cast< ::xml_schema::type& > (*this) = x;
+        this->description_ = x.description_;
+        this->name_ = x.name_;
+        this->action_ = x.action_;
+        this->rename_ = x.rename_;
+      }
+
+      return *this;
+    }
+
+    Value_t::
+    ~Value_t ()
+    {
+    }
+
+    // Selection_t
+    //
+
+    Selection_t::
+    Selection_t (const name_type& name)
+    : ::arolios::model::Classifier_t (name),
+      option_ (this)
+    {
+    }
+
+    Selection_t::
+    Selection_t (const Selection_t& x,
+                 ::xml_schema::flags f,
+                 ::xml_schema::container* c)
+    : ::arolios::model::Classifier_t (x, f, c),
+      option_ (x.option_, f, this)
+    {
+    }
+
+    Selection_t::
+    Selection_t (const ::xercesc::DOMElement& e,
+                 ::xml_schema::flags f,
+                 ::xml_schema::container* c)
+    : ::arolios::model::Classifier_t (e, f | ::xml_schema::flags::base, c),
+      option_ (this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void Selection_t::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      this->::arolios::model::Classifier_t::parse (p, f);
+
+      for (; p.more_content (); p.next_content (false))
+      {
+        const ::xercesc::DOMElement& i (p.cur_element ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        // option
+        //
+        if (n.name () == "option" && n.namespace_ ().empty ())
+        {
+          ::std::unique_ptr< option_type > r (
+            option_traits::create (i, f, this));
+
+          this->option_.push_back (::std::move (r));
+          continue;
+        }
+
+        break;
+      }
+    }
+
+    Selection_t* Selection_t::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class Selection_t (*this, f, c);
+    }
+
+    Selection_t& Selection_t::
+    operator= (const Selection_t& x)
+    {
+      if (this != &x)
+      {
+        static_cast< ::arolios::model::Classifier_t& > (*this) = x;
+        this->option_ = x.option_;
+      }
+
+      return *this;
+    }
+
+    Selection_t::
+    ~Selection_t ()
+    {
+    }
+
+    // Constraint_t
+    //
+
+    Constraint_t::
+    Constraint_t (const name_type& name,
+                  const expression_type& expression)
+    : ::arolios::model::Element_t (name),
+      expression_ (expression, this)
+    {
+    }
+
+    Constraint_t::
+    Constraint_t (const Constraint_t& x,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
+    : ::arolios::model::Element_t (x, f, c),
+      expression_ (x.expression_, f, this)
+    {
+    }
+
+    Constraint_t::
+    Constraint_t (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
+    : ::arolios::model::Element_t (e, f | ::xml_schema::flags::base, c),
+      expression_ (this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, true, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void Constraint_t::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      this->::arolios::model::Element_t::parse (p, f);
+
+      p.reset_attributes ();
+
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "expression" && n.namespace_ ().empty ())
+        {
+          this->expression_.set (expression_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!expression_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "expression",
+          "");
+      }
+    }
+
+    Constraint_t* Constraint_t::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class Constraint_t (*this, f, c);
+    }
+
+    Constraint_t& Constraint_t::
+    operator= (const Constraint_t& x)
+    {
+      if (this != &x)
+      {
+        static_cast< ::arolios::model::Element_t& > (*this) = x;
+        this->expression_ = x.expression_;
+      }
+
+      return *this;
+    }
+
+    Constraint_t::
+    ~Constraint_t ()
+    {
+    }
+
     // Action_t
     //
 
@@ -2243,7 +3742,7 @@ namespace arolios
     Action_t (const ::xercesc::DOMElement& e,
               ::xml_schema::flags f,
               ::xml_schema::container* c)
-    : ::xml_schema::string (e, f, c)
+    : ::xml_schema::token (e, f, c)
     {
       _xsd_Action_t_convert ();
     }
@@ -2252,7 +3751,7 @@ namespace arolios
     Action_t (const ::xercesc::DOMAttr& a,
               ::xml_schema::flags f,
               ::xml_schema::container* c)
-    : ::xml_schema::string (a, f, c)
+    : ::xml_schema::token (a, f, c)
     {
       _xsd_Action_t_convert ();
     }
@@ -2262,7 +3761,7 @@ namespace arolios
               const ::xercesc::DOMElement* e,
               ::xml_schema::flags f,
               ::xml_schema::container* c)
-    : ::xml_schema::string (s, e, f, c)
+    : ::xml_schema::token (s, e, f, c)
     {
       _xsd_Action_t_convert ();
     }
@@ -2308,6 +3807,106 @@ namespace arolios
       ::arolios::model::Action_t::update
     };
 
+    // Range_t
+    //
+
+    Range_t::
+    Range_t (const min_type& min,
+             const max_type& max)
+    : ::xml_schema::type (),
+      min_ (min, this),
+      max_ (max, this)
+    {
+    }
+
+    Range_t::
+    Range_t (const Range_t& x,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
+    : ::xml_schema::type (x, f, c),
+      min_ (x.min_, f, this),
+      max_ (x.max_, f, this)
+    {
+    }
+
+    Range_t::
+    Range_t (const ::xercesc::DOMElement& e,
+             ::xml_schema::flags f,
+             ::xml_schema::container* c)
+    : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+      min_ (this),
+      max_ (this)
+    {
+      if ((f & ::xml_schema::flags::base) == 0)
+      {
+        ::xsd::cxx::xml::dom::parser< char > p (e, false, false, true);
+        this->parse (p, f);
+      }
+    }
+
+    void Range_t::
+    parse (::xsd::cxx::xml::dom::parser< char >& p,
+           ::xml_schema::flags f)
+    {
+      while (p.more_attributes ())
+      {
+        const ::xercesc::DOMAttr& i (p.next_attribute ());
+        const ::xsd::cxx::xml::qualified_name< char > n (
+          ::xsd::cxx::xml::dom::name< char > (i));
+
+        if (n.name () == "min" && n.namespace_ ().empty ())
+        {
+          this->min_.set (min_traits::create (i, f, this));
+          continue;
+        }
+
+        if (n.name () == "max" && n.namespace_ ().empty ())
+        {
+          this->max_.set (max_traits::create (i, f, this));
+          continue;
+        }
+      }
+
+      if (!min_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "min",
+          "");
+      }
+
+      if (!max_.present ())
+      {
+        throw ::xsd::cxx::tree::expected_attribute< char > (
+          "max",
+          "");
+      }
+    }
+
+    Range_t* Range_t::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class Range_t (*this, f, c);
+    }
+
+    Range_t& Range_t::
+    operator= (const Range_t& x)
+    {
+      if (this != &x)
+      {
+        static_cast< ::xml_schema::type& > (*this) = x;
+        this->min_ = x.min_;
+        this->max_ = x.max_;
+      }
+
+      return *this;
+    }
+
+    Range_t::
+    ~Range_t ()
+    {
+    }
+
     // Min_occurrences_t
     //
 
@@ -2315,7 +3914,7 @@ namespace arolios
     Min_occurrences_t (const ::xercesc::DOMElement& e,
                        ::xml_schema::flags f,
                        ::xml_schema::container* c)
-    : ::xml_schema::string (e, f, c)
+    : ::xml_schema::token (e, f, c)
     {
       _xsd_Min_occurrences_t_convert ();
     }
@@ -2324,7 +3923,7 @@ namespace arolios
     Min_occurrences_t (const ::xercesc::DOMAttr& a,
                        ::xml_schema::flags f,
                        ::xml_schema::container* c)
-    : ::xml_schema::string (a, f, c)
+    : ::xml_schema::token (a, f, c)
     {
       _xsd_Min_occurrences_t_convert ();
     }
@@ -2334,7 +3933,7 @@ namespace arolios
                        const ::xercesc::DOMElement* e,
                        ::xml_schema::flags f,
                        ::xml_schema::container* c)
-    : ::xml_schema::string (s, e, f, c)
+    : ::xml_schema::token (s, e, f, c)
     {
       _xsd_Min_occurrences_t_convert ();
     }
@@ -2385,7 +3984,7 @@ namespace arolios
     Max_occurrences_t (const ::xercesc::DOMElement& e,
                        ::xml_schema::flags f,
                        ::xml_schema::container* c)
-    : ::xml_schema::string (e, f, c)
+    : ::xml_schema::token (e, f, c)
     {
       _xsd_Max_occurrences_t_convert ();
     }
@@ -2394,7 +3993,7 @@ namespace arolios
     Max_occurrences_t (const ::xercesc::DOMAttr& a,
                        ::xml_schema::flags f,
                        ::xml_schema::container* c)
-    : ::xml_schema::string (a, f, c)
+    : ::xml_schema::token (a, f, c)
     {
       _xsd_Max_occurrences_t_convert ();
     }
@@ -2404,7 +4003,7 @@ namespace arolios
                        const ::xercesc::DOMElement* e,
                        ::xml_schema::flags f,
                        ::xml_schema::container* c)
-    : ::xml_schema::string (s, e, f, c)
+    : ::xml_schema::token (s, e, f, c)
     {
       _xsd_Max_occurrences_t_convert ();
     }
@@ -2447,6 +4046,152 @@ namespace arolios
       ::arolios::model::Max_occurrences_t::many,
       ::arolios::model::Max_occurrences_t::one
     };
+
+    // KindOfCollection_t
+    //
+
+    KindOfCollection_t::
+    KindOfCollection_t (const ::xercesc::DOMElement& e,
+                        ::xml_schema::flags f,
+                        ::xml_schema::container* c)
+    : ::xml_schema::token (e, f, c)
+    {
+      _xsd_KindOfCollection_t_convert ();
+    }
+
+    KindOfCollection_t::
+    KindOfCollection_t (const ::xercesc::DOMAttr& a,
+                        ::xml_schema::flags f,
+                        ::xml_schema::container* c)
+    : ::xml_schema::token (a, f, c)
+    {
+      _xsd_KindOfCollection_t_convert ();
+    }
+
+    KindOfCollection_t::
+    KindOfCollection_t (const ::std::string& s,
+                        const ::xercesc::DOMElement* e,
+                        ::xml_schema::flags f,
+                        ::xml_schema::container* c)
+    : ::xml_schema::token (s, e, f, c)
+    {
+      _xsd_KindOfCollection_t_convert ();
+    }
+
+    KindOfCollection_t* KindOfCollection_t::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class KindOfCollection_t (*this, f, c);
+    }
+
+    KindOfCollection_t::value KindOfCollection_t::
+    _xsd_KindOfCollection_t_convert () const
+    {
+      ::xsd::cxx::tree::enum_comparator< char > c (_xsd_KindOfCollection_t_literals_);
+      const value* i (::std::lower_bound (
+                        _xsd_KindOfCollection_t_indexes_,
+                        _xsd_KindOfCollection_t_indexes_ + 4,
+                        *this,
+                        c));
+
+      if (i == _xsd_KindOfCollection_t_indexes_ + 4 || _xsd_KindOfCollection_t_literals_[*i] != *this)
+      {
+        throw ::xsd::cxx::tree::unexpected_enumerator < char > (*this);
+      }
+
+      return *i;
+    }
+
+    const char* const KindOfCollection_t::
+    _xsd_KindOfCollection_t_literals_[4] =
+    {
+      "array",
+      "list",
+      "set",
+      "bag"
+    };
+
+    const KindOfCollection_t::value KindOfCollection_t::
+    _xsd_KindOfCollection_t_indexes_[4] =
+    {
+      ::arolios::model::KindOfCollection_t::array,
+      ::arolios::model::KindOfCollection_t::bag,
+      ::arolios::model::KindOfCollection_t::list,
+      ::arolios::model::KindOfCollection_t::set
+    };
+
+    // HighLimit_t
+    //
+
+    HighLimit_t::
+    HighLimit_t ()
+    : ::xml_schema::token ()
+    {
+    }
+
+    HighLimit_t::
+    HighLimit_t (const char* _xsd_token_base)
+    : ::xml_schema::token (_xsd_token_base)
+    {
+    }
+
+    HighLimit_t::
+    HighLimit_t (const ::std::string& _xsd_token_base)
+    : ::xml_schema::token (_xsd_token_base)
+    {
+    }
+
+    HighLimit_t::
+    HighLimit_t (const ::xml_schema::token& _xsd_token_base)
+    : ::xml_schema::token (_xsd_token_base)
+    {
+    }
+
+    HighLimit_t::
+    HighLimit_t (const HighLimit_t& x,
+                 ::xml_schema::flags f,
+                 ::xml_schema::container* c)
+    : ::xml_schema::token (x, f, c)
+    {
+    }
+
+    HighLimit_t::
+    HighLimit_t (const ::xercesc::DOMElement& e,
+                 ::xml_schema::flags f,
+                 ::xml_schema::container* c)
+    : ::xml_schema::token (e, f, c)
+    {
+    }
+
+    HighLimit_t::
+    HighLimit_t (const ::xercesc::DOMAttr& a,
+                 ::xml_schema::flags f,
+                 ::xml_schema::container* c)
+    : ::xml_schema::token (a, f, c)
+    {
+    }
+
+    HighLimit_t::
+    HighLimit_t (const ::std::string& s,
+                 const ::xercesc::DOMElement* e,
+                 ::xml_schema::flags f,
+                 ::xml_schema::container* c)
+    : ::xml_schema::token (s, e, f, c)
+    {
+    }
+
+    HighLimit_t* HighLimit_t::
+    _clone (::xml_schema::flags f,
+            ::xml_schema::container* c) const
+    {
+      return new class HighLimit_t (*this, f, c);
+    }
+
+    HighLimit_t::
+    ~HighLimit_t ()
+    {
+    }
   }
 }
 

@@ -1,9 +1,10 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
+#include "omm/Named_element.h"
 #include <omm/Enumeration.h>
 #include <omm/Package.h>
 #include <omm/Visitor.h>
@@ -106,7 +107,7 @@ void Enumeration::recursive_lc_status(const omm::Lc_status p_status)
 }
 
 
-std::shared_ptr<Named_element> Enumeration::find_element ( const std::string& p_name) const {
+std::shared_ptr<Named_element> Enumeration::find_element( const std::string& p_name) const {
    auto search = values_.find(p_name) ;
    return  (search== values_.end()) ? nullptr : search->second;
 }        

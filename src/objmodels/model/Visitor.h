@@ -5,6 +5,8 @@
  *
  */
 #pragma once
+#include "omm/Selection_type.h"
+#include "omm/Specific_type.h"
 #include <model/Model_element_create.h>
 #include <model/Model_element_delete.h>
 #include <model/Model_element_update.h>
@@ -23,6 +25,8 @@ namespace omm {
     class Association;
     class Property;
     class Package;
+    class Selection;
+    class Specific;
     
 }
 
@@ -56,9 +60,9 @@ public:
     virtual void visit (const Model_element_create<Enumeration_t, omm::Enumeration >& p_obj)  = 0 ;
     virtual void visit (const Model_element_delete<Enumeration_t, omm::Enumeration >& p_obj)  = 0 ;
     virtual void visit (const Model_element_update<Enumeration_t, omm::Enumeration >& p_obj)  = 0 ;
-    virtual void visit (const Model_element_create<Element_t, omm::Enum_value >& p_obj)  = 0 ;
-    virtual void visit (const Model_element_delete<Element_t, omm::Enum_value >& p_obj)  = 0 ;
-    virtual void visit (const Model_element_update<Element_t, omm::Enum_value >& p_obj)  = 0 ; 
+    virtual void visit (const Model_element_create<Value_t, omm::Enum_value >& p_obj)  = 0 ;
+    virtual void visit (const Model_element_delete<Value_t, omm::Enum_value >& p_obj)  = 0 ;
+    virtual void visit (const Model_element_update<Value_t, omm::Enum_value >& p_obj)  = 0 ; 
     virtual void visit (const Model_element_create<Type_t, omm::Composite_type >& p_obj)  = 0;
     virtual void visit (const Model_element_delete<Type_t, omm::Composite_type >& p_obj)  = 0;
     virtual void visit (const Model_element_update<Type_t, omm::Composite_type >& p_obj)  = 0;
@@ -83,6 +87,15 @@ public:
     virtual void visit (const Model_element_create<Domain_t, omm::Package >& p_obj)  = 0;
     virtual void visit (const Model_element_delete<Domain_t, omm::Package >& p_obj)  = 0 ;
     virtual void visit (const Model_element_update<Domain_t, omm::Package >& p_obj)  = 0;
+    virtual void visit (const Model_element_create<Selection_t, omm::Selection_type >& p_obj)  = 0;
+    virtual void visit (const Model_element_delete<Selection_t, omm::Selection_type >& p_obj)  = 0 ;
+    virtual void visit (const Model_element_update<Selection_t, omm::Selection_type >& p_obj)  = 0;
+    virtual void visit (const Model_element_create<Specific_t, omm::Specific_type >& p_obj)  = 0;
+    virtual void visit (const Model_element_delete<Specific_t, omm::Specific_type >& p_obj)  = 0 ;
+    virtual void visit (const Model_element_update<Specific_t, omm::Specific_type >& p_obj)  = 0;
+    virtual void visit (const Model_element_create<Constraint_t, omm::Constraint >& p_obj)  = 0;
+    virtual void visit (const Model_element_delete<Constraint_t, omm::Constraint >& p_obj)  = 0 ;
+    virtual void visit (const Model_element_update<Constraint_t, omm::Constraint >& p_obj)  = 0;
   
     virtual void visit (const Root_loader& p_obj) = 0 ;
 protected:

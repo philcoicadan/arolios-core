@@ -4,6 +4,7 @@
  * License: LGPL-3.0-or-later
  *
  */
+
 #include <common/Object_model_info.h>
 #include <omm/Model_factory.h>
 #include <qry/Model_retriever.h>
@@ -11,6 +12,8 @@
 #include <qry/Util.h>
 #include <util/String.h>
 #include <exception/Exceptions.h>
+#include <omm/Selection_type.h>
+#include <omm/Specific_type.h>
 
 
 
@@ -93,6 +96,8 @@ template <typename T> void Object_model_info::insert (const std::shared_ptr<T>& 
 template void Object_model_info::insert<omm::Class> (const std::shared_ptr<omm::Class>& p_elt) ;
 template void Object_model_info::insert<omm::Composite_type> (const std::shared_ptr<omm::Composite_type>& p_elt) ;
 template void Object_model_info::insert<omm::Primitive_type> (const std::shared_ptr<omm::Primitive_type>& p_elt) ;
+template void Object_model_info::insert<omm::Selection_type> (const std::shared_ptr<omm::Selection_type>& p_elt) ;
+template void Object_model_info::insert<omm::Specific_type> (const std::shared_ptr<omm::Specific_type>& p_elt) ;
 template void Object_model_info::insert<omm::Enumeration> (const std::shared_ptr<omm::Enumeration>& p_elt) ;
 template void Object_model_info::insert<omm::Association> (const std::shared_ptr<omm::Association>& p_elt) ;
 
@@ -118,10 +123,13 @@ template <typename T> void Object_model_info::rename ( const std::shared_ptr<T>&
 template void Object_model_info::rename<omm::Class> (const std::shared_ptr<omm::Class>& p_elt, const std::string& p_new_name) ;
 template void Object_model_info::rename<omm::Composite_type> (const std::shared_ptr<omm::Composite_type>& p_elt, const std::string& p_new_name) ;
 template void Object_model_info::rename<omm::Primitive_type> (const std::shared_ptr<omm::Primitive_type>& p_elt, const std::string& p_new_name) ;
+template void Object_model_info::rename<omm::Selection_type> (const std::shared_ptr<omm::Selection_type>& p_elt, const std::string& p_new_name) ;
+template void Object_model_info::rename<omm::Specific_type> (const std::shared_ptr<omm::Specific_type>& p_elt, const std::string& p_new_name) ;
 template void Object_model_info::rename<omm::Enumeration> (const std::shared_ptr<omm::Enumeration>& p_elt, const std::string& p_new_name) ;
 template void Object_model_info::rename<omm::Association> (const std::shared_ptr<omm::Association>& p_elt, const std::string& p_new_name) ;
 template void Object_model_info::rename<omm::Property> (const std::shared_ptr<omm::Property>& p_elt, const std::string& p_new_name) ;
 template void Object_model_info::rename<omm::Enum_value> (const std::shared_ptr<omm::Enum_value>& p_elt, const std::string& p_new_name) ;
+template void Object_model_info::rename<omm::Constraint> (const std::shared_ptr<omm::Constraint>& p_elt, const std::string& p_new_name) ;
 
 template <> void Object_model_info::rename ( const std::shared_ptr<omm::Package>& p_domain, const std::string& p_new_name ) {
     if ( p_new_name != p_domain->name() ) {
@@ -138,6 +146,8 @@ template <typename T>  void Object_model_info::eliminate (const std::shared_ptr<
 template void Object_model_info::eliminate<omm::Class> (const std::shared_ptr<omm::Class>& p_elt) ;
 template void Object_model_info::eliminate<omm::Composite_type> (const std::shared_ptr<omm::Composite_type>& p_elt) ;
 template void Object_model_info::eliminate<omm::Primitive_type> (const std::shared_ptr<omm::Primitive_type>& p_elt) ;
+template void Object_model_info::eliminate<omm::Selection_type> (const std::shared_ptr<omm::Selection_type>& p_elt) ;
+template void Object_model_info::eliminate<omm::Specific_type> (const std::shared_ptr<omm::Specific_type>& p_elt) ;
 template void Object_model_info::eliminate<omm::Enumeration> (const std::shared_ptr<omm::Enumeration>& p_elt) ;
 template void Object_model_info::eliminate<omm::Association> (const std::shared_ptr<omm::Association>& p_elt) ;
 
@@ -157,6 +167,10 @@ template <>  void Object_model_info::eliminate (const std::shared_ptr<omm::Prope
 template <>  void Object_model_info::eliminate (const std::shared_ptr<omm::Enum_value>& p_prop) {
 
     // nothing to do
+}
+
+template <> void Object_model_info::eliminate<omm::Constraint> (const std::shared_ptr<omm::Constraint>& p_elt) {
+    // Nothing to do
 }
 
 

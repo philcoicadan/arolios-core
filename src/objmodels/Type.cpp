@@ -13,6 +13,7 @@
 #include <model/Model_composite.h>
 #include "Model_composite.tpp"
 #include <model/xam.h>
+#include <exception/Exceptions.h>
 
 
 
@@ -25,8 +26,8 @@ namespace arolios::model {
 
 
 template <> void Model_element<Type_t, omm::Composite_type >::fill_children() {
- 
-    Model_composite<Type_property_t, omm::Property, Model_element> container (*this);
+  
+     Model_composite<Type_property_t, omm::Property, Model_element> container (*this);
 	for (Type_t::property_const_iterator j (this->xml_obj_.property().begin ());
 			j!=this->xml_obj_.property().end ();
 			++j)
@@ -43,7 +44,7 @@ template <> void Model_element<Type_t, omm::Composite_type >::fill_children() {
 
 template class Model_element<Type_t, omm::Composite_type > ;
 
-template class Model_composite<Type_property_t, omm::Property, Model_element>;
 
+template class Model_composite<Type_t, omm::Composite_type,  Model_element>;
 }
 

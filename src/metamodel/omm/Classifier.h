@@ -40,6 +40,7 @@ namespace omm {
 		virtual bool has_properties () const ;
 		virtual bool has_generalizations () const ;
 		virtual bool has_specializations () const ;
+        virtual bool has_id () const ;
         virtual bool has_elements (bool p_active_only = true) const override;
         virtual bool is_abstract() const { return is_abstract_; }
         virtual void is_abstract( const bool p_is_abstract) { is_abstract_ = p_is_abstract; }

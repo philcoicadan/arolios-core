@@ -189,7 +189,7 @@ std::shared_ptr<omm::Property_view> Base_classifier_config::add_property_view (c
         prop_view->is_inherited (p_is_inherited);
         if ( p_prop->has_primitive_type() ) {
             prop_view->metatype(omm::Property_view::Metatype::_primitive);
-        } else if (p_prop->has_referencing_type()) {
+        } else if (p_prop->has_instance_type()) {
                 prop_view->metatype(omm::Property_view::Metatype::_class);
         } else if  (p_prop->has_enum_type()) {
             prop_view->metatype(omm::Property_view::Metatype::_enumeration);

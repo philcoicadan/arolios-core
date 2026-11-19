@@ -12,11 +12,16 @@
 #include <omm/Primitive_type.h>
 #include <omm/Class.h>
 #include <omm/Association.h>
+#include <omm/Specific_type.h>
+#include <omm/Selection_type.h>
 #include <model/xam.h>
 #include <model/Model_composite.h>
+#include <model/Model_element_create.h>
 #include <model/Root_loader.h>
 #include "Model_composite.tpp"
 #include <model/Domain_post_implementor.h>
+#include <exception/Exceptions.h>
+#include <util/String.h>
 
 
 
@@ -32,10 +37,9 @@ namespace arolios::model {
 
 
 template <> void Model_element<Domain_t, omm::Package >::fill_children() {
+     
  
-    
-
-    	// enumerations
+     	// enumerations
     Model_composite<Enumeration_t, omm::Enumeration, Model_element > cont_enum (*this);
 	for (Domain_t::enumeration_const_iterator i (this->xml_obj_.enumeration().begin ());
 			i != this->xml_obj_.enumeration ().end ();
@@ -58,7 +62,7 @@ template <> void Model_element<Domain_t, omm::Package >::fill_children() {
 
 	}
 
-	//types
+	// composite types
     Model_composite<Type_t, omm::Composite_type, Model_element > cont_type (*this);
 
 	for (Domain_t::type_const_iterator i (this->xml_obj_.type().begin ());
@@ -67,6 +71,26 @@ template <> void Model_element<Domain_t, omm::Package >::fill_children() {
 	{
         
 		cont_type.insert_child(*i);
+
+	}
+
+	//specifics
+    Model_composite<Specific_t, omm::Specific_type, Model_element > cont_specific (*this);
+	for (Domain_t::specific_const_iterator i (this->xml_obj_.specific().begin ());
+			i != this->xml_obj_.specific ().end () ;
+			++i)
+	{
+     		cont_specific.insert_child(*i);
+
+	}
+
+    //selections
+    Model_composite<Selection_t, omm::Selection_type, Model_element > cont_selection (*this);
+	for (Domain_t::selection_const_iterator i (this->xml_obj_.selection().begin ());
+			i != this->xml_obj_.selection ().end () ;
+			++i)
+	{
+        cont_selection.insert_child(*i);
 
 	}
 
@@ -149,15 +173,10 @@ template <> void Model_element<Domain_t, omm::Package >::execute () {
 
 template class Model_element<Domain_t, omm::Package > ;
 
-template class Model_composite<Enumeration_t, omm::Enumeration, Model_element >;
 
-template class Model_composite<Type_t, omm::Composite_type,  Model_element>;
 
-template class Model_composite<Primitive_t, omm::Primitive_type,  Model_element>;
 
-template class Model_composite<Class_t, omm::Class,  Model_element>;
 
-template class Model_composite<Association_t, omm::Association, Model_element>;
 
 }
 

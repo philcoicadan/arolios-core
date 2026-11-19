@@ -35,6 +35,10 @@ bool  Classifier::has_specializations () const {
 	return !specializations_.empty();
 }
 
+bool Classifier::has_id () const {
+    return false;
+}
+
 const std::unordered_map<std::string,std::shared_ptr<Property>>& Classifier::all_elements_as_property () const {
     return all_props_;
 }
@@ -109,17 +113,37 @@ void Classifier::insert_element (const std::shared_ptr<Named_element>& p_elem) {
     auto && elem = std::dynamic_pointer_cast<Property>(p_elem);
     if (elem) {
         properties_.insert(std::make_pair<const std::string&,const std::shared_ptr<Property>&>(elem->name(),elem));
+    } 
+    else {
+      auto &&ctt = std::dynamic_pointer_cast<Constraint>(p_elem);
+      if (ctt) {
+        constraints_.insert(std::make_pair<const std::string &,
+                                           const std::shared_ptr<Constraint> &>(
+            ctt->name(), ctt));
+      } else {
+        throw exception::Failure(p_elem->name() + " is not an element contained in a classifier");
+      }
     }
 }
 
 void Classifier::erase_element (const std::shared_ptr<Named_element>& p_elem) {
-    
+
+  auto &&elem = std::dynamic_pointer_cast<Property>(p_elem);
+  if (elem) {
     auto search = properties_.find(p_elem->name());
-    if ( search != properties_.end() ) {
-        properties_.erase (search->first) ;
+    if (search != properties_.end()) {
+      properties_.erase(search->first);
     } else {
-        throw exception::Failure("element " + p_elem->name() + " not found" );
+      throw exception::Failure("element " + p_elem->name() + " not found");
     }
+  } else {
+    auto search2 = constraints_.find(p_elem->name());
+    if (search2 != constraints_.end()) {
+      constraints_.erase(search2->first);
+    } else {
+      throw exception::Failure("element " + p_elem->name() + " not found");
+    }
+  }
 }
 
 void Classifier::rename_element (const std::shared_ptr<Packageable_element>& p_elem, const std::string& p_new_name) {
@@ -128,6 +152,18 @@ void Classifier::rename_element (const std::shared_ptr<Packageable_element>& p_e
         properties_.insert(std::make_pair<const std::string&,const std::shared_ptr<Property>&>(p_new_name,elem));
         properties_.erase (elem->name());
     }
+    else {
+      auto &&ctt = std::dynamic_pointer_cast<Constraint>(p_elem);
+      if (ctt) {
+        constraints_.insert(std::make_pair<const std::string &,
+                                           const std::shared_ptr<Constraint> &>(
+            p_new_name, ctt));
+        constraints_.erase(ctt->name());
+      } else {
+        throw exception::Failure(p_elem->name() + " is not an element contained in a classifier");
+      }
+    }
+    
 }
 
 
@@ -200,10 +236,14 @@ bool Classifier::has_elements (bool p_active_only) const {
     
     auto elts = own_properties();
     if (! p_active_only) {
-        return !elts.empty();
+        return !elts.empty() || !constraints_.empty();
     } else {
         bool result = false;
         for (auto  it = elts.begin(); it != elts.end() && result == false ; ++it ) {
+            if (it->second->lc_status() != Lc_status::active) continue;
+            result = true;
+        }
+        for (auto  it = constraints_.begin(); it != constraints_.end() && result == false ; ++it ) {
             if (it->second->lc_status() != Lc_status::active) continue;
             result = true;
         }
@@ -218,6 +258,10 @@ void Classifier::recursive_lc_status(const omm::Lc_status p_status)
     for ( auto  it = elts.begin(); it != elts.end()  ; ++it ) {
         it->second->lc_status ( p_status );
 
+    }
+
+    for (auto it = constraints_.begin(); it != constraints_.end(); ++it) {
+      it->second->lc_status(p_status);
     }
 
     lc_status ( p_status );
@@ -239,10 +283,19 @@ void Classifier::own_namespace( const std::shared_ptr<Namespace>& p_parent) {
     }
 }
 
-
-std::shared_ptr<Named_element> Classifier::find_element ( const std::string& p_name) const {
-   auto search = properties_.find(p_name) ;
-   return  (search== properties_.end()) ? nullptr : search->second;
+std::shared_ptr<Named_element>
+Classifier::find_element(const std::string &p_name) const {
+  auto search = properties_.find(p_name);
+  if (search != properties_.end()) {
+    return search->second;
+  } else {
+    auto search2 = constraints_.find(p_name);
+    if (search2 != constraints_.end()) {
+      return search2->second;
+    } else {
+      return nullptr;
+    }
+  }
 }
 
 std::shared_ptr<Namespace> Classifier::own_namespace() const  {

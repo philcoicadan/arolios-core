@@ -34,6 +34,9 @@ namespace arolios {
 namespace omm
 {
 
+class Specific_type;
+class Collection_attributes;
+
 class Model_factory
 {
 public:
@@ -49,12 +52,14 @@ public:
 	virtual std::shared_ptr<omm::Composite_type> make_composite_type(const std::string& p_name, const std::shared_ptr<omm::Package>& p_package, const omm::Lc_status p_status = omm::Lc_status::active, const std::string& p_desc = std::string());
 	virtual std::shared_ptr<omm::Primitive_type> make_primitive_type(const std::string& p_name, const std::shared_ptr<omm::Package>& p_package, const util::Native_type& p_native_type, const omm::Lc_status p_status = omm::Lc_status::active, const std::string& p_desc = std::string());
 	virtual std::shared_ptr<omm::Enumeration> make_enumeration(const std::string& p_name, const std::shared_ptr<omm::Package>& p_package, const omm::Lc_status p_status = omm::Lc_status::active, const std::string& p_desc = std::string());
-	virtual std::shared_ptr<omm::Association> make_association(const std::string& p_name,const std::shared_ptr<omm::Package>& p_package, const omm::Lc_status p_status = omm::Lc_status::active, const std::string& p_desc = std::string());
+	virtual std::shared_ptr<omm::Association> make_association(const std::string& p_name,const std::shared_ptr<omm::Package>& p_package, const bool p_is_abstract = false, const omm::Lc_status p_status = omm::Lc_status::active, const std::string& p_desc = std::string());
 	virtual std::shared_ptr<omm::Property> make_property(const std::string& p_name, const std::shared_ptr<omm::Classifier>& p_classifier, const std::shared_ptr<const omm::Classifier>& p_type,
 			const int p_min_occurs = 0, const int p_max_occurs = 1, const std::string& p_computed = "", const std::string& p_default = "",  /*const bool p_part_of_id = false,*/ const omm::Lc_status p_status = omm::Lc_status::active, const std::string& p_desc = std::string());
-	virtual std::shared_ptr<omm::Property> make_member_end(const std::string& p_name,const std::shared_ptr<omm::Association>& p_assoc, const std::shared_ptr<const omm::Class>& p_target, const std::shared_ptr<omm::Class>& p_source,
-			const int p_min = 0, const int p_max = -1, const bool p_is_src_class_property = true, const bool p_is_composition = false, /*const bool p_part_of_id = false,*/ const omm::Lc_status p_status = omm::Lc_status::active, const std::string& p_desc = std::string());
+	virtual std::shared_ptr<omm::Property> make_member_end(const std::string& p_name,const std::shared_ptr<omm::Association>& p_assoc, const std::shared_ptr<const omm::Classifier>& p_target, const std::shared_ptr<omm::Classifier>& p_source,
+			const int p_min = 0, const int p_max = -1, const bool p_is_src_class_property = true, const bool p_is_composition = false,  const bool p_is_navigable = true ,/*const bool p_part_of_id = false,*/ const omm::Lc_status p_status = omm::Lc_status::active, const std::string& p_desc = std::string());
 	virtual std::shared_ptr<omm::Constraint> make_constraint( const std::string& p_name, const std::shared_ptr<omm::Classifier>& p_classifier, const std::string& p_expression, const omm::Lc_status p_status = omm::Lc_status::active, const std::string& p_desc = std::string() );
+	virtual std::shared_ptr<omm::Specific_type> make_specific_type( const std::string& p_name, const std::shared_ptr<omm::Package>& p_package, const std::shared_ptr<omm::Classifier>& p_referenced_type, const std::shared_ptr<omm::Collection_attributes>& p_collection = nullptr, const omm::Lc_status p_status = omm::Lc_status::active, const std::string& p_desc = std::string() );
+	virtual std::shared_ptr<omm::Selection_type> make_selection_type( const std::string& p_name, const std::shared_ptr<omm::Package>& p_package , const omm::Lc_status p_status = omm::Lc_status::active, const std::string& p_desc = std::string() );
 	virtual std::shared_ptr<omm::Generalization> make_generalization(const std::shared_ptr<omm::Classifier>& p_general, const std::shared_ptr<omm::Classifier>& p_specific);
 	std::shared_ptr<omm::Persistent_object> make_persistent_object(const std::string& p_id, const std::string& p_scope_id);
  
@@ -86,9 +91,11 @@ private:
     virtual void specific_attributes_update (const std::shared_ptr<omm::Packageable_element>& p_elem, const omm::Element_attributes& p_attrs) ;
     
     virtual void specific_attributes_update (const std::shared_ptr<omm::Class>& p_elem, const omm::Element_attributes& p_attrs) ;
+    virtual void specific_attributes_update (const std::shared_ptr<omm::Association>& p_elem, const omm::Element_attributes& p_attrs) ;
         
     virtual void specific_attributes_update (const std::shared_ptr<omm::Property>& p_elem, const omm::Element_attributes& p_attrs) ;
     virtual void specific_attributes_update (const std::shared_ptr<omm::Primitive_type>& p_elem, const omm::Element_attributes& p_attrs) ;
+    virtual void specific_attributes_update (const std::shared_ptr<omm::Constraint>& p_elem, const omm::Element_attributes& p_attrs) ;
 
 
 };

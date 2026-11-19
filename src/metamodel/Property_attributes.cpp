@@ -10,7 +10,7 @@
 using namespace arolios;
 using namespace arolios::omm;
 
-Property_attributes::Property_attributes() : min_ (0) , max_ (1), aggregation_ (Aggregation_kind::none), type_ (nullptr) , source_member_end_ (nullptr) , is_scp_ (true) {
+Property_attributes::Property_attributes() : min_ (0) , max_ (1), aggregation_ (Aggregation_kind::none), type_ (nullptr) , source_member_end_ (nullptr) , collection_ (nullptr) , is_scp_ (true), is_member_end_ (false), opposite_name_ (""), is_navigable_ (true) {
 
 }
 

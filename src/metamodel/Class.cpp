@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -24,6 +24,10 @@ using namespace arolios::omm;
 
 Class::Class (const bool p_is_abstract) : Classifier (p_is_abstract) {}
 
+
+bool Class::has_id () const {
+    return true;
+}
 
 void Class::accept (Visitor& p_visitor) const {
 	p_visitor.visit(*this);
@@ -147,11 +151,4 @@ const std::string& Class::meta_type() const {
     return mt;
 }
 
-std::shared_ptr<Named_element> Class::find_element ( const std::string& p_name) const {
- 
-
-   // the same name is possible in a more general class
-   auto search = own_properties().find(p_name) ;
-   return  (search== own_properties().end()) ? nullptr : search->second;
-}
     

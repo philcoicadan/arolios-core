@@ -13,6 +13,7 @@
 #include "Model_composite.tpp"
 #include <model/Root_loader.h>
 #include <model/xam.h>
+#include <exception/Exceptions.h>
 
 
 
@@ -26,8 +27,9 @@ namespace arolios::model {
 
 
 template <> void Model_element<Enumeration_t, omm::Enumeration >::fill_children() {
- 
-    Model_composite<Element_t, omm::Enum_value,  Model_element> container (*this);
+  
+
+    Model_composite<Value_t, omm::Enum_value,  Model_element> container (*this);
 	for (Enumeration_t::value_const_iterator j (this->xml_obj_.value().begin ());
 			j!=this->xml_obj_.value().end ();
 			++j)
@@ -36,15 +38,14 @@ template <> void Model_element<Enumeration_t, omm::Enumeration >::fill_children(
     }
         
 	
-
+ 
 }
 
 
 
 template class Model_element<Enumeration_t, omm::Enumeration > ;
 
-template class Model_composite<Element_t, omm::Enum_value, Model_element>;
-
+template class Model_composite<Enumeration_t, omm::Enumeration, Model_element >;
 
 }
 

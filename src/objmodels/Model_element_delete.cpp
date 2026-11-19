@@ -5,6 +5,7 @@
  *
  */
 #include "Model_element_delete.tpp"
+#include "model/xam.h"
 #include <omm/Class.h>
 #include <omm/Package.h>
 #include <omm/Association.h>
@@ -14,7 +15,9 @@
 #include <omm/Enumeration.h>
 #include <omm/Property.h>
 #include <omm/Enum_value.h>
-
+#include <omm/Selection_type.h>
+#include <omm/Specific_type.h>
+#include <omm/Constraint.h>
 
 
 
@@ -27,12 +30,14 @@ template <> bool Model_element_delete<Domain_t, omm::Package >::has_children() c
         !this->xml_obj_.association().empty() ||
         !this->xml_obj_.type().empty() ||
         !this->xml_obj_.primitive().empty() ||
-        !this->xml_obj_.enumeration().empty() ) ? true : false; 
+        !this->xml_obj_.enumeration().empty() ||
+        !this->xml_obj_.specific().empty() ||
+        !this->xml_obj_.selection().empty() ) ? true : false; 
 
 }
 
 template <> bool Model_element_delete<Class_t, omm::Class >::has_children() const {
-    return ( !this->xml_obj_.property().empty() || 
+    return ( !this->xml_obj_.property().empty() || !this->xml_obj_.constraint().empty() || 
         this->xml_obj_.base().present()
     ) ? true : false; 
 
@@ -40,8 +45,8 @@ template <> bool Model_element_delete<Class_t, omm::Class >::has_children() cons
 
     
 template <> bool Model_element_delete<Association_t, omm::Association >::has_children() const {
-    return ( !this->xml_obj_.property().empty() || 
-        !this->xml_obj_.memberEnd().empty()
+    return ( !this->xml_obj_.property().empty() || !this->xml_obj_.constraint().empty() || 
+        !this->xml_obj_.memberEnd().empty()  || this->xml_obj_.base().present()
     ) ? true : false; 
 
 }
@@ -57,6 +62,15 @@ template <> bool Model_element_delete<Type_t, omm::Composite_type >::has_childre
 
 }
   
+template <> bool Model_element_delete<Primitive_t, omm::Primitive_type >::has_children()  const {
+        return ( !this->xml_obj_.constraint().empty()  ) ? true : false; 
+
+}
+
+template <> bool Model_element_delete<Specific_t, omm::Specific_type >::has_children()  const {
+        return ( !this->xml_obj_.constraint().empty()  ) ? true : false; 
+
+}
     
 template class Model_element_delete<Domain_t,omm::Package > ;        
 template class Model_element_delete<Class_t,omm::Class > ;
@@ -69,7 +83,10 @@ template class Model_element_delete<Class_property_t,omm::Property > ;
 template class Model_element_delete<Type_property_t,omm::Property > ;
 template class Model_element_delete<Member_end_t,omm::Property > ;
 
-template class Model_element_delete<Element_t, omm::Enum_value> ;
+template class Model_element_delete<Value_t, omm::Enum_value> ;
+template class Model_element_delete<Selection_t, omm::Selection_type> ;
+template class Model_element_delete<Specific_t, omm::Specific_type> ;
+template class Model_element_delete<Constraint_t, omm::Constraint> ;
 
 
 

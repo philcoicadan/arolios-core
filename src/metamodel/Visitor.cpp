@@ -22,9 +22,8 @@
 #include <omm/Property_by_sub_field.h>
 #include <omm/Enum_value.h>
 #include <omm/Language.h>
-#include <omm/Restriction_type.h>
-#include <omm/Collection_type.h>
-#include <omm/Select_type.h>
+#include <omm/Specific_type.h>
+#include <omm/Selection_type.h>
 #include <omm/Primitive_type.h>
 #include <omm/Composite_type.h>
 #include <iostream>
@@ -51,8 +50,7 @@ void Visitor::visit( const Attribute& p_elem) { std::cout << "Visitor " << typei
 void Visitor::visit( const Property_by_sub_field& p_elem) { std::cout << "Visitor " << typeid(*this).name() << " not implemented for " << typeid(p_elem).name() << std::endl ; }
 void Visitor::visit( const Enum_value& p_elem) { std::cout << "Visitor " << typeid(*this).name() << " not implemented for " << typeid(p_elem).name() << std::endl ; }
 void Visitor::visit( const Language& p_elem) { std::cout << "Visitor " << typeid(*this).name() << " not implemented for " << typeid(p_elem).name() << std::endl ; }
-void Visitor::visit( const Restriction_type& p_elem) { std::cout << "Visitor " << typeid(*this).name() << " not implemented for " << typeid(p_elem).name() << std::endl ; }
-void Visitor::visit( const Collection_type& p_elem) { std::cout << "Visitor " << typeid(*this).name() << " not implemented for " << typeid(p_elem).name() << std::endl ; }
-void Visitor::visit( const Select_type& p_elem) { std::cout << "Visitor " << typeid(*this).name() << " not implemented for " << typeid(p_elem).name() << std::endl ; }
+void Visitor::visit( const Specific_type& p_elem) { std::cout << "Visitor " << typeid(*this).name() << " not implemented for " << typeid(p_elem).name() << std::endl ; }
+void Visitor::visit( const Selection_type& p_elem) { std::cout << "Visitor " << typeid(*this).name() << " not implemented for " << typeid(p_elem).name() << std::endl ; }
 void Visitor::visit( const Primitive_type& p_elem) { std::cout << "Visitor " << typeid(*this).name() << " not implemented for " << typeid(p_elem).name() << std::endl ; }
 void Visitor::visit( const Composite_type& p_elem) { std::cout << "Visitor " << typeid(*this).name() << " not implemented for " << typeid(p_elem).name() << std::endl ; }

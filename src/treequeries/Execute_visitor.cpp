@@ -410,7 +410,7 @@ void Execute_visitor::visit ( Property& p_elem ) {
                 key = nested->id_name();
             }
                 
-            if ( terminal_prop->has_referencing_type() ) {
+            if ( terminal_prop->has_instance_type() ) {
                 // to be declared by association ends
                 std::string error_msg = "Property "+  terminal_prop->name() + " is not valid in this context" ;
                  

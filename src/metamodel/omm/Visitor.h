@@ -37,9 +37,8 @@ namespace omm {
     class Property_by_sub_field;
 	class Enum_value;
 	class Language;
-	class Restriction_type;
-	class Collection_type;
-	class Select_type;
+	class Specific_type;
+	class Selection_type;
 	class Primitive_type;
 	class Composite_type;
 	
@@ -65,9 +64,8 @@ namespace omm {
         virtual void visit (const Property_by_sub_field& p_elem);
         virtual void visit (const Enum_value& p_elem);
         virtual void visit (const Language& p_elem);
-        virtual void visit (const Restriction_type& p_elem);
-        virtual void visit (const Collection_type& p_elem);
-        virtual void visit (const Select_type& p_elem);
+        virtual void visit (const Specific_type& p_elem);
+        virtual void visit (const Selection_type& p_elem);
         virtual void visit (const Primitive_type& p_elem);
         virtual void visit (const Composite_type& p_elem);
 

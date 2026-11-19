@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2024 Philippe Coicadan. All rights reserved.
+ * Copyright (C) 2024-2026 Philippe Coicadan. All rights reserved.
  * License: LGPL-3.0-or-later
  *
  */
@@ -175,7 +175,7 @@ void Classifier_properties_list::build_property_json (Json::Value& p_jrow, const
 
             build_property_json (jrow_nested_prop, (*k), /*p_prop_v->property()->part_of_id(),*/ csf_->has_required_property(p_prop_v->property()), prop_view_vec) ;
         }
-    } else if ( p_prop_v->property()->has_referencing_type () ) {
+    } else if ( p_prop_v->property()->has_instance_type () ) {
          p_jrow["linked"] = Json::Value ( Json::arrayValue );
         Json::Value& jrow_linked = p_jrow["linked"];
         int ii = 0;

@@ -294,7 +294,7 @@ Json::Value Util::native_to_json(const util::Native_type p_type, const qry::Db_f
 int Util::property_native_type(const std::shared_ptr<const omm::Property>& p_prop) {
 
     int result = -1;
-    if (p_prop->has_referencing_type() ) {
+    if (p_prop->has_instance_type() ) {
         result = static_cast<int>(util::Native_type::bigint);
 
     } else if (p_prop->has_primitive_type () ) {

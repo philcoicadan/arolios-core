@@ -27,7 +27,7 @@ CREATE TABLE am_pk (
 	UNIQUE (name, nesting)
 	);
 
-CREATE TYPE am_elem_t AS ENUM ('type', 'class', 'association', 'enum', 'primitive');
+CREATE TYPE am_elem_t AS ENUM ('type', 'class', 'association', 'enum', 'primitive', 'specific', 'selection');
 
 CREATE TABLE am_p_elem (
 	id serial PRIMARY KEY,
@@ -38,9 +38,9 @@ CREATE TABLE am_p_elem (
 	-- c_date timestamp with time zone NOT NULL,
 	-- m_date	timestamp with time zone NOT NULL,
 	-- version integer NOT NULL CHECK(version > 0),
-	elem_type am_elem_t NOT NULL, -- enum pour type, class, association ou enum
+	elem_type am_elem_t NOT NULL, -- enum pour type, class, association, enum, etc.
 	package integer REFERENCES am_pk ON DELETE CASCADE NOT NULL,
-	base integer REFERENCES am_p_elem, -- elem_types référencés doivent avoir elem_type = class ou type ou association
+	base integer REFERENCES am_p_elem, 
 	UNIQUE (name, package)
 	);
 
@@ -52,6 +52,53 @@ CREATE TABLE am_enum_val (
 	UNIQUE (e_value, e_elem)
 	);
 
+CREATE TABLE am_constraint (
+	id serial PRIMARY KEY,
+	name varchar(64) NOT NULL,
+	description text,
+	lc am_lc DEFAULT 'active',
+	ctt_elem integer REFERENCES am_p_elem ON DELETE CASCADE NOT NULL,
+	ctt_expr text,
+	UNIQUE (name, ctt_elem)
+);
+
+CREATE TABLE am_select_option (
+	id serial PRIMARY KEY,
+    lc am_lc DEFAULT 'active',
+	s_option integer REFERENCES am_p_elem ON DELETE CASCADE NOT NULL,
+	s_elem integer REFERENCES am_p_elem ON DELETE CASCADE NOT NULL, 
+	UNIQUE (s_option, s_elem)
+	
+);
+
+CREATE TABLE am_specific_type (
+	sp_elem integer REFERENCES am_p_elem ON DELETE CASCADE NOT NULL,
+	sp_ref_elem integer REFERENCES am_p_elem ON DELETE CASCADE NOT NULL,
+	PRIMARY KEY (sp_elem)
+
+);
+
+CREATE TYPE am_collect_kind AS ENUM ('array', 'list', 'set', 'bag');
+
+CREATE TABLE am_collection (
+	id serial PRIMARY KEY,
+	c_kind am_collect_kind NOT NULL,
+	c_prop integer REFERENCES am_property ON DELETE CASCADE,
+	c_elem integer REFERENCES am_p_elem ON DELETE CASCADE, -- specific
+	CHECK (c_prop <> NULL OR c_elem <> NULL)
+);  
+
+CREATE TABLE am_range (
+	id serial PRIMARY KEY,
+	r_collection integer REFERENCES am_collection ON DELETE CASCADE NOT NULL,
+	r_dim smallint NOT NULL,
+	r_low integer NOT NULL CHECK(r_low >=0),
+	r_high integer NOT NULL CHECK (r_high >= 1 OR r_high = -1),
+	CHECK (  r_high >= r_low OR  r_high = -1),
+	UNIQUE (r_collection, r_dim)
+);  
+
+
 CREATE TABLE am_property ( 
 	id serial PRIMARY KEY,
 	name varchar(64) NOT NULL,
@@ -62,11 +109,12 @@ CREATE TABLE am_property (
 	p_type integer REFERENCES am_p_elem ON DELETE RESTRICT NOT NULL, -- targetClass for assoc
 	owning_t integer REFERENCES am_p_elem ON DELETE CASCADE NOT NULL, -- type, class or assoc
 	min_occurs integer DEFAULT 0 CHECK(min_occurs >=0),
-	max_occurs integer DEFAULT 1,
+	max_occurs integer DEFAULT 1 CHECK(max_occurs >=1 OR max_occurs = -1),
 	-- deprecated part_of_id boolean DEFAULT FALSE,
 	computed varchar(64), -- only when owning_t is a type or class
 	default_v varchar(64), --only when owning_t is a type or class
-	is_member_end boolean DEFAULT FALSE -- true if a row in am_member_end exists,
+	is_member_end boolean DEFAULT FALSE, -- true if a row in am_member_end exists
+	opposite_name varchar(64), -- name of the opposite property
 	CHECK (  max_occurs >= min_occurs OR  max_occurs = -1),
 	UNIQUE (name, owning_t)
 	);

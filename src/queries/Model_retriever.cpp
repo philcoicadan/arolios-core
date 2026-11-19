@@ -210,7 +210,7 @@ void Model_retriever::retrieve_classifiers ( const std::shared_ptr<omm::Package>
                     // properties retrieved later
                 }
                 else if (elem_type == "association") {
-                    auto && new_assoc = omm::Model_factory::instance().make_association ( row["name"].as<std::string>(), p_pk , lc, desc);
+                    auto && new_assoc = omm::Model_factory::instance().make_association ( row["name"].as<std::string>(), p_pk, row["is_abstract"].as<bool>(), lc, desc);
                     new_classifier = std::static_pointer_cast<omm::Classifier> ( new_assoc ); 
                     if ( row["l_type"].as<std::string>() != "null" ) {
                         auto && new_table = omm::Model_factory::instance().make_table (new_assoc, row["l_name"].as<std::string>());
@@ -228,7 +228,7 @@ void Model_retriever::retrieve_classifiers ( const std::shared_ptr<omm::Package>
                 new_classifier->persistent_attributes ( std::to_string(id), "am_p_elem" ) ;
                 if ( ! row["base"].isNull() ) {
                     unsigned int base_id = row["base"].as<unsigned int>();
-                    auto && base = common_obj_->find_domain_element_by_id<omm::Class>(std::to_string( base_id) );
+                    auto && base = common_obj_->find_domain_element_by_id<omm::Classifier>(std::to_string( base_id) );
                     std::shared_ptr<omm::Generalization> && general = omm::Model_factory::instance().make_generalization ( base, new_classifier);
             
                 }
@@ -340,9 +340,9 @@ void Model_retriever::retrieve_properties (const std::shared_ptr<omm::Package>& 
 
                 bool is_src_property = row["c_property"].as<bool>();
                 bool is_composition = row["is_compo"].as<bool>();
-
-                new_prop = omm::Model_factory::instance().make_member_end ( name,assoc,target, source, min_occurs, max_occurs, is_src_property, is_composition, /*part_of_id, */lc, desc );
-
+                bool is_navigable = row["is_navigable"].as<bool>();
+                new_prop = omm::Model_factory::instance().make_member_end ( name,assoc,target, source, min_occurs, max_occurs, is_src_property, is_composition, is_navigable, /*part_of_id, */lc, desc );
+                
             }
 
             unsigned int new_id = row["id"].as<unsigned int>();

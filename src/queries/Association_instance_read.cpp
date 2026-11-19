@@ -71,7 +71,7 @@ void Association_instance_read::build_property_json ( const std::string& p_name,
         for ( const auto & nested_prop : p_prop->nested_properties() ) {
             build_property_json ( nested_prop->name(), nested_prop, p_csf, p_row, p_config, nested_json , p_recursive+1, column_path, p_table_alias );
         }
-    } else if (p_prop->has_referencing_type() ) {
+    } else if (p_prop->has_instance_type() ) {
         p_root_json [p_name]= Json::Value ( Json::objectValue );
         Json::Value& linked_json = p_root_json [p_name];
         auto member_end = p_config->class_instance_member_end ( p_name );

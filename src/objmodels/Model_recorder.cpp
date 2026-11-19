@@ -4,6 +4,8 @@
  * License: LGPL-3.0-or-later
  *
  */
+#include "omm/Selection_type.h"
+#include "omm/Specific_type.h"
 #include <model/Model_recorder.h>
 #include <omm/Persistent_object.h>
 #include <omm/Model_factory.h>
@@ -12,7 +14,7 @@
 #include <appcfg/Base_classifier_config.h>
 #include <model/Model_element.h>
 #include <model/Root_loader.h>
-#include <omm/Class_attributes.h>
+#include <omm/Classifier_attributes.h>
 #include <omm/Property_attributes.h>
 #include <omm/Primitive_attributes.h>
 #include <omm/Primitive_type.h>
@@ -160,18 +162,18 @@ template<> bool Model_recorder::eliminate<omm::Package> ( const std::shared_ptr<
 
 template <> std::shared_ptr<omm::Persistent_object> Model_recorder::create<omm::Class > ( const std::string& p_name, const std::shared_ptr<omm::Packageable_element>& p_parent, const std::string& p_desc, const omm::Element_attributes& p_attrs) const {
     
-    const omm::Class_attributes& attrs = dynamic_cast<const omm::Class_attributes&> (p_attrs);
+    const omm::Classifier_attributes& attrs = dynamic_cast<const omm::Classifier_attributes&> (p_attrs);
     if (attrs.base_) {
-        return store_class (p_name, "class", util::String::stoui(p_parent->id()), util::String::stoui(attrs.base_->id()),attrs.is_abstract_, p_desc);
+        return store_classifier (p_name, "class", util::String::stoui(p_parent->id()), util::String::stoui(attrs.base_->id()),attrs.is_abstract_, p_desc);
     } else {
-        return store_class (p_name, "class", util::String::stoui(p_parent->id()), attrs.is_abstract_, p_desc);
+        return store_classifier (p_name, "class", util::String::stoui(p_parent->id()), attrs.is_abstract_, p_desc);
     }
     
 }
 
 
 
-std::shared_ptr<omm::Persistent_object> Model_recorder::store_class ( const std::string& p_name, const std::string& p_elem_type, const unsigned int p_pk_id, const unsigned int p_base_id , const bool p_is_abstract, const std::string& p_desc) const {
+std::shared_ptr<omm::Persistent_object> Model_recorder::store_classifier ( const std::string& p_name, const std::string& p_elem_type, const unsigned int p_pk_id, const unsigned int p_base_id , const bool p_is_abstract, const std::string& p_desc) const {
 
     std::shared_ptr<omm::Persistent_object> result ;
     try {
@@ -198,7 +200,7 @@ std::shared_ptr<omm::Persistent_object> Model_recorder::store_class ( const std:
     
 }
 
-std::shared_ptr<omm::Persistent_object> Model_recorder::store_class ( const std::string& p_name, const std::string& p_elem_type, const unsigned int p_pk_id , const bool p_is_abstract, const std::string& p_desc) const {
+std::shared_ptr<omm::Persistent_object> Model_recorder::store_classifier ( const std::string& p_name, const std::string& p_elem_type, const unsigned int p_pk_id , const bool p_is_abstract, const std::string& p_desc) const {
 
     std::shared_ptr<omm::Persistent_object> result ;
     try {
@@ -240,9 +242,29 @@ template <> std::shared_ptr<omm::Persistent_object> Model_recorder::create<omm::
     return store_primitive (p_name, util::String::stoui(p_pk->id()), p_desc, qry::Util::get_native_name(attrs.native_type_)) ;
 }
 
+template <> std::shared_ptr<omm::Persistent_object> Model_recorder::create<omm::Selection_type>( const std::string& p_name, const std::shared_ptr<omm::Packageable_element>& p_pk, const std::string& p_desc, const omm::Element_attributes& p_attrs) const {
+   // NYI 
+   return nullptr;
+}
+
+template <> std::shared_ptr<omm::Persistent_object> Model_recorder::create<omm::Specific_type>( const std::string& p_name, const std::shared_ptr<omm::Packageable_element>& p_pk, const std::string& p_desc, const omm::Element_attributes& p_attrs) const {
+   // NYI 
+   return nullptr;
+}
+
+template <> std::shared_ptr<omm::Persistent_object> Model_recorder::create<omm::Constraint>( const std::string& p_name, const std::shared_ptr<omm::Packageable_element>& p_pk, const std::string& p_desc, const omm::Element_attributes& p_attrs) const {
+   // NYI 
+   return nullptr;
+}
+
 template <> std::shared_ptr<omm::Persistent_object> Model_recorder::create<omm::Association >( const std::string& p_name, const std::shared_ptr<omm::Packageable_element>& p_pk, const std::string& p_desc, const omm::Element_attributes& p_attrs) const {
     
-    return store_classifier (p_name, "association", util::String::stoui(p_pk->id()), p_desc) ;
+    const omm::Classifier_attributes& attrs = dynamic_cast<const omm::Classifier_attributes&> (p_attrs);
+    if (attrs.base_) {
+        return store_classifier (p_name, "association", util::String::stoui(p_pk->id()), util::String::stoui(attrs.base_->id()), attrs.is_abstract_, p_desc);
+    } else {
+        return store_classifier (p_name, "association", util::String::stoui(p_pk->id()), attrs.is_abstract_, p_desc);
+    }
 }
 
 template <> std::shared_ptr<omm::Persistent_object> Model_recorder::create<omm::Enum_value >( const std::string& p_name, const std::shared_ptr<omm::Packageable_element>& p_parent, const std::string& p_desc, const omm::Element_attributes& p_attrs) const {
@@ -325,7 +347,7 @@ template<> void Model_recorder::update<omm::Class> ( const std::shared_ptr<omm::
     
     update_classifier (p_elt, p_new_name, p_new_desc) ;
     
-    const omm::Class_attributes& attrs = dynamic_cast<const omm::Class_attributes&> (p_attrs);
+    const omm::Classifier_attributes& attrs = dynamic_cast<const omm::Classifier_attributes&> (p_attrs);
     
     if ( attrs.base_ ) {
         if ( attrs.base_->id() != p_elt->first_base_class()->id() ) {
@@ -359,6 +381,37 @@ template<> void Model_recorder::update<omm::Class> ( const std::shared_ptr<omm::
 template<> void Model_recorder::update<omm::Association> ( const std::shared_ptr<omm::Association>& p_elt, const std::string& p_new_name, const std::string& p_new_desc, const omm::Element_attributes& p_attrs ) const {
     
     update_classifier (p_elt, p_new_name, p_new_desc) ;
+    
+    const omm::Classifier_attributes& attrs = dynamic_cast<const omm::Classifier_attributes&> (p_attrs);
+    
+    if ( attrs.base_ ) {
+        auto current_base = p_elt->first_base_association();
+        if ( !current_base || attrs.base_->id() != current_base->id() ) {
+            std::cout << "WARNING: Update of the association " + p_elt->name() + " : the base association cannot be modified" << std::endl;
+        }
+    }
+    bool update_abstract = attrs.is_abstract_;
+    if (attrs.is_abstract_ == true && !p_elt->is_abstract() ) {
+        std::cout << "WARNING: Update of the association " + p_elt->name() + " : the association cannot become abstract " << std::endl;
+        update_abstract = false;
+    }
+    
+    try {
+        if ( update_abstract !=  p_elt->is_abstract() ) {
+            auto r = transPtr_->execSqlSync ("UPDATE am_p_elem SET is_abstract = $2 WHERE id = $1 RETURNING id",util::String::stoui(p_elt->id()), update_abstract);
+            if ( r.size() == 0 ) {
+                std::string error_msg = "Error in updating model_element " + p_elt->name();
+                throw exception::Sql_error ( error_msg );
+            }
+        }
+        
+
+    } catch ( const exception::Db_exception &e ) {
+         
+        throw e;
+    }
+
+    
 }
 template<> void Model_recorder::update<omm::Composite_type> ( const std::shared_ptr<omm::Composite_type>& p_elt, const std::string& p_new_name, const std::string& p_new_desc, const omm::Element_attributes& p_attrs ) const {
     
@@ -368,6 +421,15 @@ template<> void Model_recorder::update<omm::Primitive_type> ( const std::shared_
     
     update_classifier (p_elt, p_new_name, p_new_desc) ;
 }
+template<> void Model_recorder::update<omm::Specific_type> ( const std::shared_ptr<omm::Specific_type>& p_elt, const std::string& p_new_name, const std::string& p_new_desc, const omm::Element_attributes& p_attrs ) const {
+    
+    update_classifier (p_elt, p_new_name, p_new_desc) ;
+}
+template<> void Model_recorder::update<omm::Selection_type> ( const std::shared_ptr<omm::Selection_type>& p_elt, const std::string& p_new_name, const std::string& p_new_desc, const omm::Element_attributes& p_attrs ) const {
+    
+    update_classifier (p_elt, p_new_name, p_new_desc) ;
+}
+
 template<> void Model_recorder::update<omm::Enumeration> ( const std::shared_ptr<omm::Enumeration>& p_elt, const std::string& p_new_name, const std::string& p_new_desc, const omm::Element_attributes& p_attrs ) const {
     
     update_classifier (p_elt, p_new_name, p_new_desc) ;
@@ -455,10 +517,24 @@ template<> void Model_recorder::update<omm::Property> ( const std::shared_ptr<om
                     throw exception::Sql_error ( error_msg );
                 }
             }
+            if (attrs.is_navigable_ != p_elt->is_navigable()) {
+                auto r = transPtr_->execSqlSync ("UPDATE am_member_end SET is_navigable = $2 WHERE property = $1 RETURNING property",util::String::stoui(p_elt->id()), attrs.is_navigable_);
+                if ( r.size() == 0 ) {
+                    std::string error_msg = "Error in updating model_element " + p_elt->name();
+                    throw exception::Sql_error ( error_msg );
+                }
+            }
         } else {
             //simple property , parameter "required" can be updated
             if (attrs.min_ != p_elt->min_occurs()) {
                  auto r = transPtr_->execSqlSync ("UPDATE am_property SET min_occurs = $2 WHERE id = $1 RETURNING id",util::String::stoui(p_elt->id()), static_cast<int>(attrs.min_) );
+                if ( r.size() == 0 ) {
+                    std::string error_msg = "Error in updating model_element " + p_elt->name();
+                    throw exception::Sql_error ( error_msg );
+                }
+            }
+            if (attrs.max_ != p_elt->max_occurs()) {
+                 auto r = transPtr_->execSqlSync ("UPDATE am_property SET max_occurs = $2 WHERE id = $1 RETURNING id",util::String::stoui(p_elt->id()), static_cast<int>(attrs.max_) );
                 if ( r.size() == 0 ) {
                     std::string error_msg = "Error in updating model_element " + p_elt->name();
                     throw exception::Sql_error ( error_msg );
@@ -474,6 +550,13 @@ template<> void Model_recorder::update<omm::Property> ( const std::shared_ptr<om
 
     
 }
+
+template<> void Model_recorder::update<omm::Constraint> ( const std::shared_ptr<omm::Constraint>& p_elt, const std::string& p_new_name, const std::string& p_new_desc, const omm::Element_attributes& p_attrs ) const {
+    
+//TODO
+//NYI 
+}
+
 
 void Model_recorder::update_classifier ( const std::shared_ptr<omm::Classifier>& p_elt, const std::string& p_new_name, const std::string& p_new_desc ) const {
 
@@ -525,6 +608,16 @@ template<> void Model_recorder::deprecate<omm::Primitive_type> ( const std::shar
     deprecate_classifier (p_elt);
 }
 
+template<> void Model_recorder::deprecate<omm::Specific_type> ( const std::shared_ptr<omm::Specific_type>& p_elt ) const {
+    
+    deprecate_classifier (p_elt);
+}
+
+template<> void Model_recorder::deprecate<omm::Selection_type> ( const std::shared_ptr<omm::Selection_type>& p_elt ) const {
+    
+    deprecate_classifier (p_elt);
+}
+
 template<> void Model_recorder::deprecate<omm::Enumeration> ( const std::shared_ptr<omm::Enumeration>& p_elt ) const {
     
     deprecate_classifier (p_elt);
@@ -562,7 +655,13 @@ template<> void Model_recorder::deprecate<omm::Property> ( const std::shared_ptr
     }
 
 }
+
+template<> void Model_recorder::deprecate<omm::Constraint> ( const std::shared_ptr<omm::Constraint>& p_elt ) const {
     
+    //TODO
+    //NYI
+}
+
     
 void Model_recorder::deprecate_classifier ( const std::shared_ptr<omm::Classifier>& p_elt) const {
 
@@ -600,6 +699,17 @@ template<> bool Model_recorder::eliminate<omm::Primitive_type> ( const std::shar
     
     return eliminate_classifier (p_elt);
 }
+
+template<> bool Model_recorder::eliminate<omm::Specific_type> ( const std::shared_ptr<omm::Specific_type>& p_elt ) const {
+    
+    return eliminate_classifier (p_elt);
+}
+
+template<> bool Model_recorder::eliminate<omm::Selection_type> ( const std::shared_ptr<omm::Selection_type>& p_elt ) const {
+    
+    return eliminate_classifier (p_elt);
+}
+
 
 template<> bool Model_recorder::eliminate<omm::Enumeration> ( const std::shared_ptr<omm::Enumeration>& p_elt ) const {
     
@@ -643,6 +753,13 @@ template<> bool Model_recorder::eliminate<omm::Property> ( const std::shared_ptr
         throw e;
     }
     return true;
+}
+
+template<> bool Model_recorder::eliminate<omm::Constraint> ( const std::shared_ptr<omm::Constraint>& p_elt ) const {
+    
+   //TODO
+   //NYI
+   return false;
 }
 
 bool Model_recorder::eliminate_classifier ( const std::shared_ptr<omm::Classifier>& p_elt ) const {
@@ -757,7 +874,7 @@ std::shared_ptr<omm::Persistent_object> Model_recorder::store_member_end ( const
             
             store_optional_description (p_desc, result);
             
-            r = transPtr_->execSqlSync ("INSERT INTO am_member_end (property, assoc, source, c_property, is_compo) VALUES ($1,$2,$3,$4,$5) RETURNING property",row["id"].as<unsigned int>(), p_pk_assoc_id, p_pk_elem_source_id, p_is_source_class_property, p_is_composition);
+            r = transPtr_->execSqlSync ("INSERT INTO am_member_end (property, assoc, source, c_property, is_compo, is_navigable) VALUES ($1,$2,$3,$4,$5,$6) RETURNING property",row["id"].as<unsigned int>(), p_pk_assoc_id, p_pk_elem_source_id, p_is_source_class_property, p_is_composition, true);
             
             if ( r.size() == 0 ) {
                 std::string error_msg = "Error in recording attributes of association member " + p_name;
